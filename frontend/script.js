@@ -1,156 +1,116 @@
-// ============================================
-// بيانات محاكاة محلية
-// ============================================
-let currentUser = null;
-const users = JSON.parse(localStorage.getItem('forsale_users')) || [];
-let activeCategory = 'all';
-let activeSub = null;
-let unreadNotifications = 2;
-let selectedProductForCheckout = null;  // 👈 متغير جديد لحفظ المنتج الذي سيتم الدفع له
+/***********************
+ * GLOBAL CONFIG
+ ***********************/
+const API_BASE = "https://forsale-production.up.railway.app";
 
-// محاكاة للإشعارات
-let logyMsgs = [
-    { s: 'ai', t: 'مرحباً بك! أنا Logy AI، مساعدك الشخصي في Forsale. كيف يمكنني خدمتك اليوم؟\nيمكنك أن تطلب مني البحث، أو تحليل منتج، أو مراجعة طلباتك.' }
-];
-
-// ============================================
-// وظائف تسجيل الدخول
-// ============================================
-function checkLoginStatus() {
-    currentUser = JSON.parse(localStorage.getItem('forsale_current_user'));
-    if (currentUser) {
-        showApp();
-    } else {
-        document.getElementById('auth-container').style.display = 'flex';
-    }
+/***********************
+ * BASIC HELPERS
+ ***********************/
+function isPiBrowser() {
+  return typeof window.Pi !== "undefined";
 }
 
-function showApp() {
-    closeAllModals();
-    document.getElementById('auth-container').style.display = 'none';
-    document.getElementById('app-container').style.display = 'block';
-    initializeApp();
+/***********************
+ * CHECKOUT FLOW
+ ***********************/
+async function checkout() {
+  if (!isPiBrowser()) {
+    alert("⚠️ افتح التطبيق من Pi Browser لإتمام الدفع");
+    return;
+  }
+
+  try {
+    // بيانات المنتج (مؤقتًا – بعدين هتيجي من state / backend)
+    const product = {
+      productId: "P1",
+      title: "iPhone 15 Pro (Titanium)",
+      amount: 105000
+    };
+
+    await payWithPi(product);
+  } catch (err) {
+    console.error(err);
+    alert("حدث خطأ أثناء بدء عملية الدفع");
+  }
 }
 
-// ============================================
-// عرض التفاصيل وتحديد المنتج (تعديل مهم)
-// ============================================
-function openProductDetail(id) {
-    closeAllModals();
+/***********************
+ * PI PAYMENT
+ ***********************/
+async function payWithPi(product) {
+  // 1️⃣ اطلب من السيرفر إنشاء عملية الدفع
+  const res = await fetch(`${API_BASE}/api/pi/create-payment`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      amount: product.amount,
+      memo: `Forsale | ${product.title}`,
+      metadata: {
+        productId: product.productId
+      }
+    })
+  });
 
-    const product = PRODUCTS.find(p => p.id === id);
-    if (!product) return;
+  if (!res.ok) {
+    throw new Error("Failed to create payment");
+  }
 
-    selectedProductForCheckout = id;  // حفظ المنتج المختار
+  const payment = await res.json();
 
-    document.getElementById('detail-title').textContent = product.name;
-    document.getElementById('detail-price').textContent = `${product.price.toLocaleString()} Pi`;
-    document.getElementById('detail-img').src = product.img;
-    document.getElementById('detail-desc').textContent = product.details;
-    document.getElementById('ai-score').textContent = product.ai_analysis.score.toFixed(1);
-    document.getElementById('ai-market-price').textContent = `${product.ai_analysis.market_price.toLocaleString()} Pi`;
-    document.getElementById('ai-summary').textContent = product.ai_analysis.summary;
+  // 2️⃣ افتح واجهة الدفع الرسمية من Pi
+  Pi.createPayment(
+    {
+      identifier: payment.identifier,
+      amount: payment.amount,
+      memo: payment.memo,
+      metadata: payment.metadata
+    },
+    {
+      onReadyForServerApproval: async function (paymentId) {
+        console.log("🟡 Ready for approval:", paymentId);
 
-    document.getElementById('ai-score-box').style.borderColor = product.ai_analysis.price_state_color;
-    document.getElementById('ai-score').style.color = product.ai_analysis.price_state_color;
+        await fetch(`${API_BASE}/api/pi/approve-payment`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ paymentId })
+        });
+      },
 
-    document.getElementById('shipping-eta').textContent = product.shipping_ai.eta;
-    document.getElementById('shipping-problem').textContent = product.shipping_ai.problem_handling;
-    document.getElementById('shipping-carrier').textContent = product.shipping_ai.carrier;
+      onReadyForServerCompletion: async function (paymentId, txid) {
+        console.log("🟢 Ready for completion:", paymentId, txid);
 
-    const specsList = document.getElementById('specs-list');
-    specsList.innerHTML = Object.entries(product.specs).map(([k, v]) => `
-        <li style="display:flex; justify-content:space-between; padding:5px 0;">
-            <span>${k}</span><strong>${v}</strong>
-        </li>
-    `).join('');
-
-    showDetailTab('description', document.querySelector('.detail-tab-item[data-tab="description"]'));
-
-    document.getElementById('product-detail-modal').style.display = 'block';
-    document.body.style.overflow = 'hidden';
-}
-
-// ============================================
-// عرض تفاصيل الدفع
-// ============================================
-window.openCheckoutModal = () => {
-    closeAllModals();
-
-    if (!selectedProductForCheckout) {
-        alert("لم يتم اختيار منتج");
-        return;
-    }
-
-    const product = PRODUCTS.find(p => p.id === selectedProductForCheckout);
-    if (!product) {
-        alert("المنتج غير موجود");
-        return;
-    }
-
-    document.getElementById('checkout-product-name').textContent = product.name;
-    document.getElementById('checkout-product-price').textContent = `${product.price.toLocaleString()} Pi`;
-
-    document.getElementById('checkoutModal').style.display = 'block';
-    document.body.style.overflow = 'hidden';
-};
-
-// ============================================
-// دفع المنتج عبر Pi
-// ============================================
-async function realPiPayment(productId) {
-    if (!window.Pi) {
-        alert("⚠️ افتح التطبيق من Pi Browser");
-        return;
-    }
-
-    const product = PRODUCTS.find(p => p.id === productId);
-    if (!product) {
-        alert("المنتج غير موجود");
-        return;
-    }
-
-    try {
-        const res = await fetch("https://forsale-production.up.railway.app/api/pi/create-payment", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                amount: product.price,
-                memo: product.name,
-                uid: window.Pi.user?.uid || "guest"
-            })
+        await fetch(`${API_BASE}/api/pi/complete-payment`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ paymentId, txid })
         });
 
-        if (!res.ok) throw new Error("Backend Error");
+        alert("✅ تم الدفع بنجاح! الطلب قيد المعالجة");
+        closeCheckoutModal();
+      },
 
-        const paymentData = await res.json();
+      onCancel: function (paymentId) {
+        console.log("🔴 Payment cancelled:", paymentId);
+        alert("تم إلغاء عملية الدفع");
+      },
 
-        Pi.createPayment(
-            {
-                identifier: paymentData.identifier,
-                amount: paymentData.amount,
-                memo: paymentData.memo,
-                metadata: paymentData.metadata
-            },
-            {
-                onReadyForServerApproval(paymentId) {
-                    console.log("🟡 Ready for approval", paymentId);
-                },
-                onReadyForServerCompletion(paymentId) {
-                    console.log("🟢 Payment completed", paymentId);
-                    alert("✅ تم الدفع بنجاح!");
-                },
-                onCancel(paymentId) {
-                    alert("❌ تم إلغاء الدفع");
-                },
-                onError(error) {
-                    console.error(error);
-                    alert("⚠️ خطأ أثناء الدفع");
-                }
-            }
-        );
-    } catch (err) {
-        console.error(err);
-        alert("فشل الاتصال بالسيرفر");
+      onError: function (error, payment) {
+        console.error("❌ Pi Error:", error, payment);
+        alert("حدث خطأ أثناء الدفع");
+      }
     }
+  );
+}
+
+/***********************
+ * UI FUNCTIONS (أمثلة)
+ ***********************/
+function openCheckoutModal() {
+  document.getElementById("checkoutModal").style.display = "block";
+}
+
+function closeCheckoutModal() {
+  document.getElementById("checkoutModal").style.display = "none";
 }
