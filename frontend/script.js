@@ -572,3 +572,61 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+async function realPiPayment(productId) {
+    if (!window.Pi) {
+        alert("⚠️ افتح التطبيق من Pi Browser");
+        return;
+    }
+
+    const product = PRODUCTS.find(p => p.id === productId);
+    if (!product) {
+        alert("المنتج غير موجود");
+        return;
+    }
+
+    try {
+        // 1️⃣ إنشاء Payment من الـ Backend
+        const res = await fetch("https://forsale-production.up.railway.app/api/pi/create-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                amount: product.price,
+                memo: product.name,
+                uid: window.Pi.user?.uid || "guest"
+            })
+        });
+
+        if (!res.ok) throw new Error("Backend Error");
+
+        const paymentData = await res.json();
+
+        // 2️⃣ فتح واجهة الدفع الرسمية
+        Pi.createPayment(
+            {
+                identifier: paymentData.identifier,
+                amount: paymentData.amount,
+                memo: paymentData.memo,
+                metadata: paymentData.metadata
+            },
+            {
+                onReadyForServerApproval(paymentId) {
+                    console.log("🟡 Ready for approval", paymentId);
+                },
+                onReadyForServerCompletion(paymentId) {
+                    console.log("🟢 Payment completed", paymentId);
+                    alert("✅ تم الدفع بنجاح!");
+                },
+                onCancel(paymentId) {
+                    alert("❌ تم إلغاء الدفع");
+                },
+                onError(error) {
+                    console.error(error);
+                    alert("⚠️ خطأ أثناء الدفع");
+                }
+            }
+        );
+    } catch (err) {
+        console.error(err);
+        alert("فشل الاتصال بالسيرفر");
+    }
+}
