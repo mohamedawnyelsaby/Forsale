@@ -1,20 +1,20 @@
-# Use official Node.js
-FROM node:18
+# Use Node.js LTS
+FROM node:18-alpine
 
 # Create app directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy package files first (to allow layer caching)
+COPY package.json package-lock.json* ./
 
 # Install dependencies
-RUN npm install --force
+RUN npm install --legacy-peer-deps
 
-# Copy source code
+# Copy all project files
 COPY . .
 
-# Expose backend port
+# Expose port
 EXPOSE 3000
 
-# Start server
-CMD ["npm", "start"]
+# Start the app
+CMD ["node", "server.js"]
