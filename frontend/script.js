@@ -1,59 +1,46 @@
-/***********************
+/************************
  * GLOBAL CONFIG
- ***********************/
+ ************************/
 const API_BASE = "https://forsale-production.up.railway.app";
-let selectedProduct = null;
 
-/***********************
- * BASIC HELPERS
- ***********************/
+let selectedProduct = null;
+let activeOrderId = null;
+let paymentInProgress = false;
+
+/************************
+ * PI CHECK
+ ************************/
 function isPiBrowser() {
   return typeof window.Pi !== "undefined";
 }
 
-/***********************
- * LOAD PRODUCTS FROM BACKEND
- ***********************/
-async function loadProducts() {
-  const res = await fetch(`${API_BASE}/api/products`);
-  const products = await res.json();
+/************************
+ * PRODUCT DETAILS
+ ************************/
+function openProductDetail(id) {
+  const product = PRODUCTS.find(p => p.id === id);
+  if (!product) return;
 
-  const grid = document.getElementById("products-grid");
-  grid.innerHTML = "";
-
-  products.forEach(product => {
-    const card = document.createElement("div");
-    card.className = "product-card";
-    card.innerHTML = `
-      <h3>${product.title}</h3>
-      <p>${product.price} Pi</p>
-      <button onclick='selectProduct(${JSON.stringify(product)})'>
-        شراء
-      </button>
-    `;
-    grid.appendChild(card);
-  });
-}
-
-/***********************
- * SELECT PRODUCT
- ***********************/
-function selectProduct(product) {
   selectedProduct = product;
 
-  document.getElementById("checkout-product-name").innerText = product.title;
-  document.getElementById("checkout-product-price").innerText =
-    product.price + " Pi";
+  document.getElementById("detail-title").innerText = product.name;
+  document.getElementById("detail-price").innerText =
+    product.price.toLocaleString() + " Pi";
 
-  openCheckoutModal();
+  document.getElementById("product-detail-modal").style.display = "block";
 }
 
-/***********************
- * CHECKOUT FLOW
- ***********************/
-async function checkout() {
+/************************
+ * START PAYMENT (FROM PRODUCT PAGE)
+ ************************/
+async function startProductPayment() {
+  if (paymentInProgress) {
+    alert("⚠️ عملية دفع جارية بالفعل");
+    return;
+  }
+
   if (!isPiBrowser()) {
-    alert("⚠️ افتح التطبيق من Pi Browser لإتمام الدفع");
+    alert("⚠️ افتح التطبيق من Pi Browser");
     return;
   }
 
@@ -63,30 +50,51 @@ async function checkout() {
   }
 
   try {
-    await payWithPi(selectedProduct);
+    paymentInProgress = true;
+    disableBuyButton(true);
+
+    // 1️⃣ Create Order (pending)
+    const orderRes = await fetch(`${API_BASE}/api/orders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        productId: selectedProduct.id,
+        amount: selectedProduct.price
+      })
+    });
+
+    if (!orderRes.ok) throw new Error("Order creation failed");
+
+    const order = await orderRes.json();
+    activeOrderId = order._id;
+
+    // 2️⃣ Start Pi Payment
+    await payWithPi(order);
+
   } catch (err) {
     console.error(err);
-    alert("حدث خطأ أثناء بدء عملية الدفع");
+    alert("❌ فشل بدء الدفع");
+    resetPaymentState();
   }
 }
 
-/***********************
+/************************
  * PI PAYMENT
- ***********************/
-async function payWithPi(product) {
+ ************************/
+async function payWithPi(order) {
   const res = await fetch(`${API_BASE}/api/pi/create-payment`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      amount: product.price,
-      memo: `Forsale | ${product.title}`,
+      amount: order.amount,
+      memo: `Forsale Order ${order._id}`,
       metadata: {
-        productId: product._id
+        orderId: order._id
       }
     })
   });
 
-  if (!res.ok) throw new Error("Failed to create payment");
+  if (!res.ok) throw new Error("Payment creation failed");
 
   const payment = await res.json();
 
@@ -113,36 +121,41 @@ async function payWithPi(product) {
           body: JSON.stringify({
             paymentId,
             txid,
-            productId: product._id
+            orderId: order._id
           })
         });
 
         alert("✅ تم الدفع بنجاح");
-        closeCheckoutModal();
+        resetPaymentState();
+        closeProductDetailModal();
       },
 
-      onCancel: () => alert("❌ تم إلغاء الدفع"),
+      onCancel: () => {
+        alert("❌ تم إلغاء الدفع");
+        resetPaymentState();
+      },
+
       onError: err => {
         console.error(err);
         alert("⚠️ خطأ أثناء الدفع");
+        resetPaymentState();
       }
     }
   );
 }
 
-/***********************
- * UI
- ***********************/
-function openCheckoutModal() {
-  document.getElementById("checkoutModal").style.display = "block";
+/************************
+ * UI HELPERS
+ ************************/
+function disableBuyButton(state) {
+  const btn = document.querySelector(".buy-btn");
+  if (!btn) return;
+  btn.disabled = state;
+  btn.style.opacity = state ? "0.5" : "1";
 }
 
-function closeCheckoutModal() {
-  document.getElementById("checkoutModal").style.display = "none";
+function resetPaymentState() {
+  paymentInProgress = false;
+  activeOrderId = null;
+  disableBuyButton(false);
 }
-
-/***********************
- * INIT
- ***********************/
-document.addEventListener("DOMContentLoaded", loadProducts);
-          
