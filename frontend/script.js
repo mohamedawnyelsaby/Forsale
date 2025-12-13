@@ -2,12 +2,50 @@
  * GLOBAL CONFIG
  ***********************/
 const API_BASE = "https://forsale-production.up.railway.app";
+let selectedProduct = null;
 
 /***********************
  * BASIC HELPERS
  ***********************/
 function isPiBrowser() {
   return typeof window.Pi !== "undefined";
+}
+
+/***********************
+ * LOAD PRODUCTS FROM BACKEND
+ ***********************/
+async function loadProducts() {
+  const res = await fetch(`${API_BASE}/api/products`);
+  const products = await res.json();
+
+  const grid = document.getElementById("products-grid");
+  grid.innerHTML = "";
+
+  products.forEach(product => {
+    const card = document.createElement("div");
+    card.className = "product-card";
+    card.innerHTML = `
+      <h3>${product.title}</h3>
+      <p>${product.price} Pi</p>
+      <button onclick='selectProduct(${JSON.stringify(product)})'>
+        شراء
+      </button>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/***********************
+ * SELECT PRODUCT
+ ***********************/
+function selectProduct(product) {
+  selectedProduct = product;
+
+  document.getElementById("checkout-product-name").innerText = product.title;
+  document.getElementById("checkout-product-price").innerText =
+    product.price + " Pi";
+
+  openCheckoutModal();
 }
 
 /***********************
@@ -19,15 +57,13 @@ async function checkout() {
     return;
   }
 
-  try {
-    // بيانات المنتج (مؤقتًا – بعدين هتيجي من state / backend)
-    const product = {
-      productId: "P1",
-      title: "iPhone 15 Pro (Titanium)",
-      amount: 105000
-    };
+  if (!selectedProduct) {
+    alert("❌ لم يتم اختيار منتج");
+    return;
+  }
 
-    await payWithPi(product);
+  try {
+    await payWithPi(selectedProduct);
   } catch (err) {
     console.error(err);
     alert("حدث خطأ أثناء بدء عملية الدفع");
@@ -38,28 +74,22 @@ async function checkout() {
  * PI PAYMENT
  ***********************/
 async function payWithPi(product) {
-  // 1️⃣ اطلب من السيرفر إنشاء عملية الدفع
   const res = await fetch(`${API_BASE}/api/pi/create-payment`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      amount: product.amount,
+      amount: product.price,
       memo: `Forsale | ${product.title}`,
       metadata: {
-        productId: product.productId
+        productId: product._id
       }
     })
   });
 
-  if (!res.ok) {
-    throw new Error("Failed to create payment");
-  }
+  if (!res.ok) throw new Error("Failed to create payment");
 
   const payment = await res.json();
 
-  // 2️⃣ افتح واجهة الدفع الرسمية من Pi
   Pi.createPayment(
     {
       identifier: payment.identifier,
@@ -68,9 +98,7 @@ async function payWithPi(product) {
       metadata: payment.metadata
     },
     {
-      onReadyForServerApproval: async function (paymentId) {
-        console.log("🟡 Ready for approval:", paymentId);
-
+      onReadyForServerApproval: async paymentId => {
         await fetch(`${API_BASE}/api/pi/approve-payment`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -78,34 +106,32 @@ async function payWithPi(product) {
         });
       },
 
-      onReadyForServerCompletion: async function (paymentId, txid) {
-        console.log("🟢 Ready for completion:", paymentId, txid);
-
+      onReadyForServerCompletion: async (paymentId, txid) => {
         await fetch(`${API_BASE}/api/pi/complete-payment`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ paymentId, txid })
+          body: JSON.stringify({
+            paymentId,
+            txid,
+            productId: product._id
+          })
         });
 
-        alert("✅ تم الدفع بنجاح! الطلب قيد المعالجة");
+        alert("✅ تم الدفع بنجاح");
         closeCheckoutModal();
       },
 
-      onCancel: function (paymentId) {
-        console.log("🔴 Payment cancelled:", paymentId);
-        alert("تم إلغاء عملية الدفع");
-      },
-
-      onError: function (error, payment) {
-        console.error("❌ Pi Error:", error, payment);
-        alert("حدث خطأ أثناء الدفع");
+      onCancel: () => alert("❌ تم إلغاء الدفع"),
+      onError: err => {
+        console.error(err);
+        alert("⚠️ خطأ أثناء الدفع");
       }
     }
   );
 }
 
 /***********************
- * UI FUNCTIONS (أمثلة)
+ * UI
  ***********************/
 function openCheckoutModal() {
   document.getElementById("checkoutModal").style.display = "block";
@@ -114,3 +140,9 @@ function openCheckoutModal() {
 function closeCheckoutModal() {
   document.getElementById("checkoutModal").style.display = "none";
 }
+
+/***********************
+ * INIT
+ ***********************/
+document.addEventListener("DOMContentLoaded", loadProducts);
+          
