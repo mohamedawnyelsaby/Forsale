@@ -4,7 +4,6 @@
 const API_BASE = "https://forsale-production.up.railway.app";
 
 let selectedProduct = null;
-let activeOrderId = null;
 let paymentInProgress = false;
 
 /************************
@@ -31,7 +30,7 @@ function openProductDetail(id) {
 }
 
 /************************
- * START PAYMENT (FROM PRODUCT PAGE)
+ * START PAYMENT
  ************************/
 async function startProductPayment() {
   if (paymentInProgress) {
@@ -40,7 +39,7 @@ async function startProductPayment() {
   }
 
   if (!isPiBrowser()) {
-    alert("⚠️ افتح التطبيق من Pi Browser");
+    alert("⚠️ افتح الموقع من Pi Browser");
     return;
   }
 
@@ -53,95 +52,60 @@ async function startProductPayment() {
     paymentInProgress = true;
     disableBuyButton(true);
 
-    // 1️⃣ Create Order (pending)
-    const orderRes = await fetch(`${API_BASE}/api/orders`, {
+    // ✅ Create payment (Order created automatically in backend)
+    const res = await fetch(`${API_BASE}/api/pi/create-payment`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         productId: selectedProduct.id,
-        amount: selectedProduct.price
+        amount: selectedProduct.price,
+        memo: `Forsale | ${selectedProduct.name}`
       })
     });
 
-    if (!orderRes.ok) throw new Error("Order creation failed");
+    if (!res.ok) {
+      throw new Error("Payment creation failed");
+    }
 
-    const order = await orderRes.json();
-    activeOrderId = order._id;
+    const payment = await res.json();
 
-    // 2️⃣ Start Pi Payment
-    await payWithPi(order);
+    // ✅ Open Pi Payment UI
+    Pi.createPayment(
+      {
+        identifier: payment.identifier,
+        amount: payment.amount,
+        memo: payment.memo,
+        metadata: payment.metadata
+      },
+      {
+        onReadyForServerApproval(paymentId) {
+          console.log("🟡 Ready for approval:", paymentId);
+        },
 
+        onReadyForServerCompletion(paymentId, txid) {
+          console.log("🟢 Payment completed:", paymentId, txid);
+          alert("✅ تم الدفع بنجاح");
+          resetPaymentState();
+          closeProductDetailModal();
+        },
+
+        onCancel() {
+          alert("❌ تم إلغاء الدفع");
+          resetPaymentState();
+        },
+
+        onError(err) {
+          console.error("❌ Pi Error:", err);
+          alert("⚠️ حدث خطأ أثناء الدفع");
+          resetPaymentState();
+        }
+      }
+    );
   } catch (err) {
     console.error(err);
-    alert("❌ فشل بدء الدفع");
+    alert("❌ فشل بدء عملية الدفع");
     resetPaymentState();
   }
-}
-
-/************************
- * PI PAYMENT
- ************************/
-async function payWithPi(order) {
-  const res = await fetch(`${API_BASE}/api/pi/create-payment`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      amount: order.amount,
-      memo: `Forsale Order ${order._id}`,
-      metadata: {
-        orderId: order._id
-      }
-    })
-  });
-
-  if (!res.ok) throw new Error("Payment creation failed");
-
-  const payment = await res.json();
-
-  Pi.createPayment(
-    {
-      identifier: payment.identifier,
-      amount: payment.amount,
-      memo: payment.memo,
-      metadata: payment.metadata
-    },
-    {
-      onReadyForServerApproval: async paymentId => {
-        await fetch(`${API_BASE}/api/pi/approve-payment`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ paymentId })
-        });
-      },
-
-      onReadyForServerCompletion: async (paymentId, txid) => {
-        await fetch(`${API_BASE}/api/pi/complete-payment`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            paymentId,
-            txid,
-            orderId: order._id
-          })
-        });
-
-        alert("✅ تم الدفع بنجاح");
-        resetPaymentState();
-        closeProductDetailModal();
-      },
-
-      onCancel: () => {
-        alert("❌ تم إلغاء الدفع");
-        resetPaymentState();
-      },
-
-      onError: err => {
-        console.error(err);
-        alert("⚠️ خطأ أثناء الدفع");
-        resetPaymentState();
-      }
-    }
-  );
 }
 
 /************************
@@ -150,12 +114,18 @@ async function payWithPi(order) {
 function disableBuyButton(state) {
   const btn = document.querySelector(".buy-btn");
   if (!btn) return;
+
   btn.disabled = state;
   btn.style.opacity = state ? "0.5" : "1";
 }
 
 function resetPaymentState() {
   paymentInProgress = false;
-  activeOrderId = null;
   disableBuyButton(false);
 }
+
+function closeProductDetailModal() {
+  document.getElementById("product-detail-modal").style.display = "none";
+  selectedProduct = null;
+  }
+    
