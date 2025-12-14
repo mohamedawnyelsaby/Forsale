@@ -5,12 +5,12 @@ const router = express.Router();
 
 /**
  * 🧠 In-memory Orders Store (MVP)
- * Production الحقيقي → Database
+ * Production حقيقي = Database
  */
 const orders = [];
 
 /**
- * 🔹 Create Order (manual – optional)
+ * 🔹 Create Order
  */
 router.post("/", (req, res) => {
   const { productId, amount, uid } = req.body;
@@ -34,9 +34,9 @@ router.post("/", (req, res) => {
   res.json(order);
 });
 
-/* ============================
-   🔧 INTERNAL STORE FUNCTIONS
-   ============================ */
+/* =========================
+   INTERNAL STORE FUNCTIONS
+========================= */
 
 function create(data) {
   orders.push(data);
@@ -45,9 +45,7 @@ function create(data) {
 
 function attachPayment(orderId, paymentId) {
   const order = orders.find(o => o.id === orderId);
-  if (order) {
-    order.paymentId = paymentId;
-  }
+  if (order) order.paymentId = paymentId;
 }
 
 function get(orderId) {
@@ -56,12 +54,9 @@ function get(orderId) {
 
 function markPaid(orderId, paymentId, txid) {
   const order = orders.find(o => o.id === orderId);
-
   if (!order) return null;
 
-  if (order.status === "PAID") {
-    return order; // 🛑 anti double payment
-  }
+  if (order.status === "PAID") return order;
 
   order.status = "PAID";
   order.paymentId = paymentId;
