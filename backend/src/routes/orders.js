@@ -1,10 +1,11 @@
-const express = require("express");
+import express from "express";
+import { v4 as uuidv4 } from "uuid";
+
 const router = express.Router();
-const { v4: uuidv4 } = require("uuid");
 
 /**
  * 🧠 In-memory Orders Store (MVP)
- * Production حقيقي = Database
+ * Production الحقيقي → Database
  */
 const orders = [];
 
@@ -33,23 +34,15 @@ router.post("/", (req, res) => {
   res.json(order);
 });
 
-/**
- * ============================
- * 🔧 INTERNAL STORE FUNCTIONS
- * ============================
- */
+/* ============================
+   🔧 INTERNAL STORE FUNCTIONS
+   ============================ */
 
-/**
- * Create order from Pi flow
- */
 function create(data) {
   orders.push(data);
   return data;
 }
 
-/**
- * Attach Pi payment identifier
- */
 function attachPayment(orderId, paymentId) {
   const order = orders.find(o => o.id === orderId);
   if (order) {
@@ -57,23 +50,17 @@ function attachPayment(orderId, paymentId) {
   }
 }
 
-/**
- * Get order by ID
- */
 function get(orderId) {
   return orders.find(o => o.id === orderId);
 }
 
-/**
- * Mark order as PAID (ANTI DOUBLE PAYMENT)
- */
 function markPaid(orderId, paymentId, txid) {
   const order = orders.find(o => o.id === orderId);
 
   if (!order) return null;
 
   if (order.status === "PAID") {
-    return order; // 🛑 already paid
+    return order; // 🛑 anti double payment
   }
 
   order.status = "PAID";
@@ -84,7 +71,7 @@ function markPaid(orderId, paymentId, txid) {
   return order;
 }
 
-module.exports = {
+export default {
   router,
   create,
   attachPayment,
