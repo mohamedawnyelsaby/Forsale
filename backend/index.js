@@ -8,7 +8,6 @@ import ordersRoutes from "./routes/orders.js";
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-/* ========= MIDDLEWARES ========= */
 app.use(cors());
 app.use(express.json());
 
@@ -19,20 +18,13 @@ app.use(
   })
 );
 
-/* ========= HEALTH ========= */
 app.get("/", (req, res) => {
   res.json({ status: "Forsale API running 🚀" });
 });
 
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok" });
-});
-
-/* ========= ROUTES ========= */
 app.use("/api/pi", piRoutes);
-app.use("/api/orders", ordersRoutes.router);
+app.use("/api/orders", ordersRoutes);
 
-/* ========= START ========= */
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
