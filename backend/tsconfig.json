@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ESNext",
-    "lib": ["ES2022"],
+    "module": "CommonJS", 
+    "lib": ["ES2022", "dom"],
     "moduleResolution": "node",
     "outDir": "./dist",
     "rootDir": "./src",
@@ -16,47 +16,6 @@
     "sourceMap": true,
     "types": ["node"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
-```
-
----
-
-### ملف 3️⃣: `.gitignore`
-
-**📍 المسار:** `backend/.gitignore`
-```
-# Dependencies
-node_modules/
-
-# Build output
-dist/
-build/
-
-# Environment variables
-.env
-.env.local
-.env.production
-
-# Logs
-logs/
-*.log
-npm-debug.log*
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Prisma
-prisma/migrations/*
-!prisma/migrations/.gitkeep
-
-# Uploads
-uploads/
