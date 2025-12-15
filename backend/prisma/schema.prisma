@@ -1,0 +1,221 @@
+// ============================================
+// 📄 FILENAME: schema.prisma
+// 📍 PATH: backend/prisma/schema.prisma
+// ============================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int       @id @default(autoincrement())
+  email           String    @unique
+  password_hash   String
+  name            String?
+  role            String    @default("user")
+  email_verified  Boolean   @default(false)
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  
+  products        Product[]
+  orders_as_buyer Order[]   @relation("BuyerOrders")
+  reviews         Review[]
+  messages_sent   Message[] @relation("SentMessages")
+  messages_received Message[] @relation("ReceivedMessages")
+  refresh_tokens  RefreshToken[]
+  notifications   Notification[]
+  saved_products  SavedProduct[]
+  search_history  SearchHistory[]
+  
+  @@map("users")
+}
+
+model RefreshToken {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  token      String   @unique
+  expires_at DateTime
+  revoked    Boolean  @default(false)
+  created_at DateTime @default(now())
+  
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@map("refresh_tokens")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  seller_id   Int
+  title       String
+  description String?
+  price_pi    Float
+  category    String
+  images      Json     @default("[]")
+  stock       Int      @default(1)
+  ai_meta     Json?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  
+  seller     User     @relation(fields: [seller_id], references: [id], onDelete: Cascade)
+  orders     Order[]
+  reviews    Review[]
+  views      ProductView[]
+  saved_by   SavedProduct[]
+  
+  @@index([seller_id])
+  @@index([category])
+  @@index([price_pi])
+  @@map("products")
+}
+
+model Order {
+  id          Int      @id @default(autoincrement())
+  buyer_id    Int
+  product_id  Int
+  quantity    Int      @default(1)
+  amount_pi   Float
+  status      String   @default("CREATED")
+  payment_id  String?
+  txid        String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  
+  buyer       User     @relation("BuyerOrders", fields: [buyer_id], references: [id])
+  product     Product  @relation(fields: [product_id], references: [id])
+  dispute     Dispute?
+  shipping    ShippingTracking?
+  
+  @@index([buyer_id])
+  @@index([product_id])
+  @@index([status])
+  @@map("orders")
+}
+
+model Review {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  product_id Int
+  rating     Int
+  comment    String?
+  created_at DateTime @default(now())
+  
+  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  
+  @@unique([user_id, product_id])
+  @@index([product_id])
+  @@map("reviews")
+}
+
+model Dispute {
+  id          Int      @id @default(autoincrement())
+  order_id    Int      @unique
+  buyer_id    Int
+  seller_id   Int
+  reason      String
+  description String?
+  evidence    Json     @default("{}")
+  status      String   @default("OPEN")
+  ai_decision Json?
+  resolution  String?
+  created_at  DateTime @default(now())
+  resolved_at DateTime?
+  
+  order Order @relation(fields: [order_id], references: [id])
+  
+  @@index([status])
+  @@map("disputes")
+}
+
+model Message {
+  id          Int      @id @default(autoincrement())
+  sender_id   Int
+  receiver_id Int
+  content     String
+  read        Boolean  @default(false)
+  created_at  DateTime @default(now())
+  
+  sender   User @relation("SentMessages", fields: [sender_id], references: [id], onDelete: Cascade)
+  receiver User @relation("ReceivedMessages", fields: [receiver_id], references: [id], onDelete: Cascade)
+  
+  @@index([sender_id])
+  @@index([receiver_id])
+  @@map("messages")
+}
+
+model Notification {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  type       String
+  title      String
+  message    String
+  read       Boolean  @default(false)
+  data       Json?
+  created_at DateTime @default(now())
+  
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@index([user_id, read])
+  @@map("notifications")
+}
+
+model ProductView {
+  id         Int      @id @default(autoincrement())
+  product_id Int
+  user_id    Int?
+  ip_address String?
+  viewed_at  DateTime @default(now())
+  
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  
+  @@index([product_id])
+  @@map("product_views")
+}
+
+model SavedProduct {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  product_id Int
+  saved_at   DateTime @default(now())
+  
+  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  
+  @@unique([user_id, product_id])
+  @@map("saved_products")
+}
+
+model SearchHistory {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  query      String
+  filters    Json?
+  created_at DateTime @default(now())
+  
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@index([user_id])
+  @@map("search_history")
+}
+
+model ShippingTracking {
+  id             Int      @id @default(autoincrement())
+  order_id       Int      @unique
+  carrier        String
+  tracking_code  String
+  status         String   @default("PENDING")
+  estimated_delivery DateTime?
+  delivered_at   DateTime?
+  events         Json     @default("[]")
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  
+  order Order @relation(fields: [order_id], references: [id])
+  
+  @@map("shipping_tracking")
+}
