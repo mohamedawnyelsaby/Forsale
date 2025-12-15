@@ -1,14 +1,16 @@
 # ============================================
-# 📄 FILENAME: Dockerfile (FINAL - NO BUILD)
+# 📄 FILENAME: Dockerfile (Debian for Prisma)
 # 📍 PATH: backend/Dockerfile
 # ============================================
 
-FROM node:18-alpine
+FROM node:18-slim
+
+# Install OpenSSL and other dependencies
+RUN apt-get update -y && \
+    apt-get install -y openssl libssl-dev ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-
-# Install tsx globally
-RUN npm install -g tsx
 
 # Copy package files
 COPY package*.json ./
@@ -19,14 +21,14 @@ RUN npm install
 # Copy prisma schema
 COPY prisma ./prisma/
 
-# Generate Prisma Client
+# Generate Prisma Client with correct binary
 RUN npx prisma generate
 
-# Copy all source code
+# Copy source code
 COPY . .
 
 # Expose port
 EXPOSE 3000
 
-# Run directly with tsx (NO BUILD!)
-CMD ["tsx", "src/index.ts"]
+# Start with tsx
+CMD ["npx", "tsx", "src/index.ts"]
