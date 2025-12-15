@@ -1,10 +1,11 @@
 // ============================================
-// 📄 FILENAME: schema.prisma
+// 📄 FILENAME: schema.prisma (FIXED)
 // 📍 PATH: backend/prisma/schema.prisma
 // ============================================
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
