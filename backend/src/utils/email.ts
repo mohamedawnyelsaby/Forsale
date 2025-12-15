@@ -1,5 +1,5 @@
 // ============================================
-// 📄 FILENAME: email.ts
+// 📄 FILENAME: email.ts (FIXED)
 // 📍 PATH: backend/src/utils/email.ts
 // ============================================
 
@@ -7,7 +7,7 @@ import nodemailer from 'nodemailer';
 import { config } from '../config/env';
 import { logger } from './logger';
 
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({  // ✅ تم التصحيح من createTransporter
   host: config.SMTP_HOST,
   port: config.SMTP_PORT,
   secure: config.SMTP_PORT === 465,
