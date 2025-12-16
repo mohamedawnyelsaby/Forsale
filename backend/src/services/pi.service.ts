@@ -1,9 +1,10 @@
 // ============================================
-// 📄 FILENAME: pi.service.ts
+// 📄 FILENAME: pi.service.ts (SECURED)
 // 📍 PATH: backend/src/services/pi.service.ts
 // ============================================
 
 import axios from 'axios';
+import crypto from 'crypto';
 import { config } from '../config/env';
 import { logger } from '../utils/logger';
 import { AppError } from '../utils/AppError';
@@ -12,13 +13,21 @@ const PI_API_BASE = 'https://api.minepi.com';
 
 export class PiService {
   private apiKey: string;
+  private appSecret: string;
   
   constructor() {
     this.apiKey = config.PI_API_KEY;
+    this.appSecret = config.PI_APP_SECRET;
+    
+    if (!this.apiKey || !this.appSecret) {
+      throw new Error('Pi Network credentials not configured');
+    }
+    
+    logger.info('✅ Pi Service initialized');
   }
   
   /**
-   * Create a payment request
+   * إنشاء دفعة جديدة
    */
   async createPayment(data: {
     amount: number;
@@ -43,16 +52,17 @@ export class PiService {
         }
       );
       
-      logger.info('Pi payment created:', response.data);
+      logger.info('✅ Pi payment created:', response.data.identifier);
       return response.data;
+      
     } catch (error: any) {
-      logger.error('Pi payment creation failed:', error.response?.data || error);
+      logger.error('❌ Pi payment creation failed:', error.response?.data || error);
       throw new AppError('Failed to create Pi payment', 500);
     }
   }
   
   /**
-   * Approve a payment (Server-side approval)
+   * الموافقة على الدفع (Server-side)
    */
   async approvePayment(paymentId: string) {
     try {
@@ -66,16 +76,17 @@ export class PiService {
         }
       );
       
-      logger.info('Pi payment approved:', paymentId);
+      logger.info('✅ Pi payment approved:', paymentId);
       return response.data;
+      
     } catch (error: any) {
-      logger.error('Pi payment approval failed:', error.response?.data || error);
+      logger.error('❌ Pi payment approval failed:', error.response?.data || error);
       throw new AppError('Failed to approve Pi payment', 500);
     }
   }
   
   /**
-   * Complete a payment (Release escrow)
+   * إكمال الدفع (Release Escrow)
    */
   async completePayment(paymentId: string, txid: string) {
     try {
@@ -89,16 +100,17 @@ export class PiService {
         }
       );
       
-      logger.info('Pi payment completed:', paymentId);
+      logger.info('✅ Pi payment completed:', paymentId);
       return response.data;
+      
     } catch (error: any) {
-      logger.error('Pi payment completion failed:', error.response?.data || error);
+      logger.error('❌ Pi payment completion failed:', error.response?.data || error);
       throw new AppError('Failed to complete Pi payment', 500);
     }
   }
   
   /**
-   * Cancel a payment
+   * إلغاء الدفع
    */
   async cancelPayment(paymentId: string) {
     try {
@@ -112,16 +124,17 @@ export class PiService {
         }
       );
       
-      logger.info('Pi payment cancelled:', paymentId);
+      logger.info('✅ Pi payment cancelled:', paymentId);
       return response.data;
+      
     } catch (error: any) {
-      logger.error('Pi payment cancellation failed:', error.response?.data || error);
+      logger.error('❌ Pi payment cancellation failed:', error.response?.data || error);
       throw new AppError('Failed to cancel Pi payment', 500);
     }
   }
   
   /**
-   * Get payment details
+   * الحصول على تفاصيل الدفع
    */
   async getPayment(paymentId: string) {
     try {
@@ -135,18 +148,102 @@ export class PiService {
       );
       
       return response.data;
+      
     } catch (error: any) {
-      logger.error('Failed to get Pi payment:', error.response?.data || error);
+      logger.error('❌ Failed to get Pi payment:', error.response?.data || error);
       throw new AppError('Failed to get Pi payment details', 500);
     }
   }
   
   /**
-   * Verify payment callback signature
+   * ✅ التحقق من صحة Callback (FIXED - CRITICAL)
+   * 
+   * هذه الدالة كانت ترجع true دائماً = خطر أمني!
+   * الآن تتحقق من التوقيع الحقيقي
    */
   verifyPaymentCallback(paymentId: string, txid: string, signature: string): boolean {
-    // TODO: Implement signature verification using Pi SDK
-    // This is critical for security
-    return true; // Placeholder
+    try {
+      // بناء النص المتوقع للتوقيع
+      const message = `${paymentId}|${txid}`;
+      
+      // حساب HMAC باستخدام App Secret
+      const expectedSignature = crypto
+        .createHmac('sha256', this.appSecret)
+        .update(message)
+        .digest('hex');
+      
+      // مقارنة التواقيع
+      const isValid = crypto.timingSafeEqual(
+        Buffer.from(signature),
+        Buffer.from(expectedSignature)
+      );
+      
+      if (!isValid) {
+        logger.warn(`⚠️ Invalid Pi callback signature for payment ${paymentId}`);
+      }
+      
+      return isValid;
+      
+    } catch (error) {
+      logger.error('❌ Signature verification error:', error);
+      return false;
+    }
+  }
+  
+  /**
+   * التحقق من صحة User Token (للـ OAuth)
+   */
+  async verifyUserToken(accessToken: string): Promise<any> {
+    try {
+      const response = await axios.get(
+        `${PI_API_BASE}/v2/me`,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        }
+      );
+      
+      return response.data;
+      
+    } catch (error) {
+      logger.error('❌ Token verification failed:', error);
+      throw new AppError('Invalid Pi token', 401);
+    }
+  }
+  
+  /**
+   * ✅ Webhook Handler - معالجة آمنة لـ Callbacks
+   */
+  async handleWebhook(payload: {
+    paymentId: string;
+    txid: string;
+    signature: string;
+  }): Promise<boolean> {
+    // 1. التحقق من التوقيع أولاً
+    const isValid = this.verifyPaymentCallback(
+      payload.paymentId,
+      payload.txid,
+      payload.signature
+    );
+    
+    if (!isValid) {
+      logger.error('❌ Webhook rejected: Invalid signature');
+      return false;
+    }
+    
+    // 2. التحقق من حالة الدفع من Pi Network
+    const payment = await this.getPayment(payload.paymentId);
+    
+    if (payment.status !== 'completed') {
+      logger.warn(`⚠️ Payment ${payload.paymentId} not completed yet`);
+      return false;
+    }
+    
+    // 3. التحقق من عدم معالجة نفس الـ Webhook مرتين
+    // (سيتم تطبيقه في الـ Controller)
+    
+    logger.info(`✅ Webhook verified for payment ${payload.paymentId}`);
+    return true;
   }
 }
