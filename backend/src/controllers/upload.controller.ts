@@ -1,5 +1,5 @@
 // ============================================
-// 📄 FILENAME: upload.controller.ts
+// 📄 FILENAME: upload.controller.ts (PRODUCTION READY)
 // 📍 PATH: backend/src/controllers/upload.controller.ts
 // ============================================
 
@@ -16,7 +16,62 @@ export class UploadController {
         throw new AppError('No file provided', 400);
       }
       
+      // Validate file
+      uploadService.validateFile(req.file);
+      
+      // Upload
       const url = await uploadService.uploadImage(req.file);
+      
+      res.json({
+        success: true,
+        data: { 
+          url,
+          thumbnail: uploadService.getThumbnailUrl(url),
+          size: req.file.size,
+          type: req.file.mimetype
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  
+  async uploadMultipleImages(req: Request, res: Response, next: NextFunction) {
+    try {
+      if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+        throw new AppError('No files provided', 400);
+      }
+      
+      // Validate all files
+      req.files.forEach(file => uploadService.validateFile(file));
+      
+      // Upload all
+      const urls = await uploadService.uploadMultipleImages(req.files);
+      
+      res.json({
+        success: true,
+        data: { 
+          urls,
+          count: urls.length,
+          thumbnails: urls.map(url => uploadService.getThumbnailUrl(url))
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  
+  async uploadAvatar(req: Request, res: Response, next: NextFunction) {
+    try {
+      if (!req.file) {
+        throw new AppError('No file provided', 400);
+      }
+      
+      // Validate
+      uploadService.validateFile(req.file);
+      
+      // Upload
+      const url = await uploadService.uploadAvatar(req.file);
       
       res.json({
         success: true,
@@ -27,17 +82,19 @@ export class UploadController {
     }
   }
   
-  async uploadMultipleImages(req: Request, res: Response, next: NextFunction) {
+  async deleteImage(req: Request, res: Response, next: NextFunction) {
     try {
-      if (!req.files || !Array.isArray(req.files)) {
-        throw new AppError('No files provided', 400);
+      const { url } = req.body;
+      
+      if (!url) {
+        throw new AppError('Image URL is required', 400);
       }
       
-      const urls = await uploadService.uploadMultipleImages(req.files);
+      await uploadService.deleteImage(url);
       
       res.json({
         success: true,
-        data: { urls }
+        message: 'Image deleted successfully'
       });
     } catch (error) {
       next(error);
