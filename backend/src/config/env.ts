@@ -9,7 +9,11 @@ dotenv.config();
 export const config = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: parseInt(process.env.PORT || '3000'),
-  CORS_ORIGIN: process.env.CORS_ORIGIN || '*',
+
+  // ✅ السطر الوحيد اللي اتغير
+  CORS_ORIGIN: process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+    : '*',
   
   // Database
   DATABASE_URL: process.env.DATABASE_URL!,
