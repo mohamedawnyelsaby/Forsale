@@ -11,14 +11,21 @@ import { authenticate } from '../middleware/auth';
 const router = Router();
 const uploadController = new UploadController();
 
-// Configure multer for file uploads
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB
+    fileSize: 10 * 1024 * 1024,
+    files: 10
   },
   fileFilter: (req, file, cb) => {
-    const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const allowedMimes = [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'image/gif',
+      'image/jpg'
+    ];
+    
     if (allowedMimes.includes(file.mimetype)) {
       cb(null, true);
     } else {
@@ -39,6 +46,19 @@ router.post(
   authenticate,
   upload.array('images', 10),
   uploadController.uploadMultipleImages
+);
+
+router.post(
+  '/avatar',
+  authenticate,
+  upload.single('avatar'),
+  uploadController.uploadAvatar
+);
+
+router.delete(
+  '/image',
+  authenticate,
+  uploadController.deleteImage
 );
 
 export default router;
