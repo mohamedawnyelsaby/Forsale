@@ -1,5 +1,5 @@
 // ============================================
-// 📄 FILENAME: upload.controller.ts (PRODUCTION READY)
+// 📄 FILENAME: upload.controller.ts
 // 📍 PATH: backend/src/controllers/upload.controller.ts
 // ============================================
 
@@ -16,10 +16,8 @@ export class UploadController {
         throw new AppError('No file provided', 400);
       }
       
-      // Validate file
       uploadService.validateFile(req.file);
       
-      // Upload
       const url = await uploadService.uploadImage(req.file);
       
       res.json({
@@ -42,10 +40,8 @@ export class UploadController {
         throw new AppError('No files provided', 400);
       }
       
-      // Validate all files
       req.files.forEach(file => uploadService.validateFile(file));
       
-      // Upload all
       const urls = await uploadService.uploadMultipleImages(req.files);
       
       res.json({
@@ -67,10 +63,8 @@ export class UploadController {
         throw new AppError('No file provided', 400);
       }
       
-      // Validate
       uploadService.validateFile(req.file);
       
-      // Upload
       const url = await uploadService.uploadAvatar(req.file);
       
       res.json({
