@@ -1,5 +1,5 @@
 // ============================================
-// 📄 FILENAME: upload.service.ts (PRODUCTION READY)
+// 📄 FILENAME: upload.service.ts
 // 📍 PATH: backend/src/services/upload.service.ts
 // ============================================
 
@@ -23,21 +23,15 @@ export class UploadService {
       forcePathStyle: true
     });
     
-    logger.info('✅ Upload Service initialized (AWS SDK v3)');
+    logger.info('✅ Upload Service initialized');
   }
   
-  /**
-   * Upload single image
-   * Using native browser image optimization or CDN transformation
-   */
   async uploadImage(file: Express.Multer.File): Promise<string> {
     try {
-      // Generate unique filename
       const ext = file.mimetype.split('/')[1] || 'jpg';
       const filename = `${uuidv4()}.${ext}`;
       const key = `products/${filename}`;
       
-      // Upload to S3/Spaces with streaming
       const upload = new Upload({
         client: this.s3Client,
         params: {
@@ -46,18 +40,13 @@ export class UploadService {
           Body: file.buffer,
           ContentType: file.mimetype,
           ACL: 'public-read',
-          CacheControl: 'max-age=31536000', // 1 year cache
+          CacheControl: 'max-age=31536000',
         }
       });
       
       await upload.done();
       
-      // Build URL with optional CDN transformation
-      const baseUrl = `${config.S3_ENDPOINT}/${config.S3_BUCKET}/${key}`;
-      
-      // If using CloudFlare Images or ImageKit, add transformation params
-      // Example: ?w=1200&q=85&f=auto
-      const url = this.addImageTransformation(baseUrl);
+      const url = `${config.S3_ENDPOINT}/${config.S3_BUCKET}/${key}`;
       
       logger.info(`✅ Image uploaded: ${url}`);
       return url;
@@ -68,15 +57,12 @@ export class UploadService {
     }
   }
   
-  /**
-   * Upload multiple images in parallel
-   */
   async uploadMultipleImages(files: Express.Multer.File[]): Promise<string[]> {
     try {
       const uploadPromises = files.map(file => this.uploadImage(file));
       const urls = await Promise.all(uploadPromises);
       
-      logger.info(`✅ Uploaded ${urls.length} images successfully`);
+      logger.info(`✅ Uploaded ${urls.length} images`);
       return urls;
       
     } catch (error) {
@@ -85,18 +71,14 @@ export class UploadService {
     }
   }
   
-  /**
-   * Delete image from storage
-   */
   async deleteImage(url: string): Promise<void> {
     try {
-      // Extract key from URL
       const urlParts = url.split(`/${config.S3_BUCKET}/`);
       if (urlParts.length < 2) {
         throw new Error('Invalid image URL');
       }
       
-      const key = urlParts[1].split('?')[0]; // Remove query params
+      const key = urlParts[1].split('?')[0];
       
       const command = new DeleteObjectCommand({
         Bucket: config.S3_BUCKET,
@@ -113,9 +95,6 @@ export class UploadService {
     }
   }
   
-  /**
-   * Upload avatar with size limit
-   */
   async uploadAvatar(file: Express.Multer.File): Promise<string> {
     try {
       const ext = file.mimetype.split('/')[1] || 'jpg';
@@ -136,8 +115,7 @@ export class UploadService {
       
       await upload.done();
       
-      const baseUrl = `${config.S3_ENDPOINT}/${config.S3_BUCKET}/${key}`;
-      const url = this.addImageTransformation(baseUrl, { width: 300, height: 300 });
+      const url = `${config.S3_ENDPOINT}/${config.S3_BUCKET}/${key}`;
       
       logger.info(`✅ Avatar uploaded: ${url}`);
       return url;
@@ -148,26 +126,6 @@ export class UploadService {
     }
   }
   
-  /**
-   * Add CDN image transformation parameters
-   * Works with CloudFlare Images, ImageKit, or similar services
-   */
-  private addImageTransformation(
-    url: string, 
-    options?: { width?: number; height?: number; quality?: number }
-  ): string {
-    // If you're using a CDN with built-in image optimization, add params here
-    // Example for CloudFlare Images: url + '?width=1200&quality=85&format=auto'
-    // Example for ImageKit: url + '?tr=w-1200,q-85,f-auto'
-    
-    // For now, return as-is (S3/Spaces will serve original)
-    // The browser or CDN will handle optimization
-    return url;
-  }
-  
-  /**
-   * Validate file before upload
-   */
   validateFile(file: Express.Multer.File): boolean {
     const allowedMimes = [
       'image/jpeg',
@@ -177,25 +135,20 @@ export class UploadService {
       'image/jpg'
     ];
     
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 10 * 1024 * 1024;
     
     if (!allowedMimes.includes(file.mimetype)) {
-      throw new Error('Invalid file type. Allowed: JPEG, PNG, WebP, GIF');
+      throw new Error('Invalid file type');
     }
     
     if (file.size > maxSize) {
-      throw new Error('File too large. Maximum size: 10MB');
+      throw new Error('File too large');
     }
     
     return true;
   }
   
-  /**
-   * Generate thumbnail URL (for list views)
-   */
   getThumbnailUrl(originalUrl: string): string {
-    // Add thumbnail transformation
-    // This depends on your CDN service
-    return originalUrl; // Return original for now
+    return originalUrl;
   }
 }
