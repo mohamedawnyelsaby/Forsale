@@ -1,19 +1,54 @@
-/************************
- * 1. الإعدادات والبيانات
- ************************/
+/*****************************************
+ * 1. CONFIGURATION & SERVER
+ *****************************************/
 const API_BASE = "https://forsale-production.up.railway.app";
 let selectedProduct = null;
 let currentUser = null;
 
-// بيانات التصنيفات (التي كانت مختفية)
-const CATEGORIES = [
-    { id: 'all', name: 'الكل', icon: 'fa-layer-group' },
-    { id: 'electronics', name: 'إلكترونيات', icon: 'fa-mobile-screen' },
-    { id: 'vehicles', name: 'سيارات', icon: 'fa-car' },
-    { id: 'fashion', name: 'موضة', icon: 'fa-shirt' },
-    { id: 'home', name: 'المنزل', icon: 'fa-couch' },
-    { id: 'gaming', name: 'ألعاب', icon: 'fa-gamepad' }
-];
+/*****************************************
+ * 2. DATA TAXONOMY (شجرة التصنيفات)
+ * هذا هو الجزء الذي يعيد القوائم المنسدلة
+ *****************************************/
+const HIERARCHY = {
+    all: {
+        label: "الكل",
+        icon: "fa-layer-group",
+        subs: [] 
+    },
+    electronics: {
+        label: "إلكترونيات",
+        icon: "fa-mobile-screen",
+        subs: [
+            { id: 'phones', name: 'هواتف ذكية' },
+            { id: 'laptops', name: 'لابتوب' },
+            { id: 'accessories', name: 'اكسسوارات' }
+        ]
+    },
+    vehicles: {
+        label: "سيارات",
+        icon: "fa-car",
+        subs: [
+            { id: 'sedan', name: 'سيدان' },
+            { id: 'suv', name: 'دفع رباعي' }
+        ]
+    },
+    fashion: {
+        label: "موضة",
+        icon: "fa-shirt",
+        subs: [
+            { id: 'men', name: 'رجالي' },
+            { id: 'women', name: 'حريمي' }
+        ]
+    },
+    home: {
+        label: "المنزل",
+        icon: "fa-couch",
+        subs: [
+            { id: 'furniture', name: 'أثاث' },
+            { id: 'decor', name: 'ديكور' }
+        ]
+    }
+};
 
 // بيانات المنتجات
 const MOCK_PRODUCTS = [
@@ -21,106 +56,174 @@ const MOCK_PRODUCTS = [
     id: 1,
     name: "iPhone 15 Pro Max",
     price: 0.01,
-    category: "electronics",
+    cat: "electronics",
+    sub: "phones",
     image: "https://images.unsplash.com/photo-1696446701796-da61225697cc?w=400",
-    desc: "آيفون 15 برو ماكس تيتانيوم، حالة الزيرو، بطارية 100%."
+    desc: "آيفون 15 برو ماكس تيتانيوم، 256 جيجا."
   },
   {
     id: 2,
-    name: "PlayStation 5",
-    price: 0.02,
-    category: "gaming",
-    image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=400",
-    desc: "بلايستيشن 5 النسخة الرقمية مع ذراعين ولعبة فيفا."
+    name: "MacBook Pro M3",
+    price: 0.05,
+    cat: "electronics",
+    sub: "laptops",
+    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
+    desc: "لابتوب ماك بوك برو M3 الجديد."
   },
   {
     id: 3,
-    name: "MacBook Air M2",
-    price: 0.05,
-    category: "electronics",
-    image: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=400",
-    desc: "ماك بوك اير M2 خفيف جداً، لون Midnight، ضمان ساري."
+    name: "Tesla Model 3",
+    price: 100.00,
+    cat: "vehicles",
+    sub: "sedan",
+    image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=400",
+    desc: "تسلا موديل 3 بحالة ممتازة."
   },
   {
     id: 4,
-    name: "Tesla Model 3 Toy",
+    name: "Sony Headphones",
     price: 0.005,
-    category: "vehicles",
-    image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=400",
-    desc: "مجسم سيارة تسلا موديل 3 معدني عالي الجودة."
-  },
-  {
-    id: 5,
-    name: "Smart Watch Ultra",
-    price: 0.015,
-    category: "electronics",
-    image: "https://images.unsplash.com/photo-1695663737526-7243c233c75d?w=400",
-    desc: "ساعة ذكية شبيهة ابل الترا 2، شاشة كاملة."
+    cat: "electronics",
+    sub: "accessories",
+    image: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=400",
+    desc: "سماعات سوني عازلة للضوضاء."
   }
 ];
 
-/************************
- * 2. تشغيل التطبيق (Initialization)
- ************************/
+/*****************************************
+ * 3. INITIALIZATION
+ *****************************************/
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("🚀 التطبيق بدأ العمل...");
+    console.log("🚀 System Started");
     
-    // 1. عرض التصنيفات (الجزء اللي كان مختفي)
-    renderCategories();
-    
-    // 2. عرض المنتجات
-    renderProducts('all');
+    renderLevel1(); // رسم الشريط العلوي
+    renderProducts(MOCK_PRODUCTS); // عرض المنتجات
 
-    // 3. التحقق من Pi Browser
+    // Pi Network Check
     if (typeof window.Pi !== 'undefined') {
         Pi.init({ version: "2.0", sandbox: true });
-        
-        // لو فاتح من Pi، اخفي شاشة الدخول تلقائياً (اختياري)
-        // document.getElementById('auth-container').style.display = 'none';
-        // document.getElementById('app-container').style.display = 'block';
     }
 });
 
-/************************
- * 3. دوال العرض (Rendering)
- ************************/
+/*****************************************
+ * 4. LOGIC: HIERARCHY & FILTERS
+ * (هذا هو الكود المسؤول عن القوائم المنسدلة)
+ *****************************************/
 
-// دالة رسم التصنيفات (Icons Scroll)
-function renderCategories() {
-    const scrollContainer = document.getElementById('level1-scroll');
-    if(!scrollContainer) return;
+// 1. رسم المستوى الأول (الأيقونات)
+function renderLevel1() {
+    const scroll = document.getElementById('level1-scroll');
+    if(!scroll) return;
 
-    scrollContainer.innerHTML = CATEGORIES.map((cat, index) => `
-        <div class="cat-item ${index === 0 ? 'active' : ''}" onclick="filterByCategory('${cat.id}', this)">
-            <i class="fa-solid ${cat.icon}"></i> ${cat.name}
-        </div>
-    `).join('');
+    scroll.innerHTML = Object.keys(HIERARCHY).map(key => {
+        const item = HIERARCHY[key];
+        return `
+            <div class="cat-item" onclick="selectLevel1('${key}', this)">
+                <i class="fa-solid ${item.icon}"></i> ${item.label}
+            </div>
+        `;
+    }).join('');
+    
+    // تفعيل "الكل" افتراضياً
+    scroll.firstElementChild.classList.add('active');
 }
 
-// دالة فلترة المنتجات
-window.filterByCategory = function(catId, element) {
-    // تحديث الشكل (Active Class)
+// 2. عند الضغط على أيقونة رئيسية
+window.selectLevel1 = function(key, element) {
+    // تحديث الشكل
     document.querySelectorAll('.cat-item').forEach(el => el.classList.remove('active'));
     element.classList.add('active');
 
-    // تحديث المنتجات
-    renderProducts(catId);
+    // إظهار/إخفاء لوحة الفلاتر
+    const filterPanel = document.getElementById('filter-panel');
+    const level2Container = document.getElementById('level2-chips');
+    const level3Container = document.getElementById('level3-area');
+
+    // تنظيف القديم
+    level2Container.innerHTML = '';
+    level3Container.innerHTML = '';
+
+    if (key === 'all') {
+        // لو اخترنا الكل، نخفي اللوحة ونعرض كل المنتجات
+        filterPanel.classList.remove('open');
+        renderProducts(MOCK_PRODUCTS);
+        return;
+    }
+
+    // جلب التصنيفات الفرعية
+    const subCats = HIERARCHY[key].subs;
+    
+    if (subCats && subCats.length > 0) {
+        // رسم الأزرار الفرعية (Chips)
+        level2Container.innerHTML = subCats.map(sub => `
+            <div class="chip" onclick="selectLevel2('${key}', '${sub.id}', this)">
+                ${sub.name}
+            </div>
+        `).join('');
+        
+        // فتح اللوحة المنسدلة
+        filterPanel.classList.add('open');
+        
+        // فلترة المنتجات حسب التصنيف الرئيسي مبدئياً
+        const filtered = MOCK_PRODUCTS.filter(p => p.cat === key);
+        renderProducts(filtered);
+    } else {
+        filterPanel.classList.remove('open');
+    }
 };
 
-// دالة رسم المنتجات
-function renderProducts(filterCategory) {
+// 3. عند الضغط على زر فرعي (Chip)
+window.selectLevel2 = function(parentKey, subKey, element) {
+    // تحديث الشكل
+    document.querySelectorAll('.chip').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+
+    // هنا نفتح المستوى الثالث (Inputs) - محاكاة
+    const level3Container = document.getElementById('level3-area');
+    
+    // رسم خانات البحث اليدوي (Dropdowns)
+    level3Container.innerHTML = `
+        <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
+            <div class="filter-group">
+                <label>تحديد الماركة:</label>
+                <select>
+                    <option>Apple</option>
+                    <option>Samsung</option>
+                    <option>Sony</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>السعر (Pi):</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="number" placeholder="من">
+                    <input type="number" placeholder="إلى">
+                </div>
+            </div>
+        </div>
+    `;
+
+    // فلترة دقيقة للمنتجات
+    const filtered = MOCK_PRODUCTS.filter(p => p.cat === parentKey && p.sub === subKey);
+    renderProducts(filtered);
+};
+
+/*****************************************
+ * 5. PRODUCT RENDERING & MODALS
+ *****************************************/
+function renderProducts(list) {
     const grid = document.getElementById('products-grid');
     if(!grid) return;
 
-    const filtered = filterCategory === 'all' 
-        ? MOCK_PRODUCTS 
-        : MOCK_PRODUCTS.filter(p => p.category === filterCategory);
+    if(list.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#888; padding:20px;">لا توجد منتجات مطابقة</div>';
+        return;
+    }
 
-    grid.innerHTML = filtered.map(p => `
+    grid.innerHTML = list.map(p => `
         <div class="product-card glass-panel" onclick="openProductModal(${p.id})">
             <div class="p-img-box">
                 <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150'">
-                <div class="ai-tag"><i class="fa-solid fa-microchip"></i> AI Verified</div>
+                <div class="ai-tag"><i class="fa-solid fa-microchip"></i> AI Check</div>
             </div>
             <div class="p-details">
                 <div class="p-name">${p.name}</div>
@@ -130,75 +233,31 @@ function renderProducts(filterCategory) {
     `).join('');
 }
 
-/************************
- * 4. وظائف التنقل (Auth)
- ************************/
-// زر الدخول التجريبي
-const loginBtn = document.getElementById('login-btn');
-if(loginBtn) {
-    loginBtn.addEventListener('click', () => {
-        document.getElementById('auth-container').style.display = 'none';
-        document.getElementById('app-container').style.display = 'block';
-    });
-}
-
-// زر دخول Pi
-const piLoginBtn = document.getElementById('pi-login-btn');
-if(piLoginBtn) {
-    piLoginBtn.addEventListener('click', async () => {
-        try {
-            const scopes = ['username', 'payments'];
-            const auth = await Pi.authenticate(scopes, onIncompletePayment);
-            currentUser = auth.user;
-            alert("مرحباً بك يا " + auth.user.username);
-            
-            document.getElementById('auth-container').style.display = 'none';
-            document.getElementById('app-container').style.display = 'block';
-        } catch (err) {
-            alert("يرجى فتح الموقع من متصفح Pi Browser");
-        }
-    });
-}
-
-/************************
- * 5. التحكم في النوافذ (Modals)
- ************************/
+// نوافذ التفاصيل والدفع (نفس الكود السابق لأنه يعمل جيداً)
 window.openProductModal = function(id) {
     const product = MOCK_PRODUCTS.find(p => p.id === id);
     if(!product) return;
-    
     selectedProduct = product;
     
     document.getElementById('detail-img').src = product.image;
     document.getElementById('detail-title').innerText = product.name;
     document.getElementById('detail-price').innerText = product.price + " Pi";
     document.getElementById('detail-desc').innerText = product.desc;
-    
-    // بيانات AI وهمية
-    document.getElementById('ai-score').innerText = "9.5";
-    document.getElementById('ai-market-price').innerText = product.price + " Pi";
-
     document.getElementById('product-detail-modal').style.display = 'block';
 };
 
-window.closeProductDetailModal = function() {
-    document.getElementById('product-detail-modal').style.display = 'none';
-};
+window.closeProductDetailModal = () => document.getElementById('product-detail-modal').style.display = 'none';
 
 window.openCheckoutModal = function() {
     if(!selectedProduct) return;
-    
     document.getElementById('checkout-product-name').innerText = selectedProduct.name;
     document.getElementById('checkout-product-price').innerText = selectedProduct.price + " Pi";
     document.getElementById('checkout-amount').innerText = selectedProduct.price;
-    
     document.getElementById('product-detail-modal').style.display = 'none';
     document.getElementById('checkoutModal').style.display = 'block';
 };
 
-window.closeCheckoutModal = function() {
-    document.getElementById('checkoutModal').style.display = 'none';
-};
+window.closeCheckoutModal = () => document.getElementById('checkoutModal').style.display = 'none';
 
 // باقي النوافذ
 window.openLogyAiModal = () => document.getElementById('logyAiModal').style.display = 'flex';
@@ -214,13 +273,6 @@ window.closeNotificationsModal = () => document.getElementById('notificationsMod
 window.openAiUploadModal = () => document.getElementById('ai-upload-modal').style.display = 'block';
 window.closeAiUploadModal = () => document.getElementById('ai-upload-modal').style.display = 'none';
 
-window.showApp = function(screen) {
-    if(screen === 'home') {
-        const modals = document.querySelectorAll('[id$="Modal"], [id$="-modal"]');
-        modals.forEach(m => m.style.display = 'none');
-    }
-};
-
 window.showDetailTab = function(tabName, el) {
     document.querySelectorAll('.detail-tab-content').forEach(c => c.style.display = 'none');
     document.querySelectorAll('.detail-tab-item').forEach(i => i.classList.remove('active'));
@@ -228,27 +280,25 @@ window.showDetailTab = function(tabName, el) {
     el.classList.add('active');
 };
 
-/************************
- * 6. وظيفة الدفع (Payment) - الجزء المهم
- ************************/
+/*****************************************
+ * 6. PAYMENT LOGIC (Essential)
+ *****************************************/
 window.checkout = async function() {
     const btn = document.querySelector('#checkoutModal .buy-btn');
     const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري المعالجة...';
-    btn.disabled = true;
     
     if (typeof window.Pi === 'undefined') {
-        alert("⚠️ يجب فتح التطبيق من متصفح Pi Browser لإتمام الدفع الحقيقي.");
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+        alert("⚠️ يجب استخدام متصفح Pi Browser للدفع الحقيقي.");
         return;
     }
 
     try {
-        // 1. طلب إنشاء الدفع من السيرفر
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> معالجة...';
+        btn.disabled = true;
+
+        // 1. Backend Request
         const response = await fetch(`${API_BASE}/api/pi/create-payment`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+            method: "POST", headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 productId: selectedProduct.id,
                 amount: selectedProduct.price,
@@ -256,16 +306,11 @@ window.checkout = async function() {
             })
         });
 
-        if (!response.ok) throw new Error("فشل الاتصال بالسيرفر");
+        if (!response.ok) throw new Error("Server Error");
         const resData = await response.json();
-        const paymentData = resData.data;
 
-        // 2. بدء الدفع في Pi SDK
-        await Pi.createPayment({
-            amount: paymentData.amount,
-            memo: paymentData.memo,
-            metadata: paymentData.metadata
-        }, {
+        // 2. Pi SDK
+        await Pi.createPayment(resData.data, {
             onReadyForServerApproval: async (paymentId) => { 
                 await fetch(`${API_BASE}/api/pi/approve-payment`, {
                     method: "POST", headers: { "Content-Type": "application/json" },
@@ -277,28 +322,40 @@ window.checkout = async function() {
                     method: "POST", headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ paymentId, txid })
                 });
-                alert("✅ تم الدفع بنجاح!");
+                alert("✅ تم الدفع!");
                 closeCheckoutModal();
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             },
             onCancel: () => { 
-                alert("تم الإلغاء"); 
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+                alert("تم الإلغاء"); btn.innerHTML = originalText; btn.disabled = false; 
             },
             onError: (err) => { 
-                alert("خطأ: " + err.message); 
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+                alert("خطأ: " + err.message); btn.innerHTML = originalText; btn.disabled = false; 
             }
         });
+
     } catch(err) {
         console.error(err);
-        alert("حدث خطأ أثناء الاتصال: " + err.message); 
+        alert("خطأ في الاتصال");
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
 };
 
-function onIncompletePayment(payment) { console.log("Incomplete payment found"); }
+// Authentication Buttons
+if(document.getElementById('login-btn')) {
+    document.getElementById('login-btn').addEventListener('click', () => {
+        document.getElementById('auth-container').style.display = 'none';
+        document.getElementById('app-container').style.display = 'block';
+    });
+}
+if(document.getElementById('pi-login-btn')) {
+    document.getElementById('pi-login-btn').addEventListener('click', async () => {
+        try {
+            const auth = await Pi.authenticate(['username', 'payments'], () => {});
+            document.getElementById('auth-container').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+        } catch (e) { alert("Error: " + e.message); }
+    });
+}
