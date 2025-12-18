@@ -1,357 +1,372 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Forsale AI - سوق المستقبل</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    
-    <!-- Pi Network SDK -->
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <script>
-      if (typeof Pi !== 'undefined') {
-        Pi.init({ version: "2.0", sandbox: true });
-        console.log('✅ Pi SDK initialized');
-      }
-    </script>
-</head>
-<body>
+import React, { useState } from 'react';
+import { ShoppingBag, Sparkles, TrendingUp, Shield, Search, Filter, Grid, List, Heart, ShoppingCart, User, Menu, X, Star, MapPin, Clock, Package, CheckCircle, ArrowRight } from 'lucide-react';
 
-<div id="auth-container">
-    <div class="auth-logo">
-        <span style="background:var(--accent);color:black;font-size:14px;padding:2px 8px;border-radius:6px">AI</span> 
-        Forsale
-    </div>
-    <p style="color:var(--text-muted);margin-bottom:30px;text-align:center">منصة المستقبل الذكية - مدعومة بـ Pi Network</p>
+const ForsaleRedesign = () => {
+  const [viewMode, setViewMode] = useState('grid');
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
 
-    <div class="auth-card">
-        <h2 style="margin-bottom:20px">تسجيل الدخول الآمن</h2>
-        
-        <div class="input-group">
-            <i class="fa-solid fa-envelope"></i>
-            <input type="email" placeholder="البريد الإلكتروني" id="login-email">
-        </div>
-        
-        <div class="input-group">
-            <i class="fa-solid fa-lock"></i>
-            <input type="password" placeholder="كلمة المرور" id="login-password">
-        </div>
+  // Mock data - enhanced
+  const products = [
+    {
+      id: 1,
+      name: "iPhone 15 Pro Max",
+      price: 0.85,
+      originalPrice: 1.2,
+      image: "https://images.unsplash.com/photo-1696446702883-application-6a0952e1e5ed?w=500",
+      aiScore: 9.4,
+      condition: "Like New",
+      seller: "TechDeals",
+      location: "Cairo, Egypt",
+      verified: true,
+      likes: 234,
+      views: 1240
+    },
+    {
+      id: 2,
+      name: "MacBook Pro M3",
+      price: 2.5,
+      originalPrice: 3.2,
+      image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500",
+      aiScore: 9.7,
+      condition: "Brand New",
+      seller: "AppleStore",
+      location: "Alexandria, Egypt",
+      verified: true,
+      likes: 456,
+      views: 2890
+    },
+    {
+      id: 3,
+      name: "AirPods Pro 2",
+      price: 0.18,
+      originalPrice: 0.25,
+      image: "https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=500",
+      aiScore: 9.1,
+      condition: "Excellent",
+      seller: "AudioHub",
+      location: "Dubai, UAE",
+      verified: true,
+      likes: 189,
+      views: 890
+    }
+  ];
 
-        <button class="main-btn" id="login-btn">
-            دخول آمن <i class="fa-solid fa-arrow-left"></i>
-        </button>
+  const categories = [
+    { icon: "📱", name: "Electronics", count: 1240 },
+    { icon: "👕", name: "Fashion", count: 890 },
+    { icon: "🏠", name: "Home", count: 567 },
+    { icon: "🎮", name: "Gaming", count: 432 },
+    { icon: "📚", name: "Books", count: 234 }
+  ];
 
-        <div style="margin-top:20px; cursor:pointer;" id="fingerprint-login-btn">
-            <i class="fa-solid fa-fingerprint fingerprint-scan"></i>
-            <p style="font-size:14px; color:var(--accent); font-weight:bold;">أو استخدم بصمة Pi Network</p>
-        </div>
-
-        <button class="main-btn pi-btn" id="pi-login-btn" style="margin-top:10px;">
-            <i class="fa-solid fa-network-wired"></i> تسجيل الدخول عبر Pi Browser
-        </button>
-
-        <div class="auth-footer">
-            <p>ليس لديك حساب؟ <a href="#" onclick="showRegister()">سجل الآن</a></p>
-        </div>
-    </div>
-</div>
-
-<div id="app-container">
-    <div class="fixed-header-wrapper">
-        <div class="header" id="main-header">
-            <div class="content-wrapper">
-                <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-store"></i> Forsale</div>
-                <div style="display:flex; gap:10px;">
-                    <div class="icon-btn primary" onclick="openAiUploadModal()"><i class="fa-solid fa-plus"></i></div>
-                    <div class="notification-icon-container">
-                        <div class="notification-dot" id="notification-dot"></div>
-                        <div class="icon-btn" onclick="openNotificationsModal()"><i class="fa-solid fa-bell"></i></div>
-                    </div>
-                    <div class="icon-btn" onclick="openSettingsModal()"><i class="fa-solid fa-gear"></i></div>
-                </div>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      {/* Modern Header */}
+      <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/50">
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <ShoppingBag className="w-8 h-8 text-violet-400" />
+              <Sparkles className="w-4 h-4 text-yellow-400 absolute -top-1 -right-1" />
             </div>
+            <div>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+                Forsale
+              </h1>
+              <p className="text-[10px] text-slate-500">AI-Powered Marketplace</p>
+            </div>
+          </div>
+
+          {/* Search - Desktop */}
+          <div className="hidden md:flex flex-1 max-w-2xl mx-8">
+            <div className="relative w-full">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search with AI intelligence..."
+                className="w-full pl-12 pr-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-violet-500 transition-colors"
+              />
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-3">
+            <button className="p-2 hover:bg-slate-800 rounded-lg transition-colors relative">
+              <Heart className="w-5 h-5 text-slate-400" />
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-violet-500 rounded-full text-[10px] flex items-center justify-center">3</span>
+            </button>
+            <button className="p-2 hover:bg-slate-800 rounded-lg transition-colors relative">
+              <ShoppingCart className="w-5 h-5 text-slate-400" />
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-violet-500 rounded-full text-[10px] flex items-center justify-center">2</span>
+            </button>
+            <button className="p-2 hover:bg-slate-800 rounded-lg transition-colors">
+              <User className="w-5 h-5 text-slate-400" />
+            </button>
+          </div>
         </div>
-    </div>
 
-    <div class="container">
-        <div class="content-wrapper">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" placeholder="ابحث بذكاء اصطناعي أو صف منتج أحلامك...">
-            </div>
-            
-            <div class="cats-scroll" id="level1-scroll"></div>
-
-            <div class="dynamic-filters glass-panel" id="filter-panel">
-                <div class="sub-chips" id="level2-chips"> </div>
-                <div id="level3-area"> </div>
-            </div>
-
-            <h2 style="font-size: 20px; color: var(--text-main); margin: 0 0 15px;">اقتراحات Logy AI</h2>
-            
-            <div class="products-grid" id="products-grid"> </div>
+        {/* Search - Mobile */}
+        <div className="md:hidden px-4 pb-3">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search..."
+              className="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white text-sm placeholder:text-slate-500"
+            />
+          </div>
         </div>
-    </div>
+      </header>
 
-    <div id="product-detail-modal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-eye"></i> تفاصيل المنتج</div>
-            <div class="icon-btn" onclick="closeProductDetailModal()"><i class="fa-solid fa-xmark"></i></div>
+      {/* Categories Bar */}
+      <div className="bg-slate-900/50 border-b border-slate-800/50 overflow-x-auto">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex gap-2 py-3">
+            {categories.map((cat, i) => (
+              <button
+                key={i}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 hover:bg-slate-800 rounded-lg whitespace-nowrap transition-colors border border-slate-700/50"
+              >
+                <span className="text-xl">{cat.icon}</span>
+                <span className="text-sm text-slate-300">{cat.name}</span>
+                <span className="text-xs text-slate-500">({cat.count})</span>
+              </button>
+            ))}
+          </div>
         </div>
-        <div class="content-wrapper">
-            <img id="detail-img" class="detail-img" src="" alt="صورة المنتج">
-            <div class="detail-title" id="detail-title"></div>
-            <div class="detail-price" id="detail-price"></div>
+      </div>
 
-            <h3 class="ai-section-title"><i class="fa-solid fa-microchip"></i> تحليل Logy AI للسعر</h3>
-            <div class="glass-panel ai-price-card">
-                <div class="stat-box" id="ai-score-box">
-                    <div class="value" id="ai-score">9.2</div>
-                    <div class="label">نقطة قوة العرض (10 هي الأفضل)</div>
-                </div>
-                <div class="stat-box">
-                    <div class="value" id="ai-market-price">0 Pi</div>
-                    <div class="label">متوسط السعر السوقي (AI)</div>
-                </div>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 py-6">
+        {/* Filters & View Toggle */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 rounded-lg transition-colors"
+            >
+              <Filter className="w-4 h-4" />
+              <span className="text-sm">Filters</span>
+            </button>
+            <div className="flex items-center gap-2 px-2 py-1 bg-slate-800/50 border border-slate-700 rounded-lg">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-1.5 rounded ${viewMode === 'grid' ? 'bg-violet-500' : 'hover:bg-slate-700'} transition-colors`}
+              >
+                <Grid className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-1.5 rounded ${viewMode === 'list' ? 'bg-violet-500' : 'hover:bg-slate-700'} transition-colors`}
+              >
+                <List className="w-4 h-4" />
+              </button>
             </div>
-            <div class="price-chart-mock"><div class="chart-line"></div></div>
-            <p id="ai-summary" style="font-size: 13px; color: var(--text-muted); margin-top: 10px; padding: 0 15px;">السعر ممتاز! التوصيل خلال 3-5 أيام.</p>
-
-            <h3 class="ai-section-title"><i class="fa-solid fa-truck-fast"></i> لوجستيات الشحن (AI Secured)</h3>
-            <div class="glass-panel ai-logistics-card">
-                <div class="step">
-                    <div class="step-icon"><i class="fa-solid fa-calendar-alt"></i></div>
-                    <div class="step-text">زمن التوصيل المقدر: <span id="shipping-eta" style="font-weight: bold; color:var(--accent);">3-5 أيام</span></div>
-                </div>
-                <div class="step">
-                    <div class="step-icon"><i class="fa-solid fa-shield-alt"></i></div>
-                    <div class="step-text">إدارة المشاكل: <span id="shipping-problem" style="color:var(--text-main);">مراقبة شحن مدارة بالذكاء الاصطناعي</span></div>
-                </div>
-                <div class="step">
-                    <div class="step-icon"><i class="fa-solid fa-box"></i></div>
-                    <div class="step-text">الناقل: <span id="shipping-carrier" style="font-weight: bold; color:var(--primary);">Logy AI Express</span></div>
-                </div>
-            </div>
-            
-            <div class="detail-tabs-container glass-panel">
-                <div class="detail-tabs-scroll">
-                    <div class="detail-tab-item active" data-tab="description" onclick="showDetailTab('description', this)">
-                        <i class="fa-solid fa-file-alt"></i> الوصف والتفاصيل 
-                    </div>
-                    <div class="detail-tab-item" data-tab="specs" onclick="showDetailTab('specs', this)">
-                        <i class="fa-solid fa-cogs"></i> المواصفات الفنية 
-                    </div>
-                    <div class="detail-tab-item" data-tab="reviews" onclick="showDetailTab('reviews', this)">
-                        <i class="fa-solid fa-comments"></i> آراء المشترين 
-                    </div>
-                </div>
-                <div class="detail-tab-content" id="detail-description">
-                    <p id="detail-desc" style="line-height: 1.8; color: var(--text-main); font-size: 14px;"></p>
-                </div>
-                <div class="detail-tab-content" id="detail-specs" style="display:none;">
-                    <ul id="specs-list" style="list-style: none; padding: 0; margin: 0;"></ul>
-                </div>
-                <div class="detail-tab-content" id="detail-reviews" style="display:none;">
-                    <p style="color:var(--text-muted);">نظام المراجعات قريباً. Logy AI يحلل المشترين لضمان المصداقية.</p>
-                </div>
-            </div>
-
-            <h3 class="ai-section-title"><i class="fa-solid fa-lock"></i> نظام الضمان والمدفوعات الآمنة (Escrow)</h3>
-            <div class="glass-panel" style="padding: 15px;">
-                <div class="escrow-step active">
-                    <div class="escrow-step-icon"><i class="fa-solid fa-wallet"></i></div>
-                    <div class="escrow-step-text"><strong>1. الدفع والاحتجاز:</strong> يتم حجز (Escrow) قيمة المنتج في محفظة مؤمنة بالذكاء الاصطناعي.</div>
-                </div>
-                <div class="escrow-step">
-                    <div class="escrow-step-icon"><i class="fa-solid fa-box"></i></div>
-                    <div class="escrow-step-text"><strong>2. الشحن والتتبع:</strong> البائع يشحن المنتج، ويراقب Logy AI كل مرحلة.</div>
-                </div>
-                <div class="escrow-step">
-                    <div class="escrow-step-icon"><i class="fa-solid fa-check"></i></div>
-                    <div class="escrow-step-text"><strong>3. التأكيد والتحرير:</strong> عند تأكيد الاستلام، يتم تحرير دفعة Pi للبائع.</div>
-                </div>
-            </div>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-slate-400">
+            <TrendingUp className="w-4 h-4" />
+            <span>1,234 items</span>
+          </div>
         </div>
-        <div class="buy-fixed-bar">
-            <div class="content-wrapper">
-                <button class="buy-btn" id="buy-btn" onclick="openCheckoutModal()"><i class="fa-solid fa-shopping-cart"></i> شراء المنتج الآن</button>
-            </div>
-        </div>
-    </div>
 
-    <div id="ai-upload-modal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-microchip"></i> إدراج منتج جديد</div>
-            <div class="icon-btn" onclick="closeAiUploadModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--accent); margin: 15px 0;">أطلق منتجك إلى العالم بواسطة Logy AI</h2>
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-image"></i> تحميل الصور</h4>
-                <p>قم بتحميل 3-5 صور واضحة لمنتجك. Logy AI سيقوم بتحليل الجودة، والمواصفات، والحالة.</p>
-                <input type="file" id="product-images" accept="image/*" multiple style="display: none;">
-                <button class="primary" onclick="document.getElementById('product-images').click()" style="background: var(--primary); color: black;">
-                    <i class="fa-solid fa-cloud-upload-alt"></i> اختر ملفات الصور
+        {/* Products Grid */}
+        <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}>
+          {products.map((product) => (
+            <div
+              key={product.id}
+              onClick={() => setSelectedProduct(product)}
+              className="group bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden hover:border-violet-500/50 transition-all cursor-pointer hover:shadow-xl hover:shadow-violet-500/10"
+            >
+              {/* Image */}
+              <div className="relative aspect-square overflow-hidden bg-slate-800">
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                {/* AI Badge */}
+                <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-1 bg-violet-500/90 backdrop-blur-sm rounded-lg">
+                  <Sparkles className="w-3 h-3" />
+                  <span className="text-xs font-bold">{product.aiScore}</span>
+                </div>
+                {/* Like Button */}
+                <button className="absolute top-3 right-3 p-2 bg-slate-900/80 backdrop-blur-sm rounded-lg hover:bg-violet-500 transition-colors">
+                  <Heart className="w-4 h-4" />
                 </button>
-                <p id="image-count-label" style="margin-top: 10px; font-size: 12px; color: var(--accent);">لم يتم اختيار أي ملفات.</p>
-            </div>
-            
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-keyboard"></i> معلومات أساسية</h4>
-                <div class="filter-group">
-                    <label for="manual-desc">وصف مختصر للمنتج (بالكلمات):</label>
-                    <textarea id="manual-desc" rows="3" placeholder="مثال: آيفون 15 برو مستعمل، لون أبيض، سعة 256 جيجا" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:var(--text-main); font-size:14px;"></textarea>
+                {/* Verified Badge */}
+                {product.verified && (
+                  <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2 py-1 bg-emerald-500/90 backdrop-blur-sm rounded-lg">
+                    <CheckCircle className="w-3 h-3" />
+                    <span className="text-xs font-medium">Verified</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Content */}
+              <div className="p-4">
+                <h3 className="font-semibold text-white mb-1 line-clamp-1">{product.name}</h3>
+                <p className="text-xs text-slate-400 mb-3">{product.condition}</p>
+                
+                {/* Price */}
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="text-2xl font-bold text-violet-400">{product.price}π</span>
+                  <span className="text-sm text-slate-500 line-through">{product.originalPrice}π</span>
+                  <span className="text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full">
+                    -{Math.round((1 - product.price/product.originalPrice) * 100)}%
+                  </span>
                 </div>
-                <div class="filter-group" style="margin-top: 15px;">
-                    <label>السعر الذي تقترحه (اختياري):</label>
-                    <input type="number" id="manual-price" placeholder="Pi" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:var(--text-main); font-size:14px;">
+
+                {/* Meta */}
+                <div className="flex items-center justify-between text-xs text-slate-400 pt-3 border-t border-slate-800">
+                  <div className="flex items-center gap-1">
+                    <MapPin className="w-3 h-3" />
+                    <span>{product.location}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span>{product.views} views</span>
+                    <span>❤️ {product.likes}</span>
+                  </div>
                 </div>
+              </div>
             </div>
-            
-            <button class="buy-btn" onclick="startAiAnalysis()" id="start-analysis-btn" style="margin-top: 20px;" disabled>
-                <i class="fa-solid fa-microchip"></i> تحليل وإدراج المنتج الآن بواسطة AI
+          ))}
+        </div>
+      </main>
+
+      {/* Product Detail Modal */}
+      {selectedProduct && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedProduct(null)} />
+          
+          <div className="relative bg-slate-900 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl border border-slate-800">
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedProduct(null)}
+              className="absolute top-4 right-4 z-10 p-2 bg-slate-800/90 backdrop-blur-sm rounded-lg hover:bg-slate-700 transition-colors"
+            >
+              <X className="w-5 h-5" />
             </button>
-        </div>
-    </div>
 
-    <div id="settingsModal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-gear"></i> الإعدادات</div>
-            <div class="icon-btn" onclick="closeSettingsModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">إعدادات الحساب والتطبيق</h2>
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-user-circle"></i> الحساب العام</h4>
-                <p>إدارة ملفك الشخصي وإعدادات الأمان.</p>
-                <button class="primary" onclick="alert('جاري التوجه لصفحة إدارة الملف الشخصي')">تعديل الملف الشخصي</button>
+            {/* Image */}
+            <div className="relative h-80 bg-slate-800">
+              <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-full object-cover" />
+              <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-violet-500/90 backdrop-blur-sm rounded-lg">
+                <Sparkles className="w-4 h-4" />
+                <span className="font-bold">AI Score: {selectedProduct.aiScore}/10</span>
+              </div>
             </div>
 
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-lock"></i> الأمان والخصوصية</h4>
-                <p>إعدادات المصادقة الثنائية وتفضيلات البيانات.</p>
-                <button class="accent" onclick="alert('تم تفعيل المصادقة الثنائية بواسطة Logy AI.')">تفعيل المصادقة الثنائية</button>
+            <div className="p-6">
+              {/* Title & Price */}
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-white mb-1">{selectedProduct.name}</h2>
+                  <p className="text-slate-400">{selectedProduct.condition}</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-violet-400">{selectedProduct.price}π</div>
+                  <div className="text-sm text-slate-500 line-through">{selectedProduct.originalPrice}π</div>
+                </div>
+              </div>
+
+              {/* AI Analysis */}
+              <div className="bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20 rounded-xl p-4 mb-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-5 h-5 text-violet-400" />
+                  <h3 className="font-semibold text-white">AI Price Analysis</h3>
+                </div>
+                <p className="text-sm text-slate-300 mb-3">
+                  Excellent deal! Price is 29% below market average. Item is verified authentic with fast shipping available.
+                </p>
+                <div className="flex items-center gap-4 text-xs">
+                  <div className="flex items-center gap-1">
+                    <TrendingUp className="w-4 h-4 text-emerald-400" />
+                    <span className="text-slate-400">Market Price: {selectedProduct.originalPrice}π</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4 text-blue-400" />
+                    <span className="text-slate-400">Delivery: 3-5 days</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Seller Info */}
+              <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-full flex items-center justify-center font-bold text-lg">
+                    {selectedProduct.seller[0]}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-white">{selectedProduct.seller}</span>
+                      {selectedProduct.verified && <CheckCircle className="w-4 h-4 text-emerald-400" />}
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-slate-400">
+                      <MapPin className="w-3 h-3" />
+                      <span>{selectedProduct.location}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center gap-1 text-yellow-400 mb-1">
+                    <Star className="w-4 h-4 fill-current" />
+                    <span className="font-semibold">4.8</span>
+                  </div>
+                  <span className="text-xs text-slate-400">234 reviews</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <button className="flex-1 px-6 py-3 bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 rounded-xl font-semibold transition-all flex items-center justify-center gap-2">
+                  <Shield className="w-5 h-5" />
+                  Buy with Escrow Protection
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Features */}
+              <div className="grid grid-cols-3 gap-3 mt-6">
+                <div className="text-center p-3 bg-slate-800/50 rounded-lg">
+                  <Shield className="w-6 h-6 text-emerald-400 mx-auto mb-1" />
+                  <p className="text-xs text-slate-400">Secure Payment</p>
+                </div>
+                <div className="text-center p-3 bg-slate-800/50 rounded-lg">
+                  <Package className="w-6 h-6 text-blue-400 mx-auto mb-1" />
+                  <p className="text-xs text-slate-400">Fast Shipping</p>
+                </div>
+                <div className="text-center p-3 bg-slate-800/50 rounded-lg">
+                  <CheckCircle className="w-6 h-6 text-violet-400 mx-auto mb-1" />
+                  <p className="text-xs text-slate-400">AI Verified</p>
+                </div>
+              </div>
             </div>
-            
-            <button class="buy-btn" style="background:var(--danger); margin-top: 30px;" onclick="alert('تم تسجيل الخروج بنجاح. سنفتقدك!')">
-                <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
+          </div>
+        </div>
+      )}
+
+      {/* Bottom Navigation - Mobile */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 md:hidden z-40">
+        <div className="flex items-center justify-around h-16 px-2">
+          {[
+            { icon: ShoppingBag, label: 'Shop', active: true },
+            { icon: Search, label: 'Search' },
+            { icon: Heart, label: 'Saved' },
+            { icon: User, label: 'Account' }
+          ].map((item, i) => (
+            <button key={i} className="flex flex-col items-center gap-1 flex-1">
+              <item.icon className={`w-5 h-5 ${item.active ? 'text-violet-400' : 'text-slate-400'}`} />
+              <span className={`text-xs ${item.active ? 'text-violet-400 font-medium' : 'text-slate-400'}`}>
+                {item.label}
+              </span>
             </button>
+          ))}
         </div>
+      </nav>
     </div>
-    
-    <div id="checkoutModal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-credit-card"></i> تأكيد الدفع</div>
-            <div class="icon-btn" onclick="closeCheckoutModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">ملخص عملية الشراء</h2>
-            
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-box"></i> المنتج</h4>
-                <p id="checkout-product-name" style="font-weight: bold; font-size: 15px; margin-bottom: 5px;">iPhone 15 Pro</p>
-                <p>السعر: <span id="checkout-product-price" style="font-weight: bold; color:var(--primary);">0.01 Pi</span></p>
-            </div>
-            
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-map-location-dot"></i> عنوان الشحن</h4>
-                <p>الاسم: <span style="font-weight: bold;">مستخدم Pi</span></p>
-                <p>العنوان: سيتم تحديده بعد تأكيد الطلب</p>
-            </div>
-            
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-shield-alt"></i> حماية المشتري (Logy AI Escrow)</h4>
-                <p style="color:var(--success-color); font-weight: bold;">أمنة: سيتم حجز (Escrow) المبلغ حتى تستلم المنتج وتؤكد مطابقته للمواصفات.</p>
-            </div>
+  );
+};
 
-            <div class="buy-fixed-bar">
-                <div class="content-wrapper">
-                    <button class="buy-btn" style="background:var(--success-color); color:black;" onclick="checkout()">
-                        <i class="fa-solid fa-wallet"></i> تأكيد ودفع <span id="checkout-amount">0.01</span> Pi
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="ordersModal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-cart-shopping"></i> Logy AI Orders</div>
-            <div class="icon-btn" onclick="closeOrdersModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">الطلبات المدارة بالذكاء الاصطناعي</h2>
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-check-circle" style="color:var(--success-color);"></i> لا توجد طلبات بعد</h4>
-                <p style="color:var(--text-muted);">قم بشراء منتجك الأول الآن!</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="walletModal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-wallet"></i> Pi Wallet</div>
-            <div class="icon-btn" onclick="closeWalletModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0 10px;">رصيد Pi الحالي</h2>
-            <div class="glass-panel" style="padding: 25px; text-align: center; border-color: var(--pi-purple);">
-                <div style="font-size: 14px; color: var(--text-muted);">الرصيد الكلي</div>
-                <div style="font-size: 40px; font-weight: 900; color: var(--pi-purple); margin-top: 5px;">
-                    -- Pi
-                </div>
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">(مدار بواسطة Logy AI)</p>
-            </div>
-        </div>
-    </div>
-    
-    <div id="notificationsModal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-bell"></i> إشعارات Logy AI</div>
-            <div class="icon-btn" onclick="closeNotificationsModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">أحدث التنبيهات</h2>
-            <div class="glass-panel" style="padding: 10px;">
-                <p style="color:var(--text-muted); text-align:center; padding:20px;">لا توجد إشعارات حالياً</p>
-            </div>
-        </div>
-    </div>
-    
-    <div id="logyAiModal">
-        <div class="logy-chat-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-robot"></i> Logy AI Chat</div>
-            <div class="icon-btn" onclick="closeLogyAiModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="logy-chat-area" id="logy-chat-area"></div>
-        <div class="logy-input-bar">
-            <input type="text" id="logy-input" placeholder="اطلب من Logy AI مساعدتك في أي شيء..." autofocus>
-            <div class="logy-send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></div>
-        </div>
-    </div>
-
-    <div class="footer-nav">
-        <div class="nav-item active" onclick="showApp('home')">
-            <i class="fa-solid fa-house"></i>
-            <span>الرئيسية</span>
-        </div>
-        <div class="nav-item" onclick="openLogyAiModal()">
-            <i class="fa-solid fa-robot"></i>
-            <span>Logy AI</span>
-        </div>
-        <div class="nav-item" onclick="openOrdersModal()">
-            <i class="fa-solid fa-box"></i>
-            <span>الطلبات</span>
-        </div>
-        <div class="nav-item" onclick="openWalletModal()">
-            <i class="fa-solid fa-wallet"></i>
-            <span>المحفظة</span>
-        </div>
-    </div>
-</div>
-
-<script src="script.js"></script>
-
-</body>
-</html>
+export default ForsaleRedesign;
