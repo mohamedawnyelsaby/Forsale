@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Forsale AI - سوق المستقبل</title>
+    <title>Forsale AI - Global Market</title>
+    
+    <!-- خطوط عالمية (Cairo + Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     
@@ -12,63 +18,72 @@
     <script>
       if (typeof Pi !== 'undefined') {
         Pi.init({ version: "2.0", sandbox: true });
-        console.log('✅ Pi SDK initialized');
       }
     </script>
 </head>
 <body>
 
+<!-- زر اللغة العائم (يظهر في شاشة الدخول) -->
+<div class="lang-float-btn" id="lang-float-btn" onclick="toggleLangDropdown()">
+    <span id="currentFlag">🇸🇦</span> <span id="currentLangCode">AR</span>
+</div>
+<div class="lang-dropdown" id="langDropdown">
+    <!-- سيتم ملؤها بالجافاسكريبت -->
+</div>
+
+<!-- ========================================== -->
+<!-- 1. شاشة تسجيل الدخول -->
+<!-- ========================================== -->
 <div id="auth-container">
     <div class="auth-logo">
         <span style="background:var(--accent);color:black;font-size:14px;padding:2px 8px;border-radius:6px">AI</span> 
         Forsale
     </div>
-    <p style="color:var(--text-muted);margin-bottom:30px;text-align:center">منصة المستقبل الذكية - مدعومة بـ Pi Network</p>
+    <p style="color:var(--text-muted);margin-bottom:30px;text-align:center" data-i18n="auth.subtitle">منصة المستقبل الذكية - مدعومة بـ Pi Network</p>
 
     <div class="auth-card">
-        <h2 style="margin-bottom:20px">تسجيل الدخول الآمن</h2>
+        <h2 style="margin-bottom:20px" data-i18n="auth.loginTitle">تسجيل الدخول الآمن</h2>
         
         <div class="input-group">
             <i class="fa-solid fa-envelope"></i>
-            <input type="email" placeholder="البريد الإلكتروني" id="login-email">
+            <input type="email" data-placeholder="auth.emailPlaceholder">
         </div>
         
         <div class="input-group">
             <i class="fa-solid fa-lock"></i>
-            <input type="password" placeholder="كلمة المرور" id="login-password">
+            <input type="password" data-placeholder="auth.passPlaceholder">
         </div>
 
-        <button class="main-btn" id="login-btn">
-            دخول آمن <i class="fa-solid fa-arrow-left"></i>
+        <button class="main-btn" onclick="login()">
+            <span data-i18n="auth.enterBtn">دخول آمن</span> <i class="fa-solid fa-arrow-left flip-icon"></i>
         </button>
 
         <div style="margin-top:20px; cursor:pointer;" id="fingerprint-login-btn">
             <i class="fa-solid fa-fingerprint fingerprint-scan"></i>
-            <p style="font-size:14px; color:var(--accent); font-weight:bold;">أو استخدم بصمة Pi Network</p>
+            <p style="font-size:14px; color:var(--accent); font-weight:bold;" data-i18n="auth.piFingerprint">أو استخدم بصمة Pi Network</p>
         </div>
 
-        <button class="main-btn pi-btn" id="pi-login-btn" style="margin-top:10px;">
-            <i class="fa-solid fa-network-wired"></i> تسجيل الدخول عبر Pi Browser
-        </button>
-
         <div class="auth-footer">
-            <p>ليس لديك حساب؟ <a href="#" onclick="showRegister()">سجل الآن</a></p>
+            <p data-i18n="auth.noAccount">ليس لديك حساب؟ <a href="#" style="color:var(--accent)">سجل الآن</a></p>
         </div>
     </div>
 </div>
 
-<div id="app-container">
+<!-- ========================================== -->
+<!-- 2. التطبيق الرئيسي -->
+<!-- ========================================== -->
+<div id="app-container" style="display:none;">
     <div class="fixed-header-wrapper">
         <div class="header" id="main-header">
             <div class="content-wrapper">
                 <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-store"></i> Forsale</div>
                 <div style="display:flex; gap:10px;">
-                    <div class="icon-btn primary" onclick="openAiUploadModal()"><i class="fa-solid fa-plus"></i></div>
+                    <div class="icon-btn primary" onclick="openModal('ai-upload-modal')"><i class="fa-solid fa-plus"></i></div>
                     <div class="notification-icon-container">
-                        <div class="notification-dot" id="notification-dot"></div>
-                        <div class="icon-btn" onclick="openNotificationsModal()"><i class="fa-solid fa-bell"></i></div>
+                        <div class="notification-dot"></div>
+                        <div class="icon-btn" onclick="openModal('notificationsModal')"><i class="fa-solid fa-bell"></i></div>
                     </div>
-                    <div class="icon-btn" onclick="openSettingsModal()"><i class="fa-solid fa-gear"></i></div>
+                    <div class="icon-btn" onclick="openModal('settingsModal')"><i class="fa-solid fa-gear"></i></div>
                 </div>
             </div>
         </div>
@@ -78,280 +93,265 @@
         <div class="content-wrapper">
             <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" placeholder="ابحث بذكاء اصطناعي أو صف منتج أحلامك...">
+                <input type="text" data-placeholder="home.searchPlaceholder">
             </div>
             
-            <div class="cats-scroll" id="level1-scroll"></div>
-
-            <div class="dynamic-filters glass-panel" id="filter-panel">
-                <div class="sub-chips" id="level2-chips"> </div>
-                <div id="level3-area"> </div>
+            <div class="cats-scroll">
+                <div class="cat-item active" data-i18n="cats.all">الكل</div>
+                <div class="cat-item" data-i18n="cats.cars">سيارات</div>
+                <div class="cat-item" data-i18n="cats.phones">هواتف</div>
+                <div class="cat-item" data-i18n="cats.realestate">عقارات</div>
+                <div class="cat-item" data-i18n="cats.services">خدمات</div>
             </div>
 
-            <h2 style="font-size: 20px; color: var(--text-main); margin: 0 0 15px;">اقتراحات Logy AI</h2>
+            <h2 style="font-size: 18px; color: var(--text-main); margin: 0 0 15px;" data-i18n="home.aiSuggestions">اقتراحات Logy AI</h2>
             
-            <div class="products-grid" id="products-grid"> </div>
+            <div class="products-grid">
+                <!-- منتج تجريبي 1 -->
+                <div class="product-card" onclick="openModal('product-detail-modal')">
+                    <div class="p-img-box">
+                        <div class="ai-tag"><i class="fa-solid fa-robot"></i> AI Verified</div>
+                        <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80" alt="Product">
+                    </div>
+                    <div class="p-details">
+                        <div class="p-name">iPhone 15 Pro Max</div>
+                        <div class="p-price">350 Pi</div>
+                    </div>
+                </div>
+                 <!-- منتج تجريبي 2 -->
+                 <div class="product-card" onclick="openModal('product-detail-modal')">
+                    <div class="p-img-box">
+                        <div class="ai-tag"><i class="fa-solid fa-robot"></i> Best Price</div>
+                        <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=500&q=80" alt="Car">
+                    </div>
+                    <div class="p-details">
+                        <div class="p-name">Tesla Model 3</div>
+                        <div class="p-price">12,000 Pi</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div id="product-detail-modal">
+    <!-- نافذة تفاصيل المنتج -->
+    <div id="product-detail-modal" class="modal">
         <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-eye"></i> تفاصيل المنتج</div>
-            <div class="icon-btn" onclick="closeProductDetailModal()"><i class="fa-solid fa-xmark"></i></div>
+            <div class="logo"><span class="ai-badge">AI</span> <span data-i18n="product.title">التفاصيل</span></div>
+            <div class="icon-btn" onclick="closeModal('product-detail-modal')"><i class="fa-solid fa-xmark"></i></div>
         </div>
         <div class="content-wrapper">
-            <img id="detail-img" class="detail-img" src="" alt="صورة المنتج">
-            <div class="detail-title" id="detail-title"></div>
-            <div class="detail-price" id="detail-price"></div>
+            <img class="detail-img" src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80">
+            <div class="detail-title">iPhone 15 Pro Max</div>
+            <div class="detail-price">350 Pi</div>
 
-            <h3 class="ai-section-title"><i class="fa-solid fa-microchip"></i> تحليل Logy AI للسعر</h3>
+            <h3 class="ai-section-title"><i class="fa-solid fa-microchip"></i> <span data-i18n="product.aiAnalysis">تحليل AI للسعر</span></h3>
             <div class="glass-panel ai-price-card">
-                <div class="stat-box" id="ai-score-box">
-                    <div class="value" id="ai-score">9.2</div>
-                    <div class="label">نقطة قوة العرض (10 هي الأفضل)</div>
+                <div class="stat-box">
+                    <div class="value">9.8</div>
+                    <div class="label" data-i18n="product.score">نقطة القوة</div>
                 </div>
                 <div class="stat-box">
-                    <div class="value" id="ai-market-price">0 Pi</div>
-                    <div class="label">متوسط السعر السوقي (AI)</div>
-                </div>
-            </div>
-            <div class="price-chart-mock"><div class="chart-line"></div></div>
-            <p id="ai-summary" style="font-size: 13px; color: var(--text-muted); margin-top: 10px; padding: 0 15px;">السعر ممتاز! التوصيل خلال 3-5 أيام.</p>
-
-            <h3 class="ai-section-title"><i class="fa-solid fa-truck-fast"></i> لوجستيات الشحن (AI Secured)</h3>
-            <div class="glass-panel ai-logistics-card">
-                <div class="step">
-                    <div class="step-icon"><i class="fa-solid fa-calendar-alt"></i></div>
-                    <div class="step-text">زمن التوصيل المقدر: <span id="shipping-eta" style="font-weight: bold; color:var(--accent);">3-5 أيام</span></div>
-                </div>
-                <div class="step">
-                    <div class="step-icon"><i class="fa-solid fa-shield-alt"></i></div>
-                    <div class="step-text">إدارة المشاكل: <span id="shipping-problem" style="color:var(--text-main);">مراقبة شحن مدارة بالذكاء الاصطناعي</span></div>
-                </div>
-                <div class="step">
-                    <div class="step-icon"><i class="fa-solid fa-box"></i></div>
-                    <div class="step-text">الناقل: <span id="shipping-carrier" style="font-weight: bold; color:var(--primary);">Logy AI Express</span></div>
+                    <div class="value">Excellent</div>
+                    <div class="label" data-i18n="product.condition">الحالة</div>
                 </div>
             </div>
             
-            <div class="detail-tabs-container glass-panel">
-                <div class="detail-tabs-scroll">
-                    <div class="detail-tab-item active" data-tab="description" onclick="showDetailTab('description', this)">
-                        <i class="fa-solid fa-file-alt"></i> الوصف والتفاصيل 
-                    </div>
-                    <div class="detail-tab-item" data-tab="specs" onclick="showDetailTab('specs', this)">
-                        <i class="fa-solid fa-cogs"></i> المواصفات الفنية 
-                    </div>
-                    <div class="detail-tab-item" data-tab="reviews" onclick="showDetailTab('reviews', this)">
-                        <i class="fa-solid fa-comments"></i> آراء المشترين 
-                    </div>
-                </div>
-                <div class="detail-tab-content" id="detail-description">
-                    <p id="detail-desc" style="line-height: 1.8; color: var(--text-main); font-size: 14px;"></p>
-                </div>
-                <div class="detail-tab-content" id="detail-specs" style="display:none;">
-                    <ul id="specs-list" style="list-style: none; padding: 0; margin: 0;"></ul>
-                </div>
-                <div class="detail-tab-content" id="detail-reviews" style="display:none;">
-                    <p style="color:var(--text-muted);">نظام المراجعات قريباً. Logy AI يحلل المشترين لضمان المصداقية.</p>
-                </div>
-            </div>
-
-            <h3 class="ai-section-title"><i class="fa-solid fa-lock"></i> نظام الضمان والمدفوعات الآمنة (Escrow)</h3>
-            <div class="glass-panel" style="padding: 15px;">
-                <div class="escrow-step active">
-                    <div class="escrow-step-icon"><i class="fa-solid fa-wallet"></i></div>
-                    <div class="escrow-step-text"><strong>1. الدفع والاحتجاز:</strong> يتم حجز (Escrow) قيمة المنتج في محفظة مؤمنة بالذكاء الاصطناعي.</div>
-                </div>
-                <div class="escrow-step">
-                    <div class="escrow-step-icon"><i class="fa-solid fa-box"></i></div>
-                    <div class="escrow-step-text"><strong>2. الشحن والتتبع:</strong> البائع يشحن المنتج، ويراقب Logy AI كل مرحلة.</div>
-                </div>
-                <div class="escrow-step">
-                    <div class="escrow-step-icon"><i class="fa-solid fa-check"></i></div>
-                    <div class="escrow-step-text"><strong>3. التأكيد والتحرير:</strong> عند تأكيد الاستلام، يتم تحرير دفعة Pi للبائع.</div>
-                </div>
-            </div>
-        </div>
-        <div class="buy-fixed-bar">
-            <div class="content-wrapper">
-                <button class="buy-btn" id="buy-btn" onclick="openCheckoutModal()"><i class="fa-solid fa-shopping-cart"></i> شراء المنتج الآن</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="ai-upload-modal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-microchip"></i> إدراج منتج جديد</div>
-            <div class="icon-btn" onclick="closeAiUploadModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--accent); margin: 15px 0;">أطلق منتجك إلى العالم بواسطة Logy AI</h2>
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-image"></i> تحميل الصور</h4>
-                <p>قم بتحميل 3-5 صور واضحة لمنتجك. Logy AI سيقوم بتحليل الجودة، والمواصفات، والحالة.</p>
-                <input type="file" id="product-images" accept="image/*" multiple style="display: none;">
-                <button class="primary" onclick="document.getElementById('product-images').click()" style="background: var(--primary); color: black;">
-                    <i class="fa-solid fa-cloud-upload-alt"></i> اختر ملفات الصور
-                </button>
-                <p id="image-count-label" style="margin-top: 10px; font-size: 12px; color: var(--accent);">لم يتم اختيار أي ملفات.</p>
-            </div>
-            
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-keyboard"></i> معلومات أساسية</h4>
-                <div class="filter-group">
-                    <label for="manual-desc">وصف مختصر للمنتج (بالكلمات):</label>
-                    <textarea id="manual-desc" rows="3" placeholder="مثال: آيفون 15 برو مستعمل، لون أبيض، سعة 256 جيجا" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:var(--text-main); font-size:14px;"></textarea>
-                </div>
-                <div class="filter-group" style="margin-top: 15px;">
-                    <label>السعر الذي تقترحه (اختياري):</label>
-                    <input type="number" id="manual-price" placeholder="Pi" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:var(--text-main); font-size:14px;">
-                </div>
-            </div>
-            
-            <button class="buy-btn" onclick="startAiAnalysis()" id="start-analysis-btn" style="margin-top: 20px;" disabled>
-                <i class="fa-solid fa-microchip"></i> تحليل وإدراج المنتج الآن بواسطة AI
-            </button>
-        </div>
-    </div>
-
-    <div id="settingsModal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-gear"></i> الإعدادات</div>
-            <div class="icon-btn" onclick="closeSettingsModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">إعدادات الحساب والتطبيق</h2>
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-user-circle"></i> الحساب العام</h4>
-                <p>إدارة ملفك الشخصي وإعدادات الأمان.</p>
-                <button class="primary" onclick="alert('جاري التوجه لصفحة إدارة الملف الشخصي')">تعديل الملف الشخصي</button>
-            </div>
-
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-lock"></i> الأمان والخصوصية</h4>
-                <p>إعدادات المصادقة الثنائية وتفضيلات البيانات.</p>
-                <button class="accent" onclick="alert('تم تفعيل المصادقة الثنائية بواسطة Logy AI.')">تفعيل المصادقة الثنائية</button>
-            </div>
-            
-            <button class="buy-btn" style="background:var(--danger); margin-top: 30px;" onclick="alert('تم تسجيل الخروج بنجاح. سنفتقدك!')">
-                <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
-            </button>
-        </div>
-    </div>
-    
-    <div id="checkoutModal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-credit-card"></i> تأكيد الدفع</div>
-            <div class="icon-btn" onclick="closeCheckoutModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">ملخص عملية الشراء</h2>
-            
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-box"></i> المنتج</h4>
-                <p id="checkout-product-name" style="font-weight: bold; font-size: 15px; margin-bottom: 5px;">iPhone 15 Pro</p>
-                <p>السعر: <span id="checkout-product-price" style="font-weight: bold; color:var(--primary);">0.01 Pi</span></p>
-            </div>
-            
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-map-location-dot"></i> عنوان الشحن</h4>
-                <p>الاسم: <span style="font-weight: bold;">مستخدم Pi</span></p>
-                <p>العنوان: سيتم تحديده بعد تأكيد الطلب</p>
-            </div>
-            
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-shield-alt"></i> حماية المشتري (Logy AI Escrow)</h4>
-                <p style="color:var(--success-color); font-weight: bold;">أمنة: سيتم حجز (Escrow) المبلغ حتى تستلم المنتج وتؤكد مطابقته للمواصفات.</p>
-            </div>
-
             <div class="buy-fixed-bar">
                 <div class="content-wrapper">
-                    <button class="buy-btn" style="background:var(--success-color); color:black;" onclick="checkout()">
-                        <i class="fa-solid fa-wallet"></i> تأكيد ودفع <span id="checkout-amount">0.01</span> Pi
+                    <button class="buy-btn" onclick="openModal('checkoutModal')">
+                        <i class="fa-solid fa-cart-shopping"></i> <span data-i18n="product.buyBtn">شراء الآن</span>
                     </button>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div id="ordersModal">
+
+    <!-- نافذة الإعدادات (فيها تغيير اللغة) -->
+    <div id="settingsModal" class="modal">
         <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-cart-shopping"></i> Logy AI Orders</div>
-            <div class="icon-btn" onclick="closeOrdersModal()"><i class="fa-solid fa-xmark"></i></div>
+            <div class="logo"><span class="ai-badge">AI</span> <span data-i18n="settings.title">الإعدادات</span></div>
+            <div class="icon-btn" onclick="closeModal('settingsModal')"><i class="fa-solid fa-xmark"></i></div>
         </div>
         <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">الطلبات المدارة بالذكاء الاصطناعي</h2>
             <div class="settings-group">
-                <h4><i class="fa-solid fa-check-circle" style="color:var(--success-color);"></i> لا توجد طلبات بعد</h4>
-                <p style="color:var(--text-muted);">قم بشراء منتجك الأول الآن!</p>
+                <h4 data-i18n="settings.general">عام</h4>
+                <!-- زر تغيير اللغة داخل الإعدادات -->
+                <button class="primary" onclick="toggleLangDropdownInSettings()">
+                    <i class="fa-solid fa-globe"></i> <span data-i18n="settings.changeLang">تغيير اللغة</span>
+                </button>
             </div>
-        </div>
-    </div>
-
-    <div id="walletModal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-wallet"></i> Pi Wallet</div>
-            <div class="icon-btn" onclick="closeWalletModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0 10px;">رصيد Pi الحالي</h2>
-            <div class="glass-panel" style="padding: 25px; text-align: center; border-color: var(--pi-purple);">
-                <div style="font-size: 14px; color: var(--text-muted);">الرصيد الكلي</div>
-                <div style="font-size: 40px; font-weight: 900; color: var(--pi-purple); margin-top: 5px;">
-                    -- Pi
-                </div>
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">(مدار بواسطة Logy AI)</p>
-            </div>
+            
+            <button class="buy-btn" style="background:var(--danger); margin-top:30px;" onclick="location.reload()">
+                <i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="settings.logout">تسجيل الخروج</span>
+            </button>
         </div>
     </div>
     
-    <div id="notificationsModal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-bell"></i> إشعارات Logy AI</div>
-            <div class="icon-btn" onclick="closeNotificationsModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">أحدث التنبيهات</h2>
-            <div class="glass-panel" style="padding: 10px;">
-                <p style="color:var(--text-muted); text-align:center; padding:20px;">لا توجد إشعارات حالياً</p>
-            </div>
-        </div>
-    </div>
-    
-    <div id="logyAiModal">
-        <div class="logy-chat-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-robot"></i> Logy AI Chat</div>
-            <div class="icon-btn" onclick="closeLogyAiModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="logy-chat-area" id="logy-chat-area"></div>
-        <div class="logy-input-bar">
-            <input type="text" id="logy-input" placeholder="اطلب من Logy AI مساعدتك في أي شيء..." autofocus>
-            <div class="logy-send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></div>
-        </div>
-    </div>
+    <!-- باقي النوافذ (Modals) فارغة لغرض العرض -->
+    <div id="ai-upload-modal" class="modal"><div class="detail-header"><div class="logo">Upload</div><div class="icon-btn" onclick="closeModal('ai-upload-modal')">X</div></div></div>
+    <div id="notificationsModal" class="modal"><div class="detail-header"><div class="logo">Notifications</div><div class="icon-btn" onclick="closeModal('notificationsModal')">X</div></div></div>
+    <div id="checkoutModal" class="modal"><div class="detail-header"><div class="logo">Checkout</div><div class="icon-btn" onclick="closeModal('checkoutModal')">X</div></div></div>
 
+    <!-- شريط التنقل السفلي -->
     <div class="footer-nav">
-        <div class="nav-item active" onclick="showApp('home')">
+        <div class="nav-item active">
             <i class="fa-solid fa-house"></i>
-            <span>الرئيسية</span>
+            <span data-i18n="nav.home">الرئيسية</span>
         </div>
-        <div class="nav-item" onclick="openLogyAiModal()">
+        <div class="nav-item">
             <i class="fa-solid fa-robot"></i>
-            <span>Logy AI</span>
+            <span data-i18n="nav.ai">Logy AI</span>
         </div>
-        <div class="nav-item" onclick="openOrdersModal()">
+        <div class="nav-item">
             <i class="fa-solid fa-box"></i>
-            <span>الطلبات</span>
+            <span data-i18n="nav.orders">الطلبات</span>
         </div>
-        <div class="nav-item" onclick="openWalletModal()">
+        <div class="nav-item">
             <i class="fa-solid fa-wallet"></i>
-            <span>المحفظة</span>
+            <span data-i18n="nav.wallet">المحفظة</span>
         </div>
     </div>
 </div>
 
-<script src="script.js"></script>
+<!-- ========================================== -->
+<!-- 3. كود الجافاسكريبت (المنطق + اللغات) -->
+<!-- ========================================== -->
+<script>
+    // --- 1. قاموس الترجمات ---
+    const TRANSLATIONS = {
+        ar: {
+            auth: { subtitle: "منصة المستقبل الذكية - مدعومة بـ Pi", loginTitle: "تسجيل الدخول الآمن", emailPlaceholder: "البريد الإلكتروني", passPlaceholder: "كلمة المرور", enterBtn: "دخول آمن", piFingerprint: "أو استخدم بصمة Pi Network", noAccount: "ليس لديك حساب؟" },
+            home: { searchPlaceholder: "ابحث بذكاء اصطناعي أو صف منتجك...", aiSuggestions: "اقتراحات Logy AI" },
+            nav: { home: "الرئيسية", ai: "Logy AI", orders: "الطلبات", wallet: "المحفظة" },
+            cats: { all: "الكل", cars: "سيارات", phones: "هواتف", realestate: "عقارات", services: "خدمات" },
+            settings: { title: "الإعدادات", general: "الحساب العام", changeLang: "تغيير اللغة", logout: "تسجيل الخروج" },
+            product: { title: "تفاصيل المنتج", aiAnalysis: "تحليل AI للسعر", score: "نقطة القوة", condition: "الحالة", buyBtn: "شراء المنتج الآن" }
+        },
+        en: {
+            auth: { subtitle: "Future Smart Platform - Powered by Pi", loginTitle: "Secure Login", emailPlaceholder: "Email Address", passPlaceholder: "Password", enterBtn: "Secure Login", piFingerprint: "Login with Pi Fingerprint", noAccount: "No account?" },
+            home: { searchPlaceholder: "Ask AI or search for products...", aiSuggestions: "Logy AI Suggestions" },
+            nav: { home: "Home", ai: "Logy AI", orders: "Orders", wallet: "Wallet" },
+            cats: { all: "All", cars: "Cars", phones: "Phones", realestate: "Real Estate", services: "Services" },
+            settings: { title: "Settings", general: "General", changeLang: "Change Language", logout: "Logout" },
+            product: { title: "Product Details", aiAnalysis: "AI Price Analysis", score: "Score", condition: "Condition", buyBtn: "Buy Now" }
+        },
+        es: {
+             auth: { subtitle: "Plataforma Inteligente", loginTitle: "Acceso Seguro", emailPlaceholder: "Correo Electrónico", passPlaceholder: "Contraseña", enterBtn: "Entrar", piFingerprint: "Usar Pi Fingerprint", noAccount: "¿Sin cuenta?" },
+             home: { searchPlaceholder: "Buscar productos...", aiSuggestions: "Sugerencias IA" },
+             nav: { home: "Inicio", ai: "Logy AI", orders: "Pedidos", wallet: "Cartera" },
+             cats: { all: "Todos", cars: "Coches", phones: "Móviles", realestate: "Inmobiliaria", services: "Servicios" },
+             settings: { title: "Ajustes", general: "General", changeLang: "Cambiar Idioma", logout: "Cerrar Sesión" },
+             product: { title: "Detalles", aiAnalysis: "Análisis IA", score: "Puntuación", condition: "Condición", buyBtn: "Comprar Ahora" }
+        }
+    };
 
+    const LANGUAGES = [
+        { code: 'ar', name: 'العربية', flag: '🇸🇦', dir: 'rtl' },
+        { code: 'en', name: 'English', flag: '🇬🇧', dir: 'ltr' },
+        { code: 'es', name: 'Español', flag: '🇪🇸', dir: 'ltr' }
+    ];
+
+    let currentLang = 'ar';
+
+    // --- 2. دوال النظام واللغات ---
+    function initApp() {
+        renderLangDropdown();
+        translatePage();
+    }
+
+    function renderLangDropdown() {
+        const dropdown = document.getElementById('langDropdown');
+        dropdown.innerHTML = LANGUAGES.map(lang => `
+            <div class="lang-option ${lang.code === currentLang ? 'active' : ''}" onclick="changeLang('${lang.code}')">
+                <span style="font-size:18px">${lang.flag}</span>
+                <span>${lang.name}</span>
+            </div>
+        `).join('');
+    }
+
+    function toggleLangDropdown() {
+        document.getElementById('langDropdown').classList.toggle('show');
+    }
+
+    function toggleLangDropdownInSettings() {
+        // نغلق المودال مؤقتاً أو نظهر القائمة فوقه
+        document.getElementById('langDropdown').classList.add('show');
+        document.getElementById('settingsModal').style.zIndex = "1000"; // Lower than dropdown
+    }
+
+    function changeLang(code) {
+        currentLang = code;
+        const langData = LANGUAGES.find(l => l.code === code);
+        
+        // تغيير الاتجاه واللغة
+        document.documentElement.lang = code;
+        document.documentElement.dir = langData.dir;
+        
+        // تحديث الزر العائم
+        document.getElementById('currentFlag').textContent = langData.flag;
+        document.getElementById('currentLangCode').textContent = code.toUpperCase();
+        
+        // تحديث النصوص
+        translatePage();
+        
+        // إخفاء القائمة
+        renderLangDropdown();
+        document.getElementById('langDropdown').classList.remove('show');
+        
+        // عكس الأيقونات (الأسهم)
+        document.querySelectorAll('.flip-icon').forEach(icon => {
+            icon.style.transform = langData.dir === 'rtl' ? 'rotate(0deg)' : 'rotate(180deg)';
+        });
+    }
+
+    function translatePage() {
+        const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+        
+        // ترجمة النصوص الداخلية
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const keys = el.dataset.i18n.split('.');
+            let value = t;
+            keys.forEach(k => { value = value ? value[k] : null });
+            if (value) el.innerHTML = value;
+        });
+
+        // ترجمة الـ Placeholders
+        document.querySelectorAll('[data-placeholder]').forEach(el => {
+            const keys = el.dataset.placeholder.split('.');
+            let value = t;
+            keys.forEach(k => { value = value ? value[k] : null });
+            if (value) el.placeholder = value;
+        });
+    }
+
+    // --- 3. دوال التطبيق (Modals & Navigation) ---
+    function login() {
+        document.getElementById('auth-container').style.display = 'none';
+        document.getElementById('lang-float-btn').style.display = 'none'; // إخفاء زر اللغة في الداخل
+        document.getElementById('app-container').style.display = 'block';
+        // إضافة أنيميشن بسيط
+        document.getElementById('app-container').style.opacity = '0';
+        setTimeout(() => document.getElementById('app-container').style.opacity = '1', 100);
+    }
+
+    function openModal(id) {
+        document.getElementById(id).style.display = 'block';
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    // إغلاق القوائم عند النقر خارجها
+    window.onclick = function(event) {
+        if (!event.target.closest('#lang-float-btn') && !event.target.closest('.settings-group')) {
+            document.getElementById('langDropdown').classList.remove('show');
+        }
+    }
+
+    // تشغيل عند البدء
+    initApp();
+
+</script>
 </body>
 </html>
