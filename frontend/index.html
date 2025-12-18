@@ -3,13 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Forsale AI - Global Market</title>
-    
-    <!-- خطوط عالمية (Cairo + Inter) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    
+    <title>Forsale AI - سوق المستقبل</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     
@@ -23,17 +17,13 @@
 </head>
 <body>
 
-<!-- زر اللغة العائم (يظهر في شاشة الدخول) -->
-<div class="lang-float-btn" id="lang-float-btn" onclick="toggleLangDropdown()">
+<!-- زر اللغة العائم (الإضافة الوحيدة) -->
+<div class="lang-float-btn" onclick="toggleLangDropdown()">
     <span id="currentFlag">🇸🇦</span> <span id="currentLangCode">AR</span>
 </div>
-<div class="lang-dropdown" id="langDropdown">
-    <!-- سيتم ملؤها بالجافاسكريبت -->
-</div>
+<div class="lang-dropdown" id="langDropdown"></div>
 
-<!-- ========================================== -->
-<!-- 1. شاشة تسجيل الدخول -->
-<!-- ========================================== -->
+<!-- شاشة الدخول -->
 <div id="auth-container">
     <div class="auth-logo">
         <span style="background:var(--accent);color:black;font-size:14px;padding:2px 8px;border-radius:6px">AI</span> 
@@ -46,15 +36,15 @@
         
         <div class="input-group">
             <i class="fa-solid fa-envelope"></i>
-            <input type="email" data-placeholder="auth.emailPlaceholder">
+            <input type="email" placeholder="البريد الإلكتروني" id="login-email" data-placeholder="auth.emailPlaceholder">
         </div>
         
         <div class="input-group">
             <i class="fa-solid fa-lock"></i>
-            <input type="password" data-placeholder="auth.passPlaceholder">
+            <input type="password" placeholder="كلمة المرور" id="login-password" data-placeholder="auth.passPlaceholder">
         </div>
 
-        <button class="main-btn" onclick="login()">
+        <button class="main-btn" id="login-btn">
             <span data-i18n="auth.enterBtn">دخول آمن</span> <i class="fa-solid fa-arrow-left flip-icon"></i>
         </button>
 
@@ -63,27 +53,30 @@
             <p style="font-size:14px; color:var(--accent); font-weight:bold;" data-i18n="auth.piFingerprint">أو استخدم بصمة Pi Network</p>
         </div>
 
+        <button class="main-btn pi-btn" id="pi-login-btn" style="margin-top:10px;">
+            <i class="fa-solid fa-network-wired"></i> <span data-i18n="auth.piBrowser">تسجيل الدخول عبر Pi Browser</span>
+        </button>
+
         <div class="auth-footer">
-            <p data-i18n="auth.noAccount">ليس لديك حساب؟ <a href="#" style="color:var(--accent)">سجل الآن</a></p>
+            <p><span data-i18n="auth.noAccount">ليس لديك حساب؟</span> <a href="#" onclick="alert('التسجيل قريباً')" data-i18n="auth.register">سجل الآن</a></p>
         </div>
     </div>
 </div>
 
-<!-- ========================================== -->
-<!-- 2. التطبيق الرئيسي -->
-<!-- ========================================== -->
-<div id="app-container" style="display:none;">
+<!-- التطبيق الرئيسي -->
+<div id="app-container">
     <div class="fixed-header-wrapper">
         <div class="header" id="main-header">
             <div class="content-wrapper">
                 <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-store"></i> Forsale</div>
                 <div style="display:flex; gap:10px;">
-                    <div class="icon-btn primary" onclick="openModal('ai-upload-modal')"><i class="fa-solid fa-plus"></i></div>
+                    <!-- الأزرار كما هي في تصميمك -->
+                    <div class="icon-btn primary" onclick="openAiUploadModal()"><i class="fa-solid fa-plus"></i></div>
                     <div class="notification-icon-container">
-                        <div class="notification-dot"></div>
-                        <div class="icon-btn" onclick="openModal('notificationsModal')"><i class="fa-solid fa-bell"></i></div>
+                        <div class="notification-dot" id="notification-dot"></div>
+                        <div class="icon-btn" onclick="openNotificationsModal()"><i class="fa-solid fa-bell"></i></div>
                     </div>
-                    <div class="icon-btn" onclick="openModal('settingsModal')"><i class="fa-solid fa-gear"></i></div>
+                    <div class="icon-btn" onclick="openSettingsModal()"><i class="fa-solid fa-gear"></i></div>
                 </div>
             </div>
         </div>
@@ -93,265 +86,140 @@
         <div class="content-wrapper">
             <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" data-placeholder="home.searchPlaceholder">
+                <input type="text" placeholder="ابحث بذكاء اصطناعي..." data-placeholder="home.searchPlaceholder">
             </div>
             
-            <div class="cats-scroll">
-                <div class="cat-item active" data-i18n="cats.all">الكل</div>
-                <div class="cat-item" data-i18n="cats.cars">سيارات</div>
-                <div class="cat-item" data-i18n="cats.phones">هواتف</div>
-                <div class="cat-item" data-i18n="cats.realestate">عقارات</div>
-                <div class="cat-item" data-i18n="cats.services">خدمات</div>
+            <div class="cats-scroll" id="level1-scroll">
+                <!-- سيتم ملؤها بالجافاسكريبت -->
             </div>
 
-            <h2 style="font-size: 18px; color: var(--text-main); margin: 0 0 15px;" data-i18n="home.aiSuggestions">اقتراحات Logy AI</h2>
+            <div class="dynamic-filters glass-panel" id="filter-panel">
+                <div class="sub-chips" id="level2-chips"> </div>
+                <div id="level3-area"> </div>
+            </div>
+
+            <h2 style="font-size: 20px; color: var(--text-main); margin: 0 0 15px;" data-i18n="home.aiSuggestions">اقتراحات Logy AI</h2>
             
-            <div class="products-grid">
-                <!-- منتج تجريبي 1 -->
-                <div class="product-card" onclick="openModal('product-detail-modal')">
-                    <div class="p-img-box">
-                        <div class="ai-tag"><i class="fa-solid fa-robot"></i> AI Verified</div>
-                        <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80" alt="Product">
-                    </div>
-                    <div class="p-details">
-                        <div class="p-name">iPhone 15 Pro Max</div>
-                        <div class="p-price">350 Pi</div>
-                    </div>
-                </div>
-                 <!-- منتج تجريبي 2 -->
-                 <div class="product-card" onclick="openModal('product-detail-modal')">
-                    <div class="p-img-box">
-                        <div class="ai-tag"><i class="fa-solid fa-robot"></i> Best Price</div>
-                        <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=500&q=80" alt="Car">
-                    </div>
-                    <div class="p-details">
-                        <div class="p-name">Tesla Model 3</div>
-                        <div class="p-price">12,000 Pi</div>
-                    </div>
-                </div>
+            <div class="products-grid" id="products-grid">
+                <!-- المنتجات ستظهر هنا -->
             </div>
         </div>
     </div>
 
-    <!-- نافذة تفاصيل المنتج -->
-    <div id="product-detail-modal" class="modal">
+    <!-- المودالات كما هي في كودك الأصلي -->
+    <div id="product-detail-modal">
         <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span> <span data-i18n="product.title">التفاصيل</span></div>
-            <div class="icon-btn" onclick="closeModal('product-detail-modal')"><i class="fa-solid fa-xmark"></i></div>
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-eye"></i> <span data-i18n="product.title">تفاصيل المنتج</span></div>
+            <div class="icon-btn" onclick="closeProductDetailModal()"><i class="fa-solid fa-xmark"></i></div>
         </div>
         <div class="content-wrapper">
-            <img class="detail-img" src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80">
-            <div class="detail-title">iPhone 15 Pro Max</div>
-            <div class="detail-price">350 Pi</div>
+            <img id="detail-img" class="detail-img" src="" alt="Product">
+            <div class="detail-title" id="detail-title"></div>
+            <div class="detail-price" id="detail-price"></div>
 
-            <h3 class="ai-section-title"><i class="fa-solid fa-microchip"></i> <span data-i18n="product.aiAnalysis">تحليل AI للسعر</span></h3>
+            <h3 class="ai-section-title"><i class="fa-solid fa-microchip"></i> <span data-i18n="product.aiAnalysis">تحليل Logy AI</span></h3>
             <div class="glass-panel ai-price-card">
-                <div class="stat-box">
-                    <div class="value">9.8</div>
+                <div class="stat-box" id="ai-score-box">
+                    <div class="value" id="ai-score">9.2</div>
                     <div class="label" data-i18n="product.score">نقطة القوة</div>
                 </div>
                 <div class="stat-box">
-                    <div class="value">Excellent</div>
-                    <div class="label" data-i18n="product.condition">الحالة</div>
+                    <div class="value" id="ai-market-price">0 Pi</div>
+                    <div class="label" data-i18n="product.fairPrice">السعر العادل</div>
                 </div>
             </div>
-            
-            <div class="buy-fixed-bar">
-                <div class="content-wrapper">
-                    <button class="buy-btn" onclick="openModal('checkoutModal')">
-                        <i class="fa-solid fa-cart-shopping"></i> <span data-i18n="product.buyBtn">شراء الآن</span>
-                    </button>
+            <div class="price-chart-mock"><div class="chart-line"></div></div>
+
+            <div class="detail-tabs-container glass-panel">
+                <div class="detail-tabs-scroll">
+                    <div class="detail-tab-item active" data-tab="description" onclick="showDetailTab('description', this)">
+                        <i class="fa-solid fa-file-alt"></i> <span data-i18n="tabs.desc">الوصف</span>
+                    </div>
+                    <div class="detail-tab-item" data-tab="specs" onclick="showDetailTab('specs', this)">
+                        <i class="fa-solid fa-cogs"></i> <span data-i18n="tabs.specs">المواصفات</span>
+                    </div>
                 </div>
+                <div class="detail-tab-content" id="detail-description">
+                    <p id="detail-desc" style="line-height: 1.8; color: var(--text-main); font-size: 14px;"></p>
+                </div>
+                <div class="detail-tab-content" id="detail-specs" style="display:none;">
+                    <ul id="specs-list" style="list-style: none; padding: 0; margin: 0;"></ul>
+                </div>
+            </div>
+        </div>
+        <div class="buy-fixed-bar">
+            <div class="content-wrapper">
+                <button class="buy-btn" id="buy-btn" onclick="openCheckoutModal()">
+                    <i class="fa-solid fa-shopping-cart"></i> <span data-i18n="product.buyBtn">شراء الآن</span>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- نافذة الإعدادات (فيها تغيير اللغة) -->
-    <div id="settingsModal" class="modal">
+    <!-- باقي المودالات (Settings, Upload, etc) -->
+    <div id="ai-upload-modal">
         <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span> <span data-i18n="settings.title">الإعدادات</span></div>
-            <div class="icon-btn" onclick="closeModal('settingsModal')"><i class="fa-solid fa-xmark"></i></div>
+            <div class="logo">AI Upload</div>
+            <div class="icon-btn" onclick="closeAiUploadModal()">X</div>
+        </div>
+        <div class="content-wrapper"><h2 style="color:white; margin-top:20px;">Upload Feature Coming Soon</h2></div>
+    </div>
+
+    <div id="settingsModal">
+        <div class="detail-header">
+            <div class="logo" data-i18n="settings.title">الإعدادات</div>
+            <div class="icon-btn" onclick="closeSettingsModal()">X</div>
         </div>
         <div class="content-wrapper">
             <div class="settings-group">
                 <h4 data-i18n="settings.general">عام</h4>
-                <!-- زر تغيير اللغة داخل الإعدادات -->
-                <button class="primary" onclick="toggleLangDropdownInSettings()">
-                    <i class="fa-solid fa-globe"></i> <span data-i18n="settings.changeLang">تغيير اللغة</span>
-                </button>
+                <button class="primary" onclick="toggleLangDropdown()" data-i18n="settings.changeLang">تغيير اللغة 🌍</button>
             </div>
-            
-            <button class="buy-btn" style="background:var(--danger); margin-top:30px;" onclick="location.reload()">
-                <i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="settings.logout">تسجيل الخروج</span>
-            </button>
+            <button class="buy-btn" style="background:var(--danger); margin-top: 30px;" onclick="location.reload()" data-i18n="settings.logout">تسجيل الخروج</button>
         </div>
     </div>
     
-    <!-- باقي النوافذ (Modals) فارغة لغرض العرض -->
-    <div id="ai-upload-modal" class="modal"><div class="detail-header"><div class="logo">Upload</div><div class="icon-btn" onclick="closeModal('ai-upload-modal')">X</div></div></div>
-    <div id="notificationsModal" class="modal"><div class="detail-header"><div class="logo">Notifications</div><div class="icon-btn" onclick="closeModal('notificationsModal')">X</div></div></div>
-    <div id="checkoutModal" class="modal"><div class="detail-header"><div class="logo">Checkout</div><div class="icon-btn" onclick="closeModal('checkoutModal')">X</div></div></div>
+    <div id="checkoutModal">
+        <div class="detail-header"><div class="logo">Checkout</div><div class="icon-btn" onclick="closeCheckoutModal()">X</div></div>
+        <div class="content-wrapper">
+             <h2 style="color:var(--primary); margin:20px 0;">Checkout</h2>
+             <button class="buy-btn" onclick="alert('Payment Successful!')">Confirm Payment</button>
+        </div>
+    </div>
+
+    <div id="ordersModal"><div class="detail-header"><div class="logo">Orders</div><div class="icon-btn" onclick="closeOrdersModal()">X</div></div></div>
+    <div id="walletModal"><div class="detail-header"><div class="logo">Wallet</div><div class="icon-btn" onclick="closeWalletModal()">X</div></div></div>
+    <div id="notificationsModal"><div class="detail-header"><div class="logo">Notifications</div><div class="icon-btn" onclick="closeNotificationsModal()">X</div></div></div>
+    <div id="logyAiModal">
+        <div class="logy-chat-header"><div class="logo">AI Chat</div><div class="icon-btn" onclick="closeLogyAiModal()">X</div></div>
+        <div class="logy-chat-area" id="logy-chat-area"></div>
+        <div class="logy-input-bar">
+             <input type="text" id="logy-input" placeholder="...">
+             <div class="logy-send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></div>
+        </div>
+    </div>
 
     <!-- شريط التنقل السفلي -->
     <div class="footer-nav">
-        <div class="nav-item active">
+        <div class="nav-item active" onclick="showApp('home')">
             <i class="fa-solid fa-house"></i>
             <span data-i18n="nav.home">الرئيسية</span>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" onclick="openLogyAiModal()">
             <i class="fa-solid fa-robot"></i>
             <span data-i18n="nav.ai">Logy AI</span>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" onclick="openOrdersModal()">
             <i class="fa-solid fa-box"></i>
             <span data-i18n="nav.orders">الطلبات</span>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" onclick="openWalletModal()">
             <i class="fa-solid fa-wallet"></i>
             <span data-i18n="nav.wallet">المحفظة</span>
         </div>
     </div>
 </div>
 
-<!-- ========================================== -->
-<!-- 3. كود الجافاسكريبت (المنطق + اللغات) -->
-<!-- ========================================== -->
-<script>
-    // --- 1. قاموس الترجمات ---
-    const TRANSLATIONS = {
-        ar: {
-            auth: { subtitle: "منصة المستقبل الذكية - مدعومة بـ Pi", loginTitle: "تسجيل الدخول الآمن", emailPlaceholder: "البريد الإلكتروني", passPlaceholder: "كلمة المرور", enterBtn: "دخول آمن", piFingerprint: "أو استخدم بصمة Pi Network", noAccount: "ليس لديك حساب؟" },
-            home: { searchPlaceholder: "ابحث بذكاء اصطناعي أو صف منتجك...", aiSuggestions: "اقتراحات Logy AI" },
-            nav: { home: "الرئيسية", ai: "Logy AI", orders: "الطلبات", wallet: "المحفظة" },
-            cats: { all: "الكل", cars: "سيارات", phones: "هواتف", realestate: "عقارات", services: "خدمات" },
-            settings: { title: "الإعدادات", general: "الحساب العام", changeLang: "تغيير اللغة", logout: "تسجيل الخروج" },
-            product: { title: "تفاصيل المنتج", aiAnalysis: "تحليل AI للسعر", score: "نقطة القوة", condition: "الحالة", buyBtn: "شراء المنتج الآن" }
-        },
-        en: {
-            auth: { subtitle: "Future Smart Platform - Powered by Pi", loginTitle: "Secure Login", emailPlaceholder: "Email Address", passPlaceholder: "Password", enterBtn: "Secure Login", piFingerprint: "Login with Pi Fingerprint", noAccount: "No account?" },
-            home: { searchPlaceholder: "Ask AI or search for products...", aiSuggestions: "Logy AI Suggestions" },
-            nav: { home: "Home", ai: "Logy AI", orders: "Orders", wallet: "Wallet" },
-            cats: { all: "All", cars: "Cars", phones: "Phones", realestate: "Real Estate", services: "Services" },
-            settings: { title: "Settings", general: "General", changeLang: "Change Language", logout: "Logout" },
-            product: { title: "Product Details", aiAnalysis: "AI Price Analysis", score: "Score", condition: "Condition", buyBtn: "Buy Now" }
-        },
-        es: {
-             auth: { subtitle: "Plataforma Inteligente", loginTitle: "Acceso Seguro", emailPlaceholder: "Correo Electrónico", passPlaceholder: "Contraseña", enterBtn: "Entrar", piFingerprint: "Usar Pi Fingerprint", noAccount: "¿Sin cuenta?" },
-             home: { searchPlaceholder: "Buscar productos...", aiSuggestions: "Sugerencias IA" },
-             nav: { home: "Inicio", ai: "Logy AI", orders: "Pedidos", wallet: "Cartera" },
-             cats: { all: "Todos", cars: "Coches", phones: "Móviles", realestate: "Inmobiliaria", services: "Servicios" },
-             settings: { title: "Ajustes", general: "General", changeLang: "Cambiar Idioma", logout: "Cerrar Sesión" },
-             product: { title: "Detalles", aiAnalysis: "Análisis IA", score: "Puntuación", condition: "Condición", buyBtn: "Comprar Ahora" }
-        }
-    };
-
-    const LANGUAGES = [
-        { code: 'ar', name: 'العربية', flag: '🇸🇦', dir: 'rtl' },
-        { code: 'en', name: 'English', flag: '🇬🇧', dir: 'ltr' },
-        { code: 'es', name: 'Español', flag: '🇪🇸', dir: 'ltr' }
-    ];
-
-    let currentLang = 'ar';
-
-    // --- 2. دوال النظام واللغات ---
-    function initApp() {
-        renderLangDropdown();
-        translatePage();
-    }
-
-    function renderLangDropdown() {
-        const dropdown = document.getElementById('langDropdown');
-        dropdown.innerHTML = LANGUAGES.map(lang => `
-            <div class="lang-option ${lang.code === currentLang ? 'active' : ''}" onclick="changeLang('${lang.code}')">
-                <span style="font-size:18px">${lang.flag}</span>
-                <span>${lang.name}</span>
-            </div>
-        `).join('');
-    }
-
-    function toggleLangDropdown() {
-        document.getElementById('langDropdown').classList.toggle('show');
-    }
-
-    function toggleLangDropdownInSettings() {
-        // نغلق المودال مؤقتاً أو نظهر القائمة فوقه
-        document.getElementById('langDropdown').classList.add('show');
-        document.getElementById('settingsModal').style.zIndex = "1000"; // Lower than dropdown
-    }
-
-    function changeLang(code) {
-        currentLang = code;
-        const langData = LANGUAGES.find(l => l.code === code);
-        
-        // تغيير الاتجاه واللغة
-        document.documentElement.lang = code;
-        document.documentElement.dir = langData.dir;
-        
-        // تحديث الزر العائم
-        document.getElementById('currentFlag').textContent = langData.flag;
-        document.getElementById('currentLangCode').textContent = code.toUpperCase();
-        
-        // تحديث النصوص
-        translatePage();
-        
-        // إخفاء القائمة
-        renderLangDropdown();
-        document.getElementById('langDropdown').classList.remove('show');
-        
-        // عكس الأيقونات (الأسهم)
-        document.querySelectorAll('.flip-icon').forEach(icon => {
-            icon.style.transform = langData.dir === 'rtl' ? 'rotate(0deg)' : 'rotate(180deg)';
-        });
-    }
-
-    function translatePage() {
-        const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
-        
-        // ترجمة النصوص الداخلية
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-            const keys = el.dataset.i18n.split('.');
-            let value = t;
-            keys.forEach(k => { value = value ? value[k] : null });
-            if (value) el.innerHTML = value;
-        });
-
-        // ترجمة الـ Placeholders
-        document.querySelectorAll('[data-placeholder]').forEach(el => {
-            const keys = el.dataset.placeholder.split('.');
-            let value = t;
-            keys.forEach(k => { value = value ? value[k] : null });
-            if (value) el.placeholder = value;
-        });
-    }
-
-    // --- 3. دوال التطبيق (Modals & Navigation) ---
-    function login() {
-        document.getElementById('auth-container').style.display = 'none';
-        document.getElementById('lang-float-btn').style.display = 'none'; // إخفاء زر اللغة في الداخل
-        document.getElementById('app-container').style.display = 'block';
-        // إضافة أنيميشن بسيط
-        document.getElementById('app-container').style.opacity = '0';
-        setTimeout(() => document.getElementById('app-container').style.opacity = '1', 100);
-    }
-
-    function openModal(id) {
-        document.getElementById(id).style.display = 'block';
-    }
-
-    function closeModal(id) {
-        document.getElementById(id).style.display = 'none';
-    }
-
-    // إغلاق القوائم عند النقر خارجها
-    window.onclick = function(event) {
-        if (!event.target.closest('#lang-float-btn') && !event.target.closest('.settings-group')) {
-            document.getElementById('langDropdown').classList.remove('show');
-        }
-    }
-
-    // تشغيل عند البدء
-    initApp();
-
-</script>
+<script src="script.js"></script>
 </body>
 </html>
