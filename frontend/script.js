@@ -1,389 +1,478 @@
-/*****************************************
- * 1. CONFIGURATION & SERVER
- *****************************************/
+/************************
+ * GLOBAL CONFIG
+ ************************/
 const API_BASE = "https://forsale-production.up.railway.app";
+
 let selectedProduct = null;
+let paymentInProgress = false;
 let currentUser = null;
 
-/*****************************************
- * 2. DATA TAXONOMY (شجرة التصنيفات)
- *****************************************/
-const HIERARCHY = {
-    all: { label: "الكل", icon: "fa-layer-group", subs: [] },
-    electronics: {
-        label: "إلكترونيات",
-        icon: "fa-mobile-screen",
-        subs: [
-            { id: 'phones', name: 'هواتف ذكية' },
-            { id: 'laptops', name: 'لابتوب' },
-            { id: 'cameras', name: 'كاميرات' }
-        ]
-    },
-    vehicles: {
-        label: "سيارات",
-        icon: "fa-car",
-        subs: [
-            { id: 'sedan', name: 'سيدان' },
-            { id: 'suv', name: 'دفع رباعي' }
-        ]
-    },
-    fashion: {
-        label: "موضة",
-        icon: "fa-shirt",
-        subs: [
-            { id: 'men', name: 'رجالي' },
-            { id: 'women', name: 'حريمي' }
-        ]
-    }
-};
-
-// بيانات المنتجات (تجريبية)
+/************************
+ * MOCK PRODUCTS DATA
+ ************************/
 const MOCK_PRODUCTS = [
   {
     id: 1,
-    name: "iPhone 15 Pro Max",
+    name: "iPhone 15 Pro (Titanium)",
     price: 0.01,
-    cat: "electronics",
-    sub: "phones",
-    brand: "Apple",
-    image: "https://images.unsplash.com/photo-1696446701796-da61225697cc?w=400",
-    desc: "آيفون 15 برو ماكس تيتانيوم، 256 جيجا."
+    description: "iPhone 15 Pro في حالة ممتازة مع جميع الملحقات. ضمان لمدة 6 أشهر.",
+    image: "https://images.unsplash.com/photo-1592286927505-b86dc33748b5?w=400",
+    category: "electronics"
   },
   {
     id: 2,
     name: "MacBook Pro M3",
     price: 0.05,
-    cat: "electronics",
-    sub: "laptops",
-    brand: "Apple",
+    description: "MacBook Pro M3 جديد بالكرتونة مع ضمان Apple رسمي.",
     image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
-    desc: "لابتوب ماك بوك برو M3 الجديد."
+    category: "electronics"
   },
   {
     id: 3,
-    name: "Tesla Model 3",
-    price: 100.00,
-    cat: "vehicles",
-    sub: "sedan",
-    brand: "Tesla",
-    image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=400",
-    desc: "تسلا موديل 3 بحالة ممتازة."
-  },
-  {
-    id: 4,
-    name: "Canon EOS R5",
-    price: 0.04,
-    cat: "electronics",
-    sub: "cameras",
-    brand: "Canon",
-    image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400",
-    desc: "كاميرا كانون احترافية."
+    name: "AirPods Pro 2",
+    price: 0.02,
+    description: "AirPods Pro الجيل الثاني مع خاصية إلغاء الضوضاء.",
+    image: "https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=400",
+    category: "electronics"
   }
 ];
 
-/*****************************************
- * 3. INITIALIZATION
- *****************************************/
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log("🚀 System Started");
-    renderLevel1();
-    renderProducts(MOCK_PRODUCTS);
+/************************
+ * PI BROWSER DETECTION
+ ************************/
+function isPiBrowser() {
+  return typeof window.Pi !== "undefined";
+}
 
-    if (typeof window.Pi !== 'undefined') {
-        Pi.init({ version: "2.0", sandbox: true });
+/************************
+ * PI AUTHENTICATION
+ ************************/
+async function authenticateUser() {
+  if (!isPiBrowser()) {
+    console.warn("⚠️ Not in Pi Browser");
+    return null;
+  }
+
+  try {
+    const scopes = ['username', 'payments'];
+    
+    function onIncompletePaymentFound(payment) {
+      console.log("⚠️ Incomplete payment found:", payment);
     }
+    
+    const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
+    currentUser = auth.user;
+    
+    console.log("✅ Authenticated:", currentUser.username);
+    return currentUser;
+    
+  } catch (error) {
+    console.error("❌ Authentication failed:", error);
+    return null;
+  }
+}
+
+/************************
+ * DISPLAY PRODUCTS
+ ************************/
+function displayProducts() {
+  const grid = document.getElementById("products-grid");
+  if (!grid) return;
+  
+  grid.innerHTML = MOCK_PRODUCTS.map(product => `
+    <div class="product-card glass-panel" onclick="openProductDetail(${product.id})">
+      <div class="p-img-box">
+        <img src="${product.image}" alt="${product.name}">
+        <div class="ai-tag">
+          <i class="fa-solid fa-microchip"></i> AI Verified
+        </div>
+      </div>
+      <div class="p-details">
+        <div class="p-name">${product.name}</div>
+        <div class="p-price">${product.price} Pi</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/************************
+ * PRODUCT DETAIL MODAL
+ ************************/
+function openProductDetail(id) {
+  const product = MOCK_PRODUCTS.find(p => p.id === id);
+  if (!product) {
+    alert("❌ المنتج غير موجود");
+    return;
+  }
+
+  selectedProduct = product;
+
+  document.getElementById("detail-title").innerText = product.name;
+  document.getElementById("detail-price").innerText = product.price + " Pi";
+  document.getElementById("detail-img").src = product.image;
+  document.getElementById("detail-desc").innerText = product.description;
+  
+  document.getElementById("ai-score").innerText = "9.2";
+  document.getElementById("ai-market-price").innerText = product.price + " Pi";
+  document.getElementById("ai-summary").innerText = 
+    "السعر ممتاز! أقل من المتوسط السوقي بنسبة 5%. التوصيل خلال 3-5 أيام.";
+
+  document.getElementById("product-detail-modal").style.display = "block";
+}
+
+function closeProductDetailModal() {
+  document.getElementById("product-detail-modal").style.display = "none";
+  selectedProduct = null;
+}
+
+/************************
+ * CHECKOUT MODAL
+ ************************/
+function openCheckoutModal() {
+  if (!selectedProduct) {
+    alert("❌ لم يتم اختيار منتج");
+    return;
+  }
+  
+  document.getElementById("checkout-product-name").innerText = selectedProduct.name;
+  document.getElementById("checkout-product-price").innerText = selectedProduct.price + " Pi";
+  document.getElementById("checkout-amount").innerText = selectedProduct.price;
+  
+  document.getElementById("product-detail-modal").style.display = "none";
+  document.getElementById("checkoutModal").style.display = "block";
+}
+
+function closeCheckoutModal() {
+  document.getElementById("checkoutModal").style.display = "none";
+  document.getElementById("product-detail-modal").style.display = "block";
+}
+
+/************************
+ * PI PAYMENT FLOW
+ ************************/
+async function checkout() {
+  if (paymentInProgress) {
+    alert("⚠️ عملية دفع جارية بالفعل");
+    return;
+  }
+
+  if (!isPiBrowser()) {
+    alert("⚠️ يجب فتح التطبيق من Pi Browser\n\nافتح: minepi.com/blackstyle");
+    return;
+  }
+
+  if (!selectedProduct) {
+    alert("❌ لم يتم اختيار منتج");
+    return;
+  }
+
+  if (!currentUser) {
+    console.log("🔐 Authenticating user...");
+    currentUser = await authenticateUser();
+    if (!currentUser) {
+      alert("❌ فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.");
+      return;
+    }
+  }
+
+  try {
+    paymentInProgress = true;
+    disableBuyButton(true);
+    
+    console.log("🔄 Creating payment for:", selectedProduct);
+
+    const response = await fetch(`${API_BASE}/api/pi/create-payment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        productId: selectedProduct.id,
+        amount: selectedProduct.price,
+        memo: `Forsale | ${selectedProduct.name}`
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "فشل إنشاء الدفع");
+    }
+
+    const result = await response.json();
+    const payment = result.data;
+    
+    console.log("✅ Payment created:", payment.identifier);
+
+    Pi.createPayment(
+      {
+        amount: payment.amount,
+        memo: payment.memo,
+        metadata: payment.metadata
+      },
+      {
+        onReadyForServerApproval: async function(paymentId) {
+          console.log("🟡 Ready for approval:", paymentId);
+          
+          try {
+            const approveRes = await fetch(`${API_BASE}/api/pi/approve-payment`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ paymentId })
+            });
+            
+            if (approveRes.ok) {
+              console.log("✅ Payment approved");
+            } else {
+              console.error("❌ Approval failed");
+            }
+          } catch (err) {
+            console.error("❌ Approval error:", err);
+          }
+        },
+
+        onReadyForServerCompletion: async function(paymentId, txid) {
+          console.log("🟢 Ready for completion:", paymentId, txid);
+          
+          try {
+            const completeRes = await fetch(`${API_BASE}/api/pi/complete-payment`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ paymentId, txid })
+            });
+            
+            if (completeRes.ok) {
+              console.log("✅ Payment completed successfully");
+              
+              showSuccessMessage();
+              
+              setTimeout(() => {
+                resetPaymentState();
+                closeCheckoutModal();
+                closeProductDetailModal();
+                openOrdersModal();
+              }, 2000);
+              
+            } else {
+              throw new Error("فشل إتمام الدفع");
+            }
+          } catch (err) {
+            console.error("❌ Completion error:", err);
+            alert("⚠️ حدث خطأ في إتمام الدفع. سيتم مراجعة الطلب.");
+            resetPaymentState();
+          }
+        },
+
+        onCancel: function(paymentId) {
+          console.log("❌ Payment cancelled:", paymentId);
+          alert("❌ تم إلغاء الدفع");
+          resetPaymentState();
+        },
+
+        onError: function(error, payment) {
+          console.error("❌ Payment error:", error, payment);
+          alert("⚠️ حدث خطأ: " + (error.message || "خطأ غير معروف"));
+          resetPaymentState();
+        }
+      }
+    );
+
+  } catch (error) {
+    console.error("❌ Checkout error:", error);
+    alert("❌ فشل بدء عملية الدفع:\n" + error.message);
+    resetPaymentState();
+  }
+}
+
+/************************
+ * SUCCESS MESSAGE
+ ************************/
+function showSuccessMessage() {
+  const successDiv = document.createElement('div');
+  successDiv.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #2ECC71, #27AE60);
+    color: white;
+    padding: 30px;
+    border-radius: 20px;
+    z-index: 10000;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(46, 204, 113, 0.5);
+  `;
+  
+  successDiv.innerHTML = `
+    <div style="font-size: 50px; margin-bottom: 15px;">✅</div>
+    <h2 style="margin: 0 0 10px 0; font-size: 24px;">تم الدفع بنجاح!</h2>
+    <p style="margin: 0; font-size: 16px;">الطلب قيد المعالجة الآن</p>
+  `;
+  
+  document.body.appendChild(successDiv);
+  
+  setTimeout(() => {
+    successDiv.remove();
+  }, 2000);
+}
+
+/************************
+ * UI HELPERS
+ ************************/
+function disableBuyButton(state) {
+  const btn = document.querySelector("#checkoutModal .buy-btn");
+  if (!btn) return;
+
+  btn.disabled = state;
+  btn.style.opacity = state ? "0.5" : "1";
+  btn.innerHTML = state 
+    ? '<i class="fa-solid fa-spinner fa-spin"></i> جاري المعالجة...'
+    : '<i class="fa-solid fa-wallet"></i> تأكيد ودفع ' + (selectedProduct?.price || 0) + ' Pi';
+}
+
+function resetPaymentState() {
+  paymentInProgress = false;
+  disableBuyButton(false);
+}
+
+/************************
+ * MODAL CONTROLS
+ ************************/
+function showApp(tab) {
+  console.log("Navigate to:", tab);
+}
+
+function openLogyAiModal() {
+  document.getElementById("logyAiModal").style.display = "flex";
+}
+
+function closeLogyAiModal() {
+  document.getElementById("logyAiModal").style.display = "none";
+}
+
+function openOrdersModal() {
+  document.getElementById("ordersModal").style.display = "block";
+}
+
+function closeOrdersModal() {
+  document.getElementById("ordersModal").style.display = "none";
+}
+
+function openWalletModal() {
+  document.getElementById("walletModal").style.display = "block";
+}
+
+function closeWalletModal() {
+  document.getElementById("walletModal").style.display = "none";
+}
+
+function openSettingsModal() {
+  document.getElementById("settingsModal").style.display = "block";
+}
+
+function closeSettingsModal() {
+  document.getElementById("settingsModal").style.display = "none";
+}
+
+function openNotificationsModal() {
+  document.getElementById("notificationsModal").style.display = "block";
+}
+
+function closeNotificationsModal() {
+  document.getElementById("notificationsModal").style.display = "none";
+}
+
+function openAiUploadModal() {
+  document.getElementById("ai-upload-modal").style.display = "block";
+}
+
+function closeAiUploadModal() {
+  document.getElementById("ai-upload-modal").style.display = "none";
+}
+
+function showDetailTab(tab, element) {
+  document.querySelectorAll('.detail-tab-content').forEach(el => {
+    el.style.display = 'none';
+  });
+  
+  document.querySelectorAll('.detail-tab-item').forEach(el => {
+    el.classList.remove('active');
+  });
+  
+  document.getElementById('detail-' + tab).style.display = 'block';
+  element.classList.add('active');
+}
+
+function sendMessage() {
+  console.log("Logy AI message sent");
+}
+
+function startAiAnalysis() {
+  console.log("AI Analysis started");
+}
+
+function showRegister() {
+  alert("صفحة التسجيل قريباً!");
+}
+
+/************************
+ * APP INITIALIZATION
+ ************************/
+document.addEventListener('DOMContentLoaded', async () => {
+  console.log("🚀 Forsale AI loaded");
+  console.log("📱 Pi App: blackstyle");
+  
+  displayProducts();
+  
+  if (isPiBrowser()) {
+    console.log("✅ Running in Pi Browser");
+    
+    document.getElementById("auth-container").style.display = "none";
+    document.getElementById("app-container").style.display = "block";
+    
+    try {
+      await authenticateUser();
+    } catch (error) {
+      console.log("⚠️ Auto-auth failed, will prompt when needed");
+    }
+    
+  } else {
+    console.log("⚠️ Not in Pi Browser - Demo mode");
+    console.log("🔗 Open: minepi.com/blackstyle");
+    
+    document.getElementById("auth-container").style.display = "none";
+    document.getElementById("app-container").style.display = "block";
+  }
 });
 
-/*****************************************
- * 4. LOGIC: HIERARCHY & FILTERS
- *****************************************/
-
-// رسم المستوى الأول (الأيقونات)
-function renderLevel1() {
-    const scroll = document.getElementById('level1-scroll');
-    if(!scroll) return;
-
-    scroll.innerHTML = Object.keys(HIERARCHY).map(key => {
-        const item = HIERARCHY[key];
-        return `
-            <div class="cat-item" onclick="selectLevel1('${key}', this)">
-                <i class="fa-solid ${item.icon}"></i> ${item.label}
-            </div>
-        `;
-    }).join('');
-    
-    // تفعيل "الكل" افتراضياً
-    scroll.firstElementChild.classList.add('active');
-}
-
-// عند اختيار تصنيف رئيسي
-window.selectLevel1 = function(key, element) {
-    document.querySelectorAll('.cat-item').forEach(el => el.classList.remove('active'));
-    element.classList.add('active');
-
-    const filterPanel = document.getElementById('filter-panel');
-    const level2Container = document.getElementById('level2-chips');
-    const level3Container = document.getElementById('level3-area');
-
-    // تنظيف
-    level2Container.innerHTML = '';
-    level3Container.innerHTML = '';
-
-    if (key === 'all') {
-        filterPanel.classList.remove('open');
-        renderProducts(MOCK_PRODUCTS);
-        return;
+/************************
+ * LOGIN HANDLERS
+ ************************/
+document.getElementById('login-btn')?.addEventListener('click', async () => {
+  if (isPiBrowser()) {
+    const user = await authenticateUser();
+    if (user) {
+      document.getElementById("auth-container").style.display = "none";
+      document.getElementById("app-container").style.display = "block";
     }
+  } else {
+    alert("⚠️ يجب فتح التطبيق من Pi Browser\n\nافتح: minepi.com/blackstyle");
+  }
+});
 
-    const subCats = HIERARCHY[key].subs;
-    
-    if (subCats && subCats.length > 0) {
-        level2Container.innerHTML = subCats.map(sub => `
-            <div class="chip" onclick="selectLevel2('${key}', '${sub.id}', this)">
-                ${sub.name}
-            </div>
-        `).join('');
-        
-        filterPanel.classList.add('open'); // فتح اللوحة بالتصميم الصحيح
-        
-        // فلترة مبدئية
-        const filtered = MOCK_PRODUCTS.filter(p => p.cat === key);
-        renderProducts(filtered);
-    } else {
-        filterPanel.classList.remove('open');
+document.getElementById('pi-login-btn')?.addEventListener('click', () => {
+  if (!isPiBrowser()) {
+    window.location.href = "https://minepi.com/blackstyle";
+  } else {
+    authenticateUser();
+  }
+});
+
+document.getElementById('fingerprint-login-btn')?.addEventListener('click', async () => {
+  if (isPiBrowser()) {
+    const user = await authenticateUser();
+    if (user) {
+      document.getElementById("auth-container").style.display = "none";
+      document.getElementById("app-container").style.display = "block";
     }
-};
-
-// عند اختيار تصنيف فرعي
-window.selectLevel2 = function(parentKey, subKey, element) {
-    document.querySelectorAll('.chip').forEach(el => el.classList.remove('active'));
-    element.classList.add('active');
-
-    const level3Container = document.getElementById('level3-area');
-    
-    // تحديد خيارات البحث بناءً على القسم (عشان مايطلعش Apple في العربيات)
-    let optionsHtml = '';
-    
-    if (parentKey === 'electronics') {
-        optionsHtml = `
-            <option value="">الكل</option>
-            <option value="Apple">Apple</option>
-            <option value="Samsung">Samsung</option>
-            <option value="Sony">Sony</option>
-            <option value="Canon">Canon</option>
-        `;
-    } else if (parentKey === 'vehicles') {
-        optionsHtml = `
-            <option value="">الكل</option>
-            <option value="Tesla">Tesla</option>
-            <option value="Toyota">Toyota</option>
-            <option value="BMW">BMW</option>
-        `;
-    } else {
-        optionsHtml = `<option value="">الكل</option>`;
-    }
-
-    // رسم المستوى الثالث (Input Groups + Search Button) بالتصميم الأصلي
-    level3Container.innerHTML = `
-        <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;">
-            
-            <div class="filter-group">
-                <label><i class="fa-solid fa-tag"></i> تحديد الماركة:</label>
-                <select id="brand-select" style="width:100%; padding:10px; border-radius:8px; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1);">
-                    ${optionsHtml}
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label><i class="fa-solid fa-coins"></i> نطاق السعر (Pi):</label>
-                <div style="display:flex; gap:10px;">
-                    <input type="number" id="price-min" placeholder="من" style="width:50%; padding:10px; border-radius:8px; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1);">
-                    <input type="number" id="price-max" placeholder="إلى" style="width:50%; padding:10px; border-radius:8px; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1);">
-                </div>
-            </div>
-
-            <button class="main-btn" onclick="executeManualSearch('${parentKey}', '${subKey}')" style="margin-top:15px; background:var(--primary); color:black;">
-                <i class="fa-solid fa-magnifying-glass"></i> بحث يدوي
-            </button>
-        </div>
-    `;
-
-    // فلترة المنتجات
-    const filtered = MOCK_PRODUCTS.filter(p => p.cat === parentKey && p.sub === subKey);
-    renderProducts(filtered);
-};
-
-// وظيفة البحث اليدوي (عند الضغط على الزر)
-window.executeManualSearch = function(parentKey, subKey) {
-    const brand = document.getElementById('brand-select').value;
-    const min = parseFloat(document.getElementById('price-min').value) || 0;
-    const max = parseFloat(document.getElementById('price-max').value) || 999999;
-
-    const filtered = MOCK_PRODUCTS.filter(p => {
-        const matchCat = p.cat === parentKey && p.sub === subKey;
-        const matchBrand = brand === "" || p.brand === brand;
-        const matchPrice = p.price >= min && p.price <= max;
-        return matchCat && matchBrand && matchPrice;
-    });
-
-    renderProducts(filtered);
-};
-
-/*****************************************
- * 5. PRODUCT RENDERING
- *****************************************/
-function renderProducts(list) {
-    const grid = document.getElementById('products-grid');
-    if(!grid) return;
-
-    if(list.length === 0) {
-        grid.innerHTML = `
-            <div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">
-                <i class="fa-solid fa-box-open fa-3x" style="margin-bottom:15px; opacity:0.5;"></i>
-                <p>لا توجد منتجات مطابقة لهذا البحث</p>
-                <button onclick="renderLevel1(); renderProducts(MOCK_PRODUCTS)" style="background:transparent; border:1px solid #555; color:white; padding:8px 15px; border-radius:20px; margin-top:10px;">إعادة تعيين</button>
-            </div>
-        `;
-        return;
-    }
-
-    grid.innerHTML = list.map(p => `
-        <div class="product-card glass-panel" onclick="openProductModal(${p.id})">
-            <div class="p-img-box">
-                <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150'">
-                <div class="ai-tag"><i class="fa-solid fa-microchip"></i> AI Verified</div>
-            </div>
-            <div class="p-details">
-                <div class="p-name">${p.name}</div>
-                <div class="p-price">${p.price} Pi</div>
-            </div>
-        </div>
-    `).join('');
-}
-
-/*****************************************
- * 6. MODALS & NAVIGATION
- *****************************************/
-window.openProductModal = function(id) {
-    const product = MOCK_PRODUCTS.find(p => p.id === id);
-    if(!product) return;
-    selectedProduct = product;
-    
-    document.getElementById('detail-img').src = product.image;
-    document.getElementById('detail-title').innerText = product.name;
-    document.getElementById('detail-price').innerText = product.price + " Pi";
-    document.getElementById('detail-desc').innerText = product.desc;
-    document.getElementById('product-detail-modal').style.display = 'block';
-};
-
-window.closeProductDetailModal = () => document.getElementById('product-detail-modal').style.display = 'none';
-
-window.openCheckoutModal = function() {
-    if(!selectedProduct) return;
-    document.getElementById('checkout-product-name').innerText = selectedProduct.name;
-    document.getElementById('checkout-product-price').innerText = selectedProduct.price + " Pi";
-    document.getElementById('checkout-amount').innerText = selectedProduct.price;
-    document.getElementById('product-detail-modal').style.display = 'none';
-    document.getElementById('checkoutModal').style.display = 'block';
-};
-
-window.closeCheckoutModal = () => document.getElementById('checkoutModal').style.display = 'none';
-
-// باقي النوافذ
-window.openLogyAiModal = () => document.getElementById('logyAiModal').style.display = 'flex';
-window.closeLogyAiModal = () => document.getElementById('logyAiModal').style.display = 'none';
-window.openOrdersModal = () => document.getElementById('ordersModal').style.display = 'block';
-window.closeOrdersModal = () => document.getElementById('ordersModal').style.display = 'none';
-window.openWalletModal = () => document.getElementById('walletModal').style.display = 'block';
-window.closeWalletModal = () => document.getElementById('walletModal').style.display = 'none';
-window.openSettingsModal = () => document.getElementById('settingsModal').style.display = 'block';
-window.closeSettingsModal = () => document.getElementById('settingsModal').style.display = 'none';
-window.openNotificationsModal = () => document.getElementById('notificationsModal').style.display = 'block';
-window.closeNotificationsModal = () => document.getElementById('notificationsModal').style.display = 'none';
-window.openAiUploadModal = () => document.getElementById('ai-upload-modal').style.display = 'block';
-window.closeAiUploadModal = () => document.getElementById('ai-upload-modal').style.display = 'none';
-
-window.showDetailTab = function(tabName, el) {
-    document.querySelectorAll('.detail-tab-content').forEach(c => c.style.display = 'none');
-    document.querySelectorAll('.detail-tab-item').forEach(i => i.classList.remove('active'));
-    document.getElementById('detail-' + tabName).style.display = 'block';
-    el.classList.add('active');
-};
-
-/*****************************************
- * 7. PAYMENT LOGIC
- *****************************************/
-window.checkout = async function() {
-    const btn = document.querySelector('#checkoutModal .buy-btn');
-    const originalText = btn.innerHTML;
-    
-    if (typeof window.Pi === 'undefined') {
-        alert("⚠️ يجب استخدام متصفح Pi Browser للدفع الحقيقي.");
-        return;
-    }
-
-    try {
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> معالجة...';
-        btn.disabled = true;
-
-        const response = await fetch(`${API_BASE}/api/pi/create-payment`, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                productId: selectedProduct.id,
-                amount: selectedProduct.price,
-                memo: `Forsale AI: ${selectedProduct.name}`
-            })
-        });
-
-        if (!response.ok) throw new Error("Server Error");
-        const resData = await response.json();
-
-        await Pi.createPayment(resData.data, {
-            onReadyForServerApproval: async (paymentId) => { 
-                await fetch(`${API_BASE}/api/pi/approve-payment`, {
-                    method: "POST", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ paymentId })
-                });
-            },
-            onReadyForServerCompletion: async (paymentId, txid) => {
-                await fetch(`${API_BASE}/api/pi/complete-payment`, {
-                    method: "POST", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ paymentId, txid })
-                });
-                alert("✅ تم الدفع!");
-                closeCheckoutModal();
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            },
-            onCancel: () => { 
-                alert("تم الإلغاء"); btn.innerHTML = originalText; btn.disabled = false; 
-            },
-            onError: (err) => { 
-                alert("خطأ: " + err.message); btn.innerHTML = originalText; btn.disabled = false; 
-            }
-        });
-
-    } catch(err) {
-        console.error(err);
-        alert("خطأ في الاتصال");
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }
-};
-
-// Authentication Buttons
-if(document.getElementById('login-btn')) {
-    document.getElementById('login-btn').addEventListener('click', () => {
-        document.getElementById('auth-container').style.display = 'none';
-        document.getElementById('app-container').style.display = 'block';
-    });
-}
-if(document.getElementById('pi-login-btn')) {
-    document.getElementById('pi-login-btn').addEventListener('click', async () => {
-        try {
-            const auth = await Pi.authenticate(['username', 'payments'], () => {});
-            document.getElementById('auth-container').style.display = 'none';
-            document.getElementById('app-container').style.display = 'block';
-        } catch (e) { alert("Error: " + e.message); }
-    });
-}
+  } else {
+    alert("⚠️ يجب فتح التطبيق من Pi Browser");
+  }
+});
