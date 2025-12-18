@@ -1,372 +1,98 @@
-import React, { useState } from 'react';
-import { ShoppingBag, Sparkles, TrendingUp, Shield, Search, Filter, Grid, List, Heart, ShoppingCart, User, Menu, X, Star, MapPin, Clock, Package, CheckCircle, ArrowRight } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="main-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Forsale AI - Global Marketplace</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+</head>
+<body class="bg-slate-950">
 
-const ForsaleRedesign = () => {
-  const [viewMode, setViewMode] = useState('grid');
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [showFilters, setShowFilters] = useState(false);
-
-  // Mock data - enhanced
-  const products = [
-    {
-      id: 1,
-      name: "iPhone 15 Pro Max",
-      price: 0.85,
-      originalPrice: 1.2,
-      image: "https://images.unsplash.com/photo-1696446702883-application-6a0952e1e5ed?w=500",
-      aiScore: 9.4,
-      condition: "Like New",
-      seller: "TechDeals",
-      location: "Cairo, Egypt",
-      verified: true,
-      likes: 234,
-      views: 1240
-    },
-    {
-      id: 2,
-      name: "MacBook Pro M3",
-      price: 2.5,
-      originalPrice: 3.2,
-      image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500",
-      aiScore: 9.7,
-      condition: "Brand New",
-      seller: "AppleStore",
-      location: "Alexandria, Egypt",
-      verified: true,
-      likes: 456,
-      views: 2890
-    },
-    {
-      id: 3,
-      name: "AirPods Pro 2",
-      price: 0.18,
-      originalPrice: 0.25,
-      image: "https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=500",
-      aiScore: 9.1,
-      condition: "Excellent",
-      seller: "AudioHub",
-      location: "Dubai, UAE",
-      verified: true,
-      likes: 189,
-      views: 890
-    }
-  ];
-
-  const categories = [
-    { icon: "📱", name: "Electronics", count: 1240 },
-    { icon: "👕", name: "Fashion", count: 890 },
-    { icon: "🏠", name: "Home", count: 567 },
-    { icon: "🎮", name: "Gaming", count: 432 },
-    { icon: "📚", name: "Books", count: 234 }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Modern Header */}
-      <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/50">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <ShoppingBag className="w-8 h-8 text-violet-400" />
-              <Sparkles className="w-4 h-4 text-yellow-400 absolute -top-1 -right-1" />
+<div id="app-container">
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1 class="logo-text">Forsale <span class="ai-tag">AI</span></h1>
+                <span class="sub-logo" data-i18n="tagline">سوق الذكاء الاصطناعي العالمي</span>
             </div>
-            <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                Forsale
-              </h1>
-              <p className="text-[10px] text-slate-500">AI-Powered Marketplace</p>
-            </div>
-          </div>
 
-          {/* Search - Desktop */}
-          <div className="hidden md:flex flex-1 max-w-2xl mx-8">
-            <div className="relative w-full">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search with AI intelligence..."
-                className="w-full pl-12 pr-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-violet-500 transition-colors"
-              />
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center gap-3">
-            <button className="p-2 hover:bg-slate-800 rounded-lg transition-colors relative">
-              <Heart className="w-5 h-5 text-slate-400" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-violet-500 rounded-full text-[10px] flex items-center justify-center">3</span>
-            </button>
-            <button className="p-2 hover:bg-slate-800 rounded-lg transition-colors relative">
-              <ShoppingCart className="w-5 h-5 text-slate-400" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-violet-500 rounded-full text-[10px] flex items-center justify-center">2</span>
-            </button>
-            <button className="p-2 hover:bg-slate-800 rounded-lg transition-colors">
-              <User className="w-5 h-5 text-slate-400" />
-            </button>
-          </div>
-        </div>
-
-        {/* Search - Mobile */}
-        <div className="md:hidden px-4 pb-3">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search..."
-              className="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white text-sm placeholder:text-slate-500"
-            />
-          </div>
-        </div>
-      </header>
-
-      {/* Categories Bar */}
-      <div className="bg-slate-900/50 border-b border-slate-800/50 overflow-x-auto">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex gap-2 py-3">
-            {categories.map((cat, i) => (
-              <button
-                key={i}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 hover:bg-slate-800 rounded-lg whitespace-nowrap transition-colors border border-slate-700/50"
-              >
-                <span className="text-xl">{cat.icon}</span>
-                <span className="text-sm text-slate-300">{cat.name}</span>
-                <span className="text-xs text-slate-500">({cat.count})</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-6">
-        {/* Filters & View Toggle */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 rounded-lg transition-colors"
-            >
-              <Filter className="w-4 h-4" />
-              <span className="text-sm">Filters</span>
-            </button>
-            <div className="flex items-center gap-2 px-2 py-1 bg-slate-800/50 border border-slate-700 rounded-lg">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded ${viewMode === 'grid' ? 'bg-violet-500' : 'hover:bg-slate-700'} transition-colors`}
-              >
-                <Grid className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded ${viewMode === 'list' ? 'bg-violet-500' : 'hover:bg-slate-700'} transition-colors`}
-              >
-                <List className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-slate-400">
-            <TrendingUp className="w-4 h-4" />
-            <span>1,234 items</span>
-          </div>
-        </div>
-
-        {/* Products Grid */}
-        <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}>
-          {products.map((product) => (
-            <div
-              key={product.id}
-              onClick={() => setSelectedProduct(product)}
-              className="group bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden hover:border-violet-500/50 transition-all cursor-pointer hover:shadow-xl hover:shadow-violet-500/10"
-            >
-              {/* Image */}
-              <div className="relative aspect-square overflow-hidden bg-slate-800">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                {/* AI Badge */}
-                <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-1 bg-violet-500/90 backdrop-blur-sm rounded-lg">
-                  <Sparkles className="w-3 h-3" />
-                  <span className="text-xs font-bold">{product.aiScore}</span>
-                </div>
-                {/* Like Button */}
-                <button className="absolute top-3 right-3 p-2 bg-slate-900/80 backdrop-blur-sm rounded-lg hover:bg-violet-500 transition-colors">
-                  <Heart className="w-4 h-4" />
-                </button>
-                {/* Verified Badge */}
-                {product.verified && (
-                  <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2 py-1 bg-emerald-500/90 backdrop-blur-sm rounded-lg">
-                    <CheckCircle className="w-3 h-3" />
-                    <span className="text-xs font-medium">Verified</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Content */}
-              <div className="p-4">
-                <h3 className="font-semibold text-white mb-1 line-clamp-1">{product.name}</h3>
-                <p className="text-xs text-slate-400 mb-3">{product.condition}</p>
+            <div class="header-actions">
+                <select id="lang-switcher" onchange="changeLanguage(this.value)" class="lang-select">
+                    <option value="ar">العربية</option>
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                    <option value="zh">中文</option>
+                </select>
                 
-                {/* Price */}
-                <div className="flex items-baseline gap-2 mb-3">
-                  <span className="text-2xl font-bold text-violet-400">{product.price}π</span>
-                  <span className="text-sm text-slate-500 line-through">{product.originalPrice}π</span>
-                  <span className="text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full">
-                    -{Math.round((1 - product.price/product.originalPrice) * 100)}%
-                  </span>
+                <div class="icon-btn" onclick="openNotificationsModal()">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="notification-badge"></span>
                 </div>
-
-                {/* Meta */}
-                <div className="flex items-center justify-between text-xs text-slate-400 pt-3 border-t border-slate-800">
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3" />
-                    <span>{product.location}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span>{product.views} views</span>
-                    <span>❤️ {product.likes}</span>
-                  </div>
+                <div class="user-avatar" onclick="openSettingsModal()">
+                    <i class="fa-solid fa-circle-user"></i>
                 </div>
-              </div>
             </div>
-          ))}
         </div>
-      </main>
-
-      {/* Product Detail Modal */}
-      {selectedProduct && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedProduct(null)} />
-          
-          <div className="relative bg-slate-900 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl border border-slate-800">
-            {/* Close Button */}
-            <button
-              onClick={() => setSelectedProduct(null)}
-              className="absolute top-4 right-4 z-10 p-2 bg-slate-800/90 backdrop-blur-sm rounded-lg hover:bg-slate-700 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {/* Image */}
-            <div className="relative h-80 bg-slate-800">
-              <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-full object-cover" />
-              <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-violet-500/90 backdrop-blur-sm rounded-lg">
-                <Sparkles className="w-4 h-4" />
-                <span className="font-bold">AI Score: {selectedProduct.aiScore}/10</span>
-              </div>
-            </div>
-
-            <div className="p-6">
-              {/* Title & Price */}
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h2 className="text-2xl font-bold text-white mb-1">{selectedProduct.name}</h2>
-                  <p className="text-slate-400">{selectedProduct.condition}</p>
-                </div>
-                <div className="text-right">
-                  <div className="text-3xl font-bold text-violet-400">{selectedProduct.price}π</div>
-                  <div className="text-sm text-slate-500 line-through">{selectedProduct.originalPrice}π</div>
-                </div>
-              </div>
-
-              {/* AI Analysis */}
-              <div className="bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20 rounded-xl p-4 mb-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-5 h-5 text-violet-400" />
-                  <h3 className="font-semibold text-white">AI Price Analysis</h3>
-                </div>
-                <p className="text-sm text-slate-300 mb-3">
-                  Excellent deal! Price is 29% below market average. Item is verified authentic with fast shipping available.
-                </p>
-                <div className="flex items-center gap-4 text-xs">
-                  <div className="flex items-center gap-1">
-                    <TrendingUp className="w-4 h-4 text-emerald-400" />
-                    <span className="text-slate-400">Market Price: {selectedProduct.originalPrice}π</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-4 h-4 text-blue-400" />
-                    <span className="text-slate-400">Delivery: 3-5 days</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Seller Info */}
-              <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-full flex items-center justify-center font-bold text-lg">
-                    {selectedProduct.seller[0]}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-white">{selectedProduct.seller}</span>
-                      {selectedProduct.verified && <CheckCircle className="w-4 h-4 text-emerald-400" />}
-                    </div>
-                    <div className="flex items-center gap-1 text-xs text-slate-400">
-                      <MapPin className="w-3 h-3" />
-                      <span>{selectedProduct.location}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="flex items-center gap-1 text-yellow-400 mb-1">
-                    <Star className="w-4 h-4 fill-current" />
-                    <span className="font-semibold">4.8</span>
-                  </div>
-                  <span className="text-xs text-slate-400">234 reviews</span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3">
-                <button className="flex-1 px-6 py-3 bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 rounded-xl font-semibold transition-all flex items-center justify-center gap-2">
-                  <Shield className="w-5 h-5" />
-                  Buy with Escrow Protection
-                  <ArrowRight className="w-5 h-5" />
+        
+        <div class="search-container">
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="ai-search" data-i18n-placeholder="search_placeholder" placeholder="ابحث بذكاء اصطناعي...">
+                <button class="filter-toggle" onclick="toggleFilters()">
+                    <i class="fa-solid fa-sliders"></i>
                 </button>
-              </div>
-
-              {/* Features */}
-              <div className="grid grid-cols-3 gap-3 mt-6">
-                <div className="text-center p-3 bg-slate-800/50 rounded-lg">
-                  <Shield className="w-6 h-6 text-emerald-400 mx-auto mb-1" />
-                  <p className="text-xs text-slate-400">Secure Payment</p>
-                </div>
-                <div className="text-center p-3 bg-slate-800/50 rounded-lg">
-                  <Package className="w-6 h-6 text-blue-400 mx-auto mb-1" />
-                  <p className="text-xs text-slate-400">Fast Shipping</p>
-                </div>
-                <div className="text-center p-3 bg-slate-800/50 rounded-lg">
-                  <CheckCircle className="w-6 h-6 text-violet-400 mx-auto mb-1" />
-                  <p className="text-xs text-slate-400">AI Verified</p>
-                </div>
-              </div>
             </div>
-          </div>
         </div>
-      )}
+    </header>
 
-      {/* Bottom Navigation - Mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 md:hidden z-40">
-        <div className="flex items-center justify-around h-16 px-2">
-          {[
-            { icon: ShoppingBag, label: 'Shop', active: true },
-            { icon: Search, label: 'Search' },
-            { icon: Heart, label: 'Saved' },
-            { icon: User, label: 'Account' }
-          ].map((item, i) => (
-            <button key={i} className="flex flex-col items-center gap-1 flex-1">
-              <item.icon className={`w-5 h-5 ${item.active ? 'text-violet-400' : 'text-slate-400'}`} />
-              <span className={`text-xs ${item.active ? 'text-violet-400 font-medium' : 'text-slate-400'}`}>
-                {item.label}
-              </span>
-            </button>
-          ))}
+    <main class="content">
+        <section class="categories-bar" id="categories-list">
+            </section>
+
+        <div class="view-controls">
+            <h2 class="section-title" data-i18n="recommended">اقتراحات Logy AI</h2>
+            <div class="view-toggles">
+                <button onclick="setView('grid')" id="grid-btn" class="active"><i class="fa-solid fa-grid-2"></i></button>
+                <button onclick="setView('list')" id="list-btn"><i class="fa-solid fa-list"></i></button>
+            </div>
         </div>
-      </nav>
+
+        <div id="products-grid" class="grid-view">
+            </div>
+    </main>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="showApp('home')">
+            <i class="fa-solid fa-house"></i>
+            <span data-i18n="nav_home">الرئيسية</span>
+        </div>
+        <div class="nav-item" onclick="openLogyAiModal()">
+            <i class="fa-solid fa-robot"></i>
+            <span data-i18n="nav_ai">Logy AI</span>
+        </div>
+        <div class="nav-item plus-btn" onclick="openAiUploadModal()">
+            <div class="inner-plus"><i class="fa-solid fa-plus"></i></div>
+        </div>
+        <div class="nav-item" onclick="openOrdersModal()">
+            <i class="fa-solid fa-box"></i>
+            <span data-i18n="nav_orders">الطلبات</span>
+        </div>
+        <div class="nav-item" onclick="openWalletModal()">
+            <i class="fa-solid fa-wallet"></i>
+            <span data-i18n="nav_wallet">المحفظة</span>
+        </div>
+    </nav>
+</div>
+
+<div id="product-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="close-modal" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+        <div id="modal-body"></div>
     </div>
-  );
-};
+</div>
 
-export default ForsaleRedesign;
+<script src="script.js"></script>
+</body>
+</html>
