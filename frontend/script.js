@@ -1,12 +1,11 @@
 // ============================================
-// 📄 FILENAME: script.js (Main Application)
+// 📄 FILENAME: script.js (FIXED WITH DEBUG)
 // 📍 PATH: frontend/script.js
 // ============================================
 
 const API_BASE = "https://forsale-production.up.railway.app";
 
 let selectedProduct = null;
-let paymentInProgress = false;
 let currentUser = null;
 let currentPage = 1;
 
@@ -15,33 +14,28 @@ let currentPage = 1;
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log("🚀 Forsale AI Global Marketplace loaded");
-  console.log("📱 Pi App: blackstyle");
+  console.log("🚀 Forsale AI initializing...");
+  console.log("📍 API Base:", API_BASE);
   
-  // Initialize all systems
-  initializeApp();
-  
-  // Load initial products
-  await loadProducts();
-  
-  // Setup event listeners
-  setupEventListeners();
-  
-  // Check if Pi Browser
-  if (isPiBrowser()) {
-    console.log("✅ Running in Pi Browser");
+  try {
+    // Initialize app
+    initializeApp();
+    
+    // Load products
+    await loadProducts();
+    
+    // Setup event listeners
+    setupEventListeners();
+    
+    // Show app
     document.getElementById("auth-container").style.display = "none";
     document.getElementById("app-container").style.display = "block";
     
-    try {
-      await authenticateUser();
-    } catch (error) {
-      console.log("⚠️ Auto-auth failed, will prompt when needed");
-    }
-  } else {
-    console.log("⚠️ Not in Pi Browser - Demo mode");
-    document.getElementById("auth-container").style.display = "none";
-    document.getElementById("app-container").style.display = "block";
+    console.log("✅ App initialized successfully");
+    
+  } catch (error) {
+    console.error("❌ Initialization failed:", error);
+    showError("Failed to initialize app: " + error.message);
   }
 });
 
@@ -50,28 +44,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ============================================
 
 function initializeApp() {
-  // Initialize i18n if available
   if (typeof i18n !== 'undefined') {
     i18n.init();
     renderLanguageSelector();
   }
   
-  // Initialize search if available
-  if (typeof searchEngine !== 'undefined' && typeof searchUI !== 'undefined') {
+  if (typeof searchUI !== 'undefined') {
     searchUI.init();
   }
   
-  // Initialize cart if available
   if (typeof cart !== 'undefined') {
     cart.init();
   }
   
-  // Update UI
   updateAllUI();
 }
 
 function updateAllUI() {
-  // Update navigation items
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     if (typeof i18n !== 'undefined') {
@@ -79,7 +68,6 @@ function updateAllUI() {
     }
   });
   
-  // Update placeholders
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.getAttribute('data-i18n-placeholder');
     if (typeof i18n !== 'undefined') {
@@ -89,7 +77,255 @@ function updateAllUI() {
 }
 
 // ============================================
-// LANGUAGE SELECTOR
+// PRODUCT LOADING (FIXED)
+// ============================================
+
+async function loadProducts(page = 1) {
+  try {
+    console.log(`📦 Loading products... (Page ${page})`);
+    showLoading();
+    currentPage = page;
+    
+    // Try API first
+    try {
+      const url = `${API_BASE}/api/products?page=${page}&limit=20`;
+      console.log("📡 Fetching:", url);
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+      
+      console.log("📡 Response status:", response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log("📦 Products received:", data);
+      
+      if (data.success && data.data) {
+        displayProducts(data.data.products || []);
+        displayPagination(data.data.pagination);
+        console.log("✅ Products loaded successfully");
+        return;
+      }
+      
+    } catch (apiError) {
+      console.warn("⚠️ API failed:", apiError.message);
+      console.log("🔄 Falling back to mock data...");
+    }
+    
+    // Fallback to mock data
+    displayProducts(MOCK_PRODUCTS);
+    displayPagination({
+      page: 1,
+      limit: 20,
+      total: MOCK_PRODUCTS.length,
+      pages: 1
+    });
+    console.log("✅ Mock products loaded");
+    
+  } catch (error) {
+    console.error('❌ Load products failed:', error);
+    showError('Failed to load products: ' + error.message);
+    
+    // Show mock products as last resort
+    displayProducts(MOCK_PRODUCTS);
+    
+  } finally {
+    hideLoading();
+  }
+}
+
+// ============================================
+// DISPLAY FUNCTIONS
+// ============================================
+
+function displayProducts(products) {
+  const grid = document.getElementById("products-grid");
+  if (!grid) {
+    console.error("❌ products-grid element not found");
+    return;
+  }
+  
+  console.log("🎨 Displaying", products.length, "products");
+  
+  if (!products || products.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+        <i class="fa-solid fa-box-open" style="font-size: 60px; color: var(--text-muted); opacity: 0.5;"></i>
+        <p style="color: var(--text-muted); margin-top: 15px; font-size: 16px;">No products found</p>
+        <button class="main-btn" onclick="loadProducts(1)" style="margin-top: 20px;">
+          Reload Products
+        </button>
+      </div>
+    `;
+    return;
+  }
+  
+  grid.innerHTML = products.map(product => {
+    const id = product.id;
+    const name = product.name || product.title || 'Untitled Product';
+    const price = product.price || product.price_pi || 0;
+    const image = product.image || (product.images && product.images[0]) || 'https://via.placeholder.com/400';
+    const condition = product.condition || '';
+    
+    return `
+      <div class="product-card glass-panel" onclick="openProductDetail(${id})">
+        <div class="p-img-box">
+          <img src="${image}" alt="${name}" onerror="this.src='https://via.placeholder.com/400'">
+          <div class="ai-tag">
+            <i class="fa-solid fa-microchip"></i>
+            <span>AI Verified</span>
+          </div>
+          ${condition ? `<div class="condition-badge">${condition}</div>` : ''}
+        </div>
+        <div class="p-details">
+          <div class="p-name">${name}</div>
+          <div class="p-price">${price} Pi</div>
+        </div>
+        <button class="quick-add-btn" onclick="event.stopPropagation(); quickAddToCart(${id})">
+          <i class="fa-solid fa-cart-plus"></i>
+        </button>
+      </div>
+    `;
+  }).join('');
+  
+  console.log("✅ Products displayed");
+}
+
+function displayPagination(pagination) {
+  const container = document.getElementById('pagination-container');
+  if (!container || !pagination) return;
+  
+  const { page, pages, total } = pagination;
+  
+  if (pages <= 1) {
+    container.innerHTML = '';
+    return;
+  }
+  
+  let html = `
+    <button class="pagination-btn" onclick="loadProducts(${page - 1})" ${page === 1 ? 'disabled' : ''}>
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+  `;
+  
+  for (let i = 1; i <= Math.min(pages, 5); i++) {
+    html += `
+      <button class="pagination-btn ${i === page ? 'active' : ''}" onclick="loadProducts(${i})">
+        ${i}
+      </button>
+    `;
+  }
+  
+  html += `
+    <button class="pagination-btn" onclick="loadProducts(${page + 1})" ${page === pages ? 'disabled' : ''}>
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+  `;
+  
+  container.innerHTML = html;
+}
+
+// ============================================
+// UI HELPERS
+// ============================================
+
+function showLoading() {
+  const indicator = document.getElementById('loading-indicator');
+  if (indicator) {
+    indicator.style.display = 'flex';
+  }
+}
+
+function hideLoading() {
+  const indicator = document.getElementById('loading-indicator');
+  if (indicator) {
+    indicator.style.display = 'none';
+  }
+}
+
+function showError(message) {
+  console.error("❌", message);
+  alert('❌ ' + message);
+}
+
+function showSuccess(message) {
+  console.log("✅", message);
+  alert('✅ ' + message);
+}
+
+// ============================================
+// PRODUCT DETAIL
+// ============================================
+
+function openProductDetail(id) {
+  console.log("📄 Opening product:", id);
+  const product = findProductById(id);
+  
+  if (!product) {
+    showError("Product not found");
+    return;
+  }
+  
+  selectedProduct = product;
+  
+  document.getElementById("detail-title").innerText = product.name || product.title;
+  document.getElementById("detail-price").innerText = (product.price || product.price_pi) + " Pi";
+  document.getElementById("detail-img").src = product.image || product.images?.[0] || 'https://via.placeholder.com/400';
+  document.getElementById("detail-desc").innerText = product.description || 'No description available';
+  
+  document.getElementById("product-detail-modal").style.display = "block";
+}
+
+function closeProductDetailModal() {
+  document.getElementById("product-detail-modal").style.display = "none";
+  selectedProduct = null;
+}
+
+function findProductById(id) {
+  // Try to find in current displayed products first
+  return MOCK_PRODUCTS.find(p => p.id === id);
+}
+
+// ============================================
+// CART FUNCTIONS
+// ============================================
+
+function quickAddToCart(productId) {
+  const product = findProductById(productId);
+  if (!product) return;
+  
+  if (typeof cart !== 'undefined') {
+    cart.addItem(product, 1);
+  } else {
+    showSuccess('Added to cart!');
+  }
+}
+
+// ============================================
+// EVENT LISTENERS
+// ============================================
+
+function setupEventListeners() {
+  // Close modals on outside click
+  document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+  });
+}
+
+// ============================================
+// LANGUAGE FUNCTIONS
 // ============================================
 
 function renderLanguageSelector() {
@@ -118,8 +354,6 @@ function changeLanguage(langCode) {
     renderLanguageSelector();
     updateAllUI();
     closeLanguageModal();
-    
-    // Reload products with new language
     loadProducts();
   }
 }
@@ -133,299 +367,28 @@ function closeLanguageModal() {
 }
 
 // ============================================
-// PRODUCT LOADING
-// ============================================
-
-async function loadProducts(page = 1) {
-  try {
-    showLoading();
-    currentPage = page;
-    
-    // If search engine is available, use it
-    if (typeof searchEngine !== 'undefined') {
-      searchEngine.setFilter('page', page);
-      const results = await searchEngine.search();
-      displayProducts(results.products);
-      displayPagination(results.pagination);
-    } else {
-      // Fallback to mock data
-      displayProducts(MOCK_PRODUCTS);
-    }
-    
-  } catch (error) {
-    console.error('Failed to load products:', error);
-    showError('Failed to load products. Please try again.');
-  } finally {
-    hideLoading();
-  }
-}
-
-function displayProducts(products) {
-  const grid = document.getElementById("products-grid");
-  if (!grid) return;
-  
-  if (!products || products.length === 0) {
-    grid.innerHTML = `
-      <div class="empty-state">
-        <i class="fa-solid fa-box-open" style="font-size: 60px; color: var(--text-muted);"></i>
-        <p style="color: var(--text-muted); margin-top: 15px;">No products found</p>
-      </div>
-    `;
-    return;
-  }
-  
-  grid.innerHTML = products.map(product => `
-    <div class="product-card glass-panel" onclick="openProductDetail(${product.id})">
-      <div class="p-img-box">
-        <img src="${product.image || product.images?.[0] || 'placeholder.jpg'}" 
-             alt="${product.name || product.title}">
-        <div class="ai-tag">
-          <i class="fa-solid fa-microchip"></i>
-          <span data-i18n="product_verified">AI Verified</span>
-        </div>
-        ${product.condition ? `
-          <div class="condition-badge">${product.condition}</div>
-        ` : ''}
-      </div>
-      <div class="p-details">
-        <div class="p-name">${product.name || product.title}</div>
-        <div class="p-price">${product.price || product.price_pi} Pi</div>
-        ${product.shipping_free ? `
-          <div class="shipping-badge">
-            <i class="fa-solid fa-truck"></i>
-            <span data-i18n="product_shipping">Free Shipping</span>
-          </div>
-        ` : ''}
-      </div>
-      <button class="quick-add-btn" onclick="event.stopPropagation(); quickAddToCart(${product.id})">
-        <i class="fa-solid fa-cart-plus"></i>
-      </button>
-    </div>
-  `).join('');
-}
-
-function displayPagination(pagination) {
-  const container = document.getElementById('pagination-container');
-  if (!container || !pagination) return;
-  
-  const { page, pages, total } = pagination;
-  
-  if (pages <= 1) {
-    container.innerHTML = '';
-    return;
-  }
-  
-  let paginationHTML = `
-    <button class="pagination-btn" 
-            onclick="loadProducts(${page - 1})"
-            ${page === 1 ? 'disabled' : ''}>
-      <i class="fa-solid fa-chevron-left"></i>
-    </button>
-  `;
-  
-  // Show max 5 page numbers
-  let startPage = Math.max(1, page - 2);
-  let endPage = Math.min(pages, startPage + 4);
-  
-  if (endPage - startPage < 4) {
-    startPage = Math.max(1, endPage - 4);
-  }
-  
-  for (let i = startPage; i <= endPage; i++) {
-    paginationHTML += `
-      <button class="pagination-btn ${i === page ? 'active' : ''}"
-              onclick="loadProducts(${i})">
-        ${i}
-      </button>
-    `;
-  }
-  
-  paginationHTML += `
-    <button class="pagination-btn" 
-            onclick="loadProducts(${page + 1})"
-            ${page === pages ? 'disabled' : ''}>
-      <i class="fa-solid fa-chevron-right"></i>
-    </button>
-  `;
-  
-  container.innerHTML = paginationHTML;
-}
-
-// ============================================
-// PRODUCT DETAIL
-// ============================================
-
-async function openProductDetail(id) {
-  try {
-    // Find product (from search results or mock data)
-    const product = findProductById(id);
-    
-    if (!product) {
-      alert("❌ Product not found");
-      return;
-    }
-    
-    selectedProduct = product;
-    
-    // Populate modal
-    document.getElementById("detail-title").innerText = product.name || product.title;
-    document.getElementById("detail-price").innerText = (product.price || product.price_pi) + " Pi";
-    document.getElementById("detail-img").src = product.image || product.images?.[0] || 'placeholder.jpg';
-    document.getElementById("detail-desc").innerText = product.description || 'No description available';
-    
-    // AI Analysis (mock for now)
-    document.getElementById("ai-score").innerText = "9.2";
-    document.getElementById("ai-market-price").innerText = (product.price || product.price_pi) + " Pi";
-    
-    // Show modal
-    document.getElementById("product-detail-modal").style.display = "block";
-    
-  } catch (error) {
-    console.error('Failed to open product detail:', error);
-    showError('Failed to load product details');
-  }
-}
-
-function findProductById(id) {
-  // Try to find in search results first
-  if (typeof searchEngine !== 'undefined' && searchEngine.lastResults) {
-    const found = searchEngine.lastResults.find(p => p.id === id);
-    if (found) return found;
-  }
-  
-  // Fallback to mock data
-  return MOCK_PRODUCTS.find(p => p.id === id);
-}
-
-function closeProductDetailModal() {
-  document.getElementById("product-detail-modal").style.display = "none";
-  selectedProduct = null;
-}
-
-// ============================================
-// QUICK ADD TO CART
-// ============================================
-
-function quickAddToCart(productId) {
-  const product = findProductById(productId);
-  if (!product) return;
-  
-  if (typeof cart !== 'undefined') {
-    cart.addItem(product, 1);
-  } else {
-    console.warn('Cart system not available');
-    alert('Added to cart!');
-  }
-}
-
-// ============================================
-// UI HELPERS
-// ============================================
-
-function showLoading() {
-  const indicator = document.getElementById('loading-indicator');
-  if (indicator) {
-    indicator.style.display = 'flex';
-  }
-}
-
-function hideLoading() {
-  const indicator = document.getElementById('loading-indicator');
-  if (indicator) {
-    indicator.style.display = 'none';
-  }
-}
-
-function showError(message) {
-  alert('❌ ' + message);
-}
-
-function showSuccess(message) {
-  alert('✅ ' + message);
-}
-
-// ============================================
-// EVENT LISTENERS
-// ============================================
-
-function setupEventListeners() {
-  // Search input
-  const searchInput = document.getElementById('main-search');
-  if (searchInput) {
-    let debounceTimer;
-    searchInput.addEventListener('input', (e) => {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-        if (typeof searchEngine !== 'undefined') {
-          searchEngine.setFilter('query', e.target.value);
-          searchUI.performSearch();
-        }
-      }, 500);
-    });
-  }
-  
-  // Close modals on outside click
-  document.querySelectorAll('.modal').forEach(modal => {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.style.display = 'none';
-      }
-    });
-  });
-}
-
-// ============================================
-// PI NETWORK INTEGRATION
-// ============================================
-
-function isPiBrowser() {
-  return typeof window.Pi !== "undefined";
-}
-
-async function authenticateUser() {
-  if (!isPiBrowser()) {
-    console.warn("⚠️ Not in Pi Browser");
-    return null;
-  }
-  
-  try {
-    const scopes = ['username', 'payments'];
-    
-    function onIncompletePaymentFound(payment) {
-      console.log("⚠️ Incomplete payment found:", payment);
-    }
-    
-    const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
-    currentUser = auth.user;
-    
-    console.log("✅ Authenticated:", currentUser.username);
-    return currentUser;
-    
-  } catch (error) {
-    console.error("❌ Authentication failed:", error);
-    return null;
-  }
-}
-
-// ============================================
-// MOCK DATA (Fallback)
+// MOCK DATA
 // ============================================
 
 const MOCK_PRODUCTS = [
   {
     id: 1,
-    name: "iPhone 15 Pro (Titanium)",
-    price: 0.01,
-    description: "iPhone 15 Pro in excellent condition with all accessories. 6 months warranty.",
+    name: "iPhone 15 Pro Max",
+    title: "iPhone 15 Pro Max",
+    price: 0.05,
+    price_pi: 0.05,
+    description: "Brand new iPhone 15 Pro Max with all accessories",
     image: "https://images.unsplash.com/photo-1592286927505-b86dc33748b5?w=400",
     category: "electronics",
-    condition: "Like New"
+    condition: "New"
   },
   {
     id: 2,
     name: "MacBook Pro M3",
-    price: 0.05,
-    description: "Brand new MacBook Pro M3 with official Apple warranty.",
+    title: "MacBook Pro M3",
+    price: 0.1,
+    price_pi: 0.1,
+    description: "Latest MacBook Pro with M3 chip",
     image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
     category: "electronics",
     condition: "New"
@@ -433,8 +396,10 @@ const MOCK_PRODUCTS = [
   {
     id: 3,
     name: "AirPods Pro 2",
+    title: "AirPods Pro 2",
     price: 0.02,
-    description: "AirPods Pro Gen 2 with Active Noise Cancellation.",
+    price_pi: 0.02,
+    description: "AirPods Pro Gen 2 with Active Noise Cancellation",
     image: "https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=400",
     category: "electronics",
     condition: "New"
@@ -442,8 +407,10 @@ const MOCK_PRODUCTS = [
   {
     id: 4,
     name: "Nike Air Max 2024",
+    title: "Nike Air Max 2024",
     price: 0.015,
-    description: "Latest Nike Air Max sneakers, size 42.",
+    price_pi: 0.015,
+    description: "Latest Nike Air Max sneakers",
     image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400",
     category: "fashion",
     condition: "New"
@@ -451,8 +418,10 @@ const MOCK_PRODUCTS = [
   {
     id: 5,
     name: "Sony WH-1000XM5",
+    title: "Sony WH-1000XM5",
     price: 0.025,
-    description: "Premium noise-cancelling headphones.",
+    price_pi: 0.025,
+    description: "Premium noise-cancelling headphones",
     image: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=400",
     category: "electronics",
     condition: "Like New"
@@ -460,21 +429,14 @@ const MOCK_PRODUCTS = [
   {
     id: 6,
     name: "Gaming Chair RGB",
+    title: "Gaming Chair RGB",
     price: 0.03,
-    description: "Ergonomic gaming chair with RGB lighting.",
+    price_pi: 0.03,
+    description: "Ergonomic gaming chair with RGB lighting",
     image: "https://images.unsplash.com/photo-1598550476439-6847785fcea6?w=400",
     category: "home",
     condition: "New"
   }
 ];
 
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    API_BASE,
-    loadProducts,
-    displayProducts,
-    openProductDetail,
-    quickAddToCart
-  };
-}
+console.log("✅ Script loaded with", MOCK_PRODUCTS.length, "mock products");
