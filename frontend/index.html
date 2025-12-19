@@ -156,7 +156,7 @@
         }
 
         /* ========================================== */
-        /* Language Selection System */
+        /* Language Selector Overlay */
         /* ========================================== */
 
         .language-overlay {
@@ -229,6 +229,12 @@
             transform: translateY(-2px);
         }
 
+        .language-option.active {
+            background: rgba(108, 75, 255, 0.3);
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
         .language-flag {
             width: 40px;
             height: 30px;
@@ -272,6 +278,69 @@
                 --content-padding-h: 15px;
                 --chat-header-height: 60px;
                 --chat-input-height: 70px;
+            }
+            
+            .auth-card {
+                padding: 20px;
+                margin: 0 10px;
+            }
+            
+            .auth-title {
+                font-size: 22px;
+            }
+            
+            .input-group input {
+                padding: 12px 40px 12px 18px;
+                font-size: 14px;
+            }
+            
+            .main-btn {
+                padding: 14px;
+                font-size: 16px;
+            }
+            
+            .fingerprint-icon {
+                font-size: 42px;
+            }
+            
+            .fingerprint-text {
+                font-size: 14px;
+            }
+            
+            .header {
+                padding: 10px 0;
+            }
+            
+            .logo {
+                font-size: 20px;
+            }
+            
+            .search-box input {
+                padding: 12px 75px 12px 18px;
+                font-size: 14px;
+            }
+            
+            .voice-search-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            
+            .p-img-box {
+                height: 140px;
+            }
+            
+            .p-name {
+                font-size: 14px;
+                height: 36px;
+            }
+            
+            .modal {
+                padding-bottom: 100px;
             }
         }
 
@@ -782,29 +851,340 @@
         }
 
         /* ========================================== */
-        /* Animations */
+        /* Search and Filters */
         /* ========================================== */
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .search-container {
+            margin: 20px 0;
+            width: 100%;
         }
 
-        @keyframes pulse {
-            0%, 100% { 
-                transform: scale(1);
-                opacity: 1; 
-            }
-            50% { 
-                transform: scale(1.05); 
-                opacity: 0.8;
-            }
+        .search-box {
+            position: relative;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 14px 90px 14px 20px;
+            border-radius: 50px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 15px;
+            transition: all var(--transition-fast);
+        }
+
+        .search-box input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 242, 255, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 14px;
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        .voice-search-btn {
+            position: absolute;
+            right: 15px;
+            top: 8px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: var(--bg-dark);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .voice-search-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px 0;
+            scrollbar-width: none;
+        }
+
+        .search-filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-btn {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* ========================================== */
+        /* Products Grid */
+        /* ========================================== */
+
+        .section-title {
+            font-size: 22px;
+            color: var(--text-main);
+            margin: 0 0 20px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .product-card {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: all var(--transition-standard);
+            border-radius: var(--radius);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            height: 270px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--accent);
+        }
+
+        .p-img-box {
+            width: 100%;
+            height: 160px;
+            background: #000;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .p-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .p-img-box img {
+            transform: scale(1.05);
+        }
+
+        .ai-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: var(--accent);
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 2;
+            backdrop-filter: blur(4px);
+        }
+
+        .p-details {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .p-name {
+            font-size: 15px;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 8px;
+        }
+
+        .p-price {
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 17px;
+            margin-top: auto;
+        }
+
+        /* ========================================== */
+        /* AI Dashboard */
+        /* ========================================== */
+
+        .ai-dashboard {
+            background: linear-gradient(135deg, rgba(108, 75, 255, 0.15), rgba(0, 242, 255, 0.15));
+            border: 1px solid rgba(108, 75, 255, 0.4);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin: 25px 0;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-standard);
+            box-shadow: var(--shadow-md);
+        }
+
+        .ai-dashboard::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(108, 75, 255, 0.1) 0%, transparent 70%);
+            z-index: 0;
+        }
+
+        .ai-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ai-header h2 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        .ai-pulse {
+            width: 12px;
+            height: 12px;
+            background: var(--success-color);
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+            animation: pulse-status 2s infinite;
+        }
+
+        @keyframes pulse-status {
+            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
+
+        .ai-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ai-feature-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 25px 15px;
+            text-align: center;
+            transition: all var(--transition-standard);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .ai-feature-card i {
+            font-size: 32px;
+            color: var(--accent);
+            margin-bottom: 12px;
+            transition: all var(--transition-fast);
+        }
+
+        .ai-feature-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 5px 0 5px;
+            color: var(--text-main);
+            transition: color var(--transition-fast);
+        }
+
+        .ai-feature-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            transition: color var(--transition-fast);
+        }
+
+        .ai-insight {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 3px solid var(--accent);
+            padding: 18px;
+            border-radius: 0 12px 12px 0;
+            position: relative;
+            z-index: 1;
+            margin-top: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-main);
+        }
+
+        .ai-insight i {
+            color: var(--accent);
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .ai-insight strong {
+            color: var(--primary);
+            font-weight: 700;
         }
 
         /* ========================================== */
@@ -858,6 +1238,19 @@
             text-align: center;
         }
 
+        html[dir="rtl"] .p-name {
+            text-align: right;
+        }
+
+        html[dir="rtl"] .p-price {
+            text-align: right;
+        }
+
+        html[dir="rtl"] .ai-tag {
+            left: auto;
+            right: 10px;
+        }
+
         /* ========================================== */
         /* Notification System */
         /* ========================================== */
@@ -893,134 +1286,29 @@
         }
 
         /* ========================================== */
-        /* Autonomous Flow Section */
+        /* Animations */
         /* ========================================== */
 
-        .autonomous-flow {
-            background: rgba(0, 242, 255, 0.1);
-            border: 1px solid rgba(0, 242, 255, 0.3);
-            border-radius: var(--radius);
-            padding: 30px;
-            margin: 30px 0;
-            text-align: center;
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .flow-diagram {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-
-        .flow-card {
-            background: linear-gradient(135deg, rgba(0,242,255,0.1), rgba(255,215,0,0.1));
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            transition: transform 0.3s;
-        }
-
-        .flow-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,242,255,0.3);
-        }
-
-        .flow-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-
-        /* ========================================== */
-        /* Stats Grid */
-        /* ========================================== */
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-
-        .stat-card {
-            background: rgba(0,242,255,0.1);
-            border: 2px solid #00f2ff;
-            border-radius: 15px;
-            padding: 25px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #FFD700;
-            margin: 10px 0;
-        }
-
-        .stat-label {
-            color: #a0a0a0;
-            font-size: 0.9rem;
-        }
-
-        /* ========================================== */
-        /* Timeline */
-        /* ========================================== */
-
-        .timeline {
-            position: relative;
-            padding-right: 30px;
-        }
-
-        .timeline-item {
-            position: relative;
-            padding-right: 40px;
-            padding-bottom: 30px;
-            border-right: 2px solid rgba(255,215,0,0.3);
-        }
-
-        .timeline-item:last-child {
-            border-right: none;
-        }
-
-        .timeline-dot {
-            position: absolute;
-            right: -9px;
-            top: 0;
-            width: 16px;
-            height: 16px;
-            background: #FFD700;
-            border-radius: 50%;
-            box-shadow: 0 0 20px rgba(255,215,0,0.5);
-        }
-
-        .timeline-content {
-            background: rgba(255,255,255,0.05);
-            padding: 20px;
-            border-radius: 10px;
-            margin-right: 20px;
-        }
-
-        /* ========================================== */
-        /* CTA Button */
-        /* ========================================== */
-
-        .cta-button {
-            background: linear-gradient(90deg, #FFD700, #00f2ff);
-            color: black;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            margin: 20px auto;
-            display: block;
-            transition: transform 0.3s;
-        }
-
-        .cta-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(255,215,0,0.5);
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1);
+                opacity: 1; 
+            }
+            50% { 
+                transform: scale(1.05); 
+                opacity: 0.8;
+            }
         }
 
         /* ========================================== */
@@ -1091,28 +1379,28 @@
     <div class="language-container">
         <h2><i class="fa-solid fa-earth-americas"></i> Select Your Language</h2>
         <div class="language-grid">
-            <div class="language-option" data-lang="en" data-region="global">
-                <img src="image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='30' viewBox='0 0 128 96'%3E%3Crect width='128' height='96' fill='%23012169'/%3E%3Cpath d='M0,0L128,96M128,0L0,96' stroke='%23fff' stroke-width='12'/%3E%3Cpath d='M0,0L128,96M128,0L0,96' stroke='%23C8102E' stroke-width='8'/%3E%3Cpath d='M0,48H128' stroke='%23fff' stroke-width='12'/%3E%3Cpath d='M0,48H128' stroke='%23C8102E' stroke-width='8'/%3E%3Cpath d='M64,0V96' stroke='%23fff' stroke-width='12'/%3E%3Cpath d='M64,0V96' stroke='%23C8102E' stroke-width='8'/%3E%3Ccircle cx='64' cy='48' r='20' fill='%23fff'/%3E%3Ccircle cx='64' cy='48' r='16' fill='%23012169'/%3E%3Cpath d='M64,28L82,46L64,64L46,46zM64,28L46,46L64,64L82,46z' fill='%23fff'/%3E%3Ccircle cx='64' cy='48' r='8' fill='%23C8102E'/%3E%3C/svg%3E" alt="English" class="language-flag">
+            <div class="language-option active" data-lang="en" data-region="global">
+                <div class="language-flag">🇬🇧</div>
                 <span>English (Global)</span>
             </div>
             <div class="language-option" data-lang="ar" data-region="middle-east">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='30' viewBox='0 0 150 100'%3E%3Crect width='150' height='100' fill='%23007a3d'/%3E%3Crect width='150' height='66.67' fill='%23ce1126'/%3E%3Crect width='150' height='33.33' fill='%23000'/%3E%3C/svg%3E" alt="العربية" class="language-flag">
+                <div class="language-flag">🇸🇦</div>
                 <span>العربية (الشرق الأوسط)</span>
             </div>
             <div class="language-option" data-lang="zh" data-region="asia">
-                <img src="image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='30' viewBox='0 0 30 20'%3E%3Crect width='30' height='20' fill='%23de2910'/%3E%3Cpath d='M5,5 L6,5 L7,4 L7,3 L6,2 L5,2 L4,3 L4,4zM7,8 L7,9 L8,10 L9,10 L10,9 L10,8 L9,7 L8,7zM9,12 L10,12 L11,13 L11,14 L10,15 L9,15 L8,14 L8,13zM12,8 L12,9 L13,10 L14,10 L15,9 L15,8 L14,7 L13,7zM14,4 L15,4 L16,3 L16,2 L15,1 L14,1 L13,2 L13,3zM4,9 L3,9 L2,10 L2,11 L3,12 L4,12 L5,11 L5,10z' fill='%23ffde00'/%3E%3Cpath d='M10,4 L11,4 L12,3 L12,2 L11,1 L10,1 L9,2 L9,3z' fill='%23ffde00'/%3E%3Cpath d='M18,4 L19,4 L20,3 L20,2 L19,1 L18,1 L17,2 L17,3z' fill='%23ffde00'/%3E%3Cpath d='M22,8 L23,8 L24,7 L24,6 L23,5 L22,5 L21,6 L21,7z' fill='%23ffde00'/%3E%3Cpath d='M18,12 L19,12 L20,11 L20,10 L19,9 L18,9 L17,10 L17,11z' fill='%23ffde00'/%3E%3C/svg%3E" alt="中文" class="language-flag">
+                <div class="language-flag">🇨🇳</div>
                 <span>中文 (亚太)</span>
             </div>
             <div class="language-option" data-lang="hi" data-region="asia">
-                <img src="image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='30' viewBox='0 0 720 480'%3E%3Crect width='720' height='480' fill='%23f93'/%3E%3Crect width='720' height='320' fill='%23fff'/%3E%3Crect width='720' height='160' fill='%23128807'/%3E%3Ccircle cx='360' cy='240' r='64' fill='%23008'/%3E%3Ccircle cx='360' cy='240' r='56' fill='%23fff'/%3E%3Cpath d='M360,184L360,240L393,216z' fill='%23008'/%3E%3C/svg%3E" alt="हिन्दी" class="language-flag">
+                <div class="language-flag">🇮🇳</div>
                 <span>हिन्दी (भारत)</span>
             </div>
             <div class="language-option" data-lang="es" data-region="americas">
-                <img src="image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='30' viewBox='0 0 24 16'%3E%3Crect width='24' height='16' fill='%23aa151b'/%3E%3Crect x='6' y='4' width='12' height='8' fill='%23f1bf00'/%3E%3C/svg%3E" alt="Español" class="language-flag">
+                <div class="language-flag">🇪🇸</div>
                 <span>Español (Américas)</span>
             </div>
             <div class="language-option" data-lang="fr" data-region="europe">
-                <img src="image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='30' viewBox='0 0 24 16'%3E%3Crect width='8' height='16' fill='%2300247d'/%3E%3Crect x='8' width='8' height='16' fill='%23fff'/%3E%3Crect x='16' width='8' height='16' fill='%23ce1126'/%3E%3C/svg%3E" alt="Français" class="language-flag">
+                <div class="language-flag">🇫🇷</div>
                 <span>Français (Europe)</span>
             </div>
         </div>
@@ -1126,7 +1414,7 @@
         <span class="ai-badge">AI</span> 
         Forsale
     </div>
-    <p class="auth-tagline">The Future of Autonomous Commerce - Powered by Pi Network</p>
+    <p class="auth-tagline">The Future of Global Commerce - Powered by Pi Network</p>
 
     <div class="auth-card">
         <h2 class="auth-title">Secure Global Access</h2>
@@ -1203,211 +1491,128 @@
 
     <div class="container">
         <div class="content-wrapper">
-            <div class="autonomous-flow glass-panel">
-                <h2 style="color: #00f2ff; margin-bottom: 30px; font-size: 2.5rem;">🚀 <span data-i18n="autonomous-vision">Forsale AI - The Self-Operating Marketplace</span></h2>
-                <p style="font-size: 1.2rem; line-height: 1.8; color: #e0e0e0; margin-bottom: 30px;">
-                    <span data-i18n="autonomous-description">The world's first 100% AI-powered e-commerce platform. From product listing to delivery and dispute resolution - everything happens automatically. Your only job: collect commissions 💰</span>
-                </p>
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="global-search" placeholder="Search globally with AI...">
+                    <button class="voice-search-btn" onclick="startVoiceSearch()" title="Voice Search">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                </div>
+                <div class="search-filters">
+                    <button class="filter-btn active" data-filter="all">All Regions</button>
+                    <button class="filter-btn" data-filter="middle-east">Middle East</button>
+                    <button class="filter-btn" data-filter="asia">Asia</button>
+                    <button class="filter-btn" data-filter="europe">Europe</button>
+                </div>
+            </div>
+            
+            <!-- AI Dashboard System -->
+            <div class="ai-dashboard glass-panel">
+                <div class="ai-header">
+                    <h2><i class="fa-solid fa-brain"></i> Logy AI Personal Shopper</h2>
+                    <div class="ai-status">
+                        <div class="ai-pulse"></div>
+                        <span>Active</span>
+                    </div>
+                </div>
                 
-                <div class="flow-diagram">
-                    <div class="flow-card">
-                        <div class="flow-icon">📸</div>
-                        <h3 data-i18n="product-listing">Product Listing</h3>
-                        <p data-i18n="product-listing-desc">User uploads photos only</p>
-                        <p style="color: #00f2ff; font-weight: bold; margin-top: 10px;" data-i18n="ai-analyzes">↓ AI analyzes everything</p>
+                <div class="ai-features">
+                    <div class="ai-feature-card" onclick="openVoiceSearch()">
+                        <i class="fa-solid fa-microphone"></i>
+                        <h3>Voice Search</h3>
+                        <p>Talk to Logy AI to find products</p>
                     </div>
                     
-                    <div class="flow-card">
-                        <div class="flow-icon">🤖</div>
-                        <h3 data-i18n="ai-analysis">AI Analysis</h3>
-                        <p data-i18n="ai-analysis-desc">Computer Vision extracts all data</p>
-                        <p style="color: #00f2ff; font-weight: bold; margin-top: 10px;" data-i18n="auto-pricing">↓ Auto pricing</p>
+                    <div class="ai-feature-card" onclick="openVisualSearch()">
+                        <i class="fa-solid fa-camera"></i>
+                        <h3>Visual Search</h3>
+                        <p>Find similar products by photo</p>
                     </div>
                     
-                    <div class="flow-card">
-                        <div class="flow-icon">💳</div>
-                        <h3 data-i18n="secure-payment">Secure Payment</h3>
-                        <p data-i18n="secure-payment-desc">Pi Network + Escrow System</p>
-                        <p style="color: #00f2ff; font-weight: bold; margin-top: 10px;" data-i18n="funds-held">↓ Funds held securely</p>
-                    </div>
-                    
-                    <div class="flow-card">
-                        <div class="flow-icon">📦</div>
-                        <h3 data-i18n="smart-shipping">Smart Shipping</h3>
-                        <p data-i18n="smart-shipping-desc">Real-time tracking + AI monitoring</p>
-                        <p style="color: #00f2ff; font-weight: bold; margin-top: 10px;" data-i18n="delivery-process">↓ Autonomous delivery</p>
-                    </div>
-                    
-                    <div class="flow-card">
-                        <div class="flow-icon">✅</div>
-                        <h3 data-i18n="auto-confirmation">Auto Confirmation</h3>
-                        <p data-i18n="auto-confirmation-desc">48 hours for buyer to contest</p>
-                        <p style="color: #00f2ff; font-weight: bold; margin-top: 10px;" data-i18n="no-contest">↓ No contest?</p>
-                    </div>
-                    
-                    <div class="flow-card">
-                        <div class="flow-icon">💰</div>
-                        <h3 data-i18n="auto-release">Auto Fund Release</h3>
-                        <p data-i18n="auto-release-desc">Seller gets 95% + You get 5%</p>
-                        <p style="color: #FFD700; font-weight: bold; margin-top: 10px;" data-i18n="complete">✨ Fully Complete</p>
+                    <div class="ai-feature-card" onclick="openAiRecommendations()">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <h3>Smart Recommendations</h3>
+                        <p>Personalized product suggestions</p>
                     </div>
                 </div>
-            </div>
-
-            <div class="autonomous-flow glass-panel">
-                <h2 style="color: #FFD700; margin-bottom: 20px;" data-i18n="dispute-resolution">AI Dispute Resolution</h2>
-                <p style="color: #e0e0e0; margin-bottom: 20px;" data-i18n="dispute-description">When disputes arise, our AI system handles everything automatically without human intervention:</p>
                 
-                <div class="flow-diagram">
-                    <div class="flow-card" style="background: rgba(255,82,82,0.1);">
-                        <div class="flow-icon">🚨</div>
-                        <h3 data-i18n="dispute-initiation">Dispute Initiated</h3>
-                        <p data-i18n="dispute-initiation-desc">Buyer uploads evidence + description</p>
-                    </div>
-                    
-                    <div class="flow-card" style="background: rgba(255,215,0,0.1);">
-                        <div class="flow-icon">🔍</div>
-                        <h3 data-i18n="ai-investigation">AI Investigation</h3>
-                        <p data-i18n="ai-investigation-desc">Logy AI analyzes all evidence</p>
-                    </div>
-                    
-                    <div class="flow-card" style="background: rgba(46,204,113,0.1);">
-                        <div class="flow-icon">⚖️</div>
-                        <h3 data-i18n="ai-decision">AI Decision</h3>
-                        <p data-i18n="ai-decision-desc">Full/partial refund or rejection</p>
-                    </div>
-                    
-                    <div class="flow-card" style="background: rgba(0,242,255,0.1);">
-                        <div class="flow-icon">🤝</div>
-                        <h3 data-i18n="auto-execution">Auto Execution</h3>
-                        <p data-i18n="auto-execution-desc">Pi Network executes the decision</p>
-                    </div>
+                <div class="ai-insight">
+                    <i class="fa-solid fa-comment-dots"></i>
+                    <p><strong>Logy AI</strong> recommends: "Based on your browsing history, you might like these trending electronics with 15% better prices"</p>
                 </div>
             </div>
 
-            <div class="autonomous-flow glass-panel">
-                <h2 style="color: #00f2ff; margin-bottom: 20px;" data-i18n="revenue-projections">Revenue Projections</h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label" data-i18n="users-1k">At 1,000 users</div>
-                        <div class="stat-value">1,500</div>
-                        <div class="stat-label" data-i18n="monthly-pi">Pi monthly</div>
+            <h2 class="section-title">Logy AI Global Recommendations</h2>
+            
+            <div class="products-grid" id="products-grid">
+                <!-- Products will be loaded dynamically -->
+                <div class="product-card">
+                    <div class="p-img-box">
+                        <img src="https://picsum.photos/300/200?random=1" alt="iPhone 15 Pro">
+                        <div class="ai-tag"><i class="fa-solid fa-microchip"></i> AI Analyzed</div>
                     </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-label" data-i18n="users-10k">At 10,000 users</div>
-                        <div class="stat-value">15,000</div>
-                        <div class="stat-label" data-i18n="monthly-pi">Pi monthly</div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-label" data-i18n="users-100k">At 100,000 users</div>
-                        <div class="stat-value">150,000</div>
-                        <div class="stat-label" data-i18n="monthly-pi">Pi monthly</div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-label" data-i18n="users-1m">At 1M users</div>
-                        <div class="stat-value">1.5M</div>
-                        <div class="stat-label" data-i18n="monthly-pi">Pi monthly</div>
+                    <div class="p-details">
+                        <div class="p-name">iPhone 15 Pro 256GB</div>
+                        <div class="p-price">0.015 Pi</div>
                     </div>
                 </div>
-                <p style="text-align: center; color: #a0a0a0; margin-top: 20px; font-size: 0.9rem;" data-i18n="revenue-note">
-                    * Assuming 5% commission, 1000 Pi average transaction, 30% monthly user activity
-                </p>
-            </div>
-
-            <div class="autonomous-flow glass-panel">
-                <h2 style="color: #FFD700; margin-bottom: 30px;" data-i18n="implementation-plan">Implementation Plan</h2>
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                            <h3 style="color: #FFD700; margin-bottom: 10px;" data-i18n="weeks-1-2">Weeks 1-2</h3>
-                            <p><strong data-i18n="critical-fixes">Critical Fixes</strong></p>
-                            <ul style="margin-top: 10px; padding-right: 20px; text-align: left;">
-                                <li data-i18n="aws-migration">AWS SDK v3 Migration</li>
-                                <li data-i18n="pi-security">Pi Payment Security Fix</li>
-                                <li data-i18n="sql-protection">SQL Injection Protection</li>
-                            </ul>
-                        </div>
+                
+                <div class="product-card">
+                    <div class="p-img-box">
+                        <img src="https://picsum.photos/300/200?random=2" alt="MacBook Air M3">
+                        <div class="ai-tag"><i class="fa-solid fa-microchip"></i> AI Analyzed</div>
                     </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                            <h3 style="color: #FFD700; margin-bottom: 10px;" data-i18n="weeks-3-6">Weeks 3-6</h3>
-                            <p><strong data-i18n="ai-engine">AI Engine Development</strong></p>
-                            <ul style="margin-top: 10px; padding-right: 20px; text-align: left;">
-                                <li data-i18n="computer-vision">Computer Vision Model</li>
-                                <li data-i18n="price-prediction">Price Prediction Engine</li>
-                                <li data-i18n="fraud-detection">Fraud Detection System</li>
-                                <li data-i18n="dispute-ai">Dispute Resolution AI</li>
-                            </ul>
-                        </div>
+                    <div class="p-details">
+                        <div class="p-name">MacBook Air M3 16GB</div>
+                        <div class="p-price">0.75 Pi</div>
                     </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                            <h3 style="color: #FFD700; margin-bottom: 10px;" data-i18n="weeks-7-8">Weeks 7-8</h3>
-                            <p><strong data-i18n="autonomous-flow">Autonomous Flow</strong></p>
-                            <ul style="margin-top: 10px; padding-right: 20px; text-align: left;">
-                                <li data-i18n="auto-order">Auto Order Processing</li>
-                                <li data-i18n="auto-release">Auto Fund Release</li>
-                                <li data-i18n="commission-system">Commission System</li>
-                            </ul>
-                        </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="p-img-box">
+                        <img src="https://picsum.photos/300/200?random=3" alt="Samsung Galaxy S24">
+                        <div class="ai-tag"><i class="fa-solid fa-microchip"></i> AI Analyzed</div>
                     </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                            <h3 style="color: #FFD700; margin-bottom: 10px;" data-i18n="months-3-4">Months 3-4</h3>
-                            <p><strong data-i18n="mobile-apps">Mobile Apps + Scale</strong></p>
-                            <ul style="margin-top: 10px; padding-right: 20px; text-align: left;">
-                                <li data-i18n="react-native">React Native iOS/Android</li>
-                                <li data-i18n="push-notifications">Push Notifications</li>
-                                <li data-i18n="global-deployment">Global Deployment</li>
-                            </ul>
-                        </div>
+                    <div class="p-details">
+                        <div class="p-name">Samsung Galaxy S24 Ultra</div>
+                        <div class="p-price">0.012 Pi</div>
                     </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                            <h3 style="color: #FFD700; margin-bottom: 10px;" data-i18n="months-5-6">Months 5-6</h3>
-                            <p><strong data-i18n="go-global">Go Global</strong></p>
-                            <ul style="margin-top: 10px; padding-right: 20px; text-align: left;">
-                                <li data-i18n="multi-language">Multi-Language (10+ languages)</li>
-                                <li data-i18n="marketing-launch">Marketing Launch</li>
-                                <li data-i18n="strategic-partnerships">Strategic Partnerships</li>
-                                <li data-i18n="scale-users">Scale to 100K users</li>
-                            </ul>
-                        </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="p-img-box">
+                        <img src="https://picsum.photos/300/200?random=4" alt="Sony WH-1000XM5">
+                        <div class="ai-tag"><i class="fa-solid fa-microchip"></i> AI Analyzed</div>
+                    </div>
+                    <div class="p-details">
+                        <div class="p-name">Sony WH-1000XM5 Headphones</div>
+                        <div class="p-price">0.035 Pi</div>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="p-img-box">
+                        <img src="https://picsum.photos/300/200?random=5" alt="iPad Pro">
+                        <div class="ai-tag"><i class="fa-solid fa-microchip"></i> AI Analyzed</div>
+                    </div>
+                    <div class="p-details">
+                        <div class="p-name">iPad Pro 12.9" M2</div>
+                        <div class="p-price">0.45 Pi</div>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="p-img-box">
+                        <img src="https://picsum.photos/300/200?random=6" alt="Apple Watch Ultra">
+                        <div class="ai-tag"><i class="fa-solid fa-microchip"></i> AI Analyzed</div>
+                    </div>
+                    <div class="p-details">
+                        <div class="p-name">Apple Watch Ultra 2</div>
+                        <div class="p-price">0.085 Pi</div>
                     </div>
                 </div>
             </div>
-
-            <div class="autonomous-flow glass-panel" style="text-align: center; background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(0,242,255,0.1));">
-                <h2 style="color: #FFD700; margin-bottom: 20px;" data-i18n="final-goal">The Final Goal</h2>
-                <p style="font-size: 1.5rem; font-weight: bold; margin: 30px 0;" data-i18n="ultimate-vision">
-                    The world's first e-commerce platform<br>
-                    <span style="color: #00f2ff;" data-i18n="fully-autonomous">100% AI-operated</span><br>
-                    <span style="color: #FFD700;" data-i18n="no-human-intervention">No human intervention required</span>
-                </p>
-                <div style="margin: 40px 0;">
-                    <div style="font-size: 3rem; margin-bottom: 10px;">🏆</div>
-                    <p style="font-size: 1.3rem; color: #e0e0e0;" data-i18n="competitor-comparison">
-                        Competitors: Amazon (manual) | eBay (manual) | AliExpress (manual)<br>
-                        <strong style="color: #FFD700;" data-i18n="our-advantage">Us: 100% Autonomous ⚡</strong>
-                    </p>
-                </div>
-            </div>
-
-            <button class="cta-button" onclick="startImplementation()" data-i18n="start-now">
-                🚀 Start Implementation Now
-            </button>
         </div>
     </div>
 </div>
@@ -1415,21 +1620,21 @@
 <!-- Logy AI Chat Modal -->
 <div id="logyAiModal">
     <div class="logy-chat-header">
-        <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-robot"></i> Logy AI Assistant</div>
+        <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-robot"></i> Logy AI Chat</div>
         <div class="icon-btn" onclick="closeLogyAiModal()"><i class="fa-solid fa-xmark"></i></div>
     </div>
-    <div class="chats-container" id="chat-container">
+    <div class="logy-chat-area" id="chat-container">
         <div class="message-bubble msg-ai">
-            <p data-i18n="ai-greeting">Hello! I'm Logy AI, your autonomous marketplace assistant. How can I help you today?</p>
+            <p>Hello! I'm Logy AI, your autonomous shopping assistant. How can I help you today?</p>
             <div class="ai-suggestions">
-                <button class="suggestion-btn" data-i18n="ai-suggestion-1">Show implementation plan</button>
-                <button class="suggestion-btn" data-i18n="ai-suggestion-2">Explain revenue model</button>
-                <button class="suggestion-btn" data-i18n="ai-suggestion-3">Get started guide</button>
+                <button class="suggestion-btn">Find similar products</button>
+                <button class="suggestion-btn">Price comparison</button>
+                <button class="suggestion-btn">Shipping information</button>
             </div>
         </div>
     </div>
     <div class="logy-input-bar">
-        <input type="text" id="logy-input" placeholder="Ask Logy AI anything about the autonomous marketplace..." data-i18n="chat-placeholder">
+        <input type="text" id="logy-input" placeholder="Ask Logy AI anything about shopping, products, or orders...">
         <div class="logy-send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></div>
     </div>
 </div>
@@ -1444,25 +1649,19 @@
 
 <script>
     // ============================================
-    // 🌍 Forsale AI Autonomous Platform
-    // Version 6.0.0 - Complete Multi-Language Support
+    // 🌍 Forsale AI - World-Class Autonomous Platform
+    // Version 6.0.0 - Complete Production Release
     // ============================================
 
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize core functionality
         initCoreFunctionality();
         
-        // Set up modals
-        setupModals();
-        
-        // Set up navigation
-        setupNavigation();
+        // Set up language system
+        setupLanguageSystem();
         
         // Set up form handling
         setupFormHandling();
-        
-        // Set up language system
-        setupLanguageSystem();
         
         // Set up chat functionality
         setupChatFunctionality();
@@ -1470,70 +1669,88 @@
         // Set up floating AI button
         setupFloatingAiButton();
         
-        // Initialize language UI
-        initLanguageUI();
+        // Simulate initial notification
+        setTimeout(() => {
+            showNotification('Welcome to Forsale AI - The world\'s first autonomous marketplace!', 'info');
+        }, 1000);
     });
 
     function initCoreFunctionality() {
-        // Hide auth container if user is already logged in
+        // Check if user is already logged in
         if (localStorage.getItem('forsale_user')) {
             document.getElementById('auth-container').style.display = 'none';
             document.getElementById('app-container').style.display = 'block';
         }
+    }
+
+    function setupLanguageSystem() {
+        // Language selector in header
+        document.getElementById('language-btn')?.addEventListener('click', function() {
+            document.getElementById('language-overlay').classList.remove('hidden');
+        });
         
-        // Set initial language
+        // Language selection
+        document.querySelectorAll('.language-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove active class from all options
+                document.querySelectorAll('.language-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                
+                // Add active class to clicked option
+                this.classList.add('active');
+                
+                const lang = this.getAttribute('data-lang');
+                const region = this.getAttribute('data-region');
+                
+                // Save preferences
+                localStorage.setItem('forsale_lang', lang);
+                localStorage.setItem('forsale_region', region);
+                
+                // Apply language and region
+                applyLanguage(lang);
+                applyRegion(region);
+                
+                // Update UI
+                updateLanguageUI(lang);
+                
+                // Close overlay
+                document.getElementById('language-overlay').classList.add('hidden');
+                
+                // Show confirmation
+                showNotification(`Language set to ${lang.toUpperCase()}`, 'success');
+            });
+        });
+        
+        // Skip language selection
+        document.getElementById('skip-language')?.addEventListener('click', function() {
+            document.getElementById('language-overlay').classList.add('hidden');
+            localStorage.setItem('forsale_lang', 'en');
+            localStorage.setItem('forsale_region', 'global');
+            applyLanguage('en');
+        });
+        
+        // Initial language setup
         const savedLang = localStorage.getItem('forsale_lang') || 'en';
-        const savedRegion = localStorage.getItem('forsale_region') || 'global';
+        applyLanguage(savedLang);
+        document.getElementById('current-language').textContent = savedLang.toUpperCase();
+    }
+
+    function applyLanguage(lang) {
+        // Update HTML attributes
+        document.documentElement.setAttribute('lang', lang);
         
-        document.documentElement.setAttribute('lang', savedLang);
-        document.documentElement.setAttribute('data-region', savedRegion);
-        
-        if (savedLang === 'ar') {
+        // Update text direction
+        if (lang === 'ar') {
             document.documentElement.setAttribute('dir', 'rtl');
         } else {
             document.documentElement.setAttribute('dir', 'ltr');
         }
-        
-        // Apply language immediately
-        applyLanguage(savedLang);
     }
 
-    function setupModals() {
-        // Close buttons for all modals
-        document.querySelectorAll('.modal .icon-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const modal = this.closest('.modal');
-                if (modal) closeModal(modal);
-            });
-        });
-        
-        // Close modals when clicking outside
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    closeModal(modal);
-                }
-            });
-        });
-    }
-
-    function setupNavigation() {
-        // Header navigation buttons
-        document.querySelector('.icon-btn.primary')?.addEventListener('click', function() {
-            showNotification('Product upload coming soon', 'info');
-        });
-        
-        document.querySelector('.notification-icon-container')?.addEventListener('click', function() {
-            showNotification('Notifications coming soon', 'info');
-        });
-        
-        document.querySelector('.icon-btn[onclick="openCartModal()"]')?.addEventListener('click', function() {
-            showNotification('Shopping cart coming soon', 'info');
-        });
-        
-        document.querySelector('.icon-btn[onclick="openSettingsModal()"]')?.addEventListener('click', function() {
-            showNotification('Settings coming soon', 'info');
-        });
+    function applyRegion(region) {
+        // Update region attribute
+        document.documentElement.setAttribute('data-region', region);
     }
 
     function setupFormHandling() {
@@ -1618,578 +1835,6 @@
         });
     }
 
-    function setupLanguageSystem() {
-        // Language selector in header
-        document.getElementById('language-btn')?.addEventListener('click', function() {
-            document.getElementById('language-overlay').classList.remove('hidden');
-        });
-        
-        // Language selection
-        document.querySelectorAll('.language-option').forEach(option => {
-            option.addEventListener('click', function() {
-                const lang = this.getAttribute('data-lang');
-                const region = this.getAttribute('data-region');
-                
-                // Save preferences
-                localStorage.setItem('forsale_lang', lang);
-                localStorage.setItem('forsale_region', region);
-                
-                // Apply language and region
-                applyLanguage(lang);
-                applyRegion(region);
-                
-                // Update UI
-                updateLanguageUI(lang);
-                
-                // Close overlay
-                document.getElementById('language-overlay').classList.add('hidden');
-                
-                // Show confirmation
-                showNotification(`Language set to ${lang.toUpperCase()}`, 'success');
-            });
-        });
-        
-        // Skip language selection
-        document.getElementById('skip-language')?.addEventListener('click', function() {
-            document.getElementById('language-overlay').classList.add('hidden');
-            localStorage.setItem('forsale_lang', 'en');
-            localStorage.setItem('forsale_region', 'global');
-            applyLanguage('en');
-        });
-        
-        // Initial language setup
-        const savedLang = localStorage.getItem('forsale_lang') || 'en';
-        applyLanguage(savedLang);
-    }
-
-    function applyLanguage(lang) {
-        // Update HTML attributes
-        document.documentElement.setAttribute('lang', lang);
-        
-        // Update text direction
-        if (lang === 'ar') {
-            document.documentElement.setAttribute('dir', 'rtl');
-        } else {
-            document.documentElement.setAttribute('dir', 'ltr');
-        }
-        
-        // Get translations
-        const translations = getTranslations(lang);
-        
-        // Update all elements with translation keys
-        document.querySelectorAll('[data-i18n]').forEach(element => {
-            const key = element.getAttribute('data-i18n');
-            const translation = translations[key] || key;
-            
-            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                element.placeholder = translation;
-            } else {
-                element.textContent = translation;
-            }
-        });
-        
-        // Update current language display
-        document.getElementById('current-language').textContent = lang.toUpperCase();
-        
-        // Update direction-specific styles
-        updateDirectionStyles(lang);
-    }
-
-    function applyRegion(region) {
-        // Update region attribute
-        document.documentElement.setAttribute('data-region', region);
-    }
-
-    function getTranslations(lang) {
-        const translations = {
-            en: {
-                'autonomous-vision': 'Forsale AI - The Self-Operating Marketplace',
-                'autonomous-description': 'The world\'s first 100% AI-powered e-commerce platform. From product listing to delivery and dispute resolution - everything happens automatically. Your only job: collect commissions 💰',
-                'product-listing': 'Product Listing',
-                'product-listing-desc': 'User uploads photos only',
-                'ai-analyzes': '↓ AI analyzes everything',
-                'ai-analysis': 'AI Analysis',
-                'ai-analysis-desc': 'Computer Vision extracts all data',
-                'auto-pricing': '↓ Auto pricing',
-                'secure-payment': 'Secure Payment',
-                'secure-payment-desc': 'Pi Network + Escrow System',
-                'funds-held': '↓ Funds held securely',
-                'smart-shipping': 'Smart Shipping',
-                'smart-shipping-desc': 'Real-time tracking + AI monitoring',
-                'delivery-process': '↓ Autonomous delivery',
-                'auto-confirmation': 'Auto Confirmation',
-                'auto-confirmation-desc': '48 hours for buyer to contest',
-                'no-contest': '↓ No contest?',
-                'auto-release': 'Auto Fund Release',
-                'auto-release-desc': 'Seller gets 95% + You get 5%',
-                'complete': '✨ Fully Complete',
-                'dispute-resolution': 'AI Dispute Resolution',
-                'dispute-description': 'When disputes arise, our AI system handles everything automatically without human intervention:',
-                'dispute-initiation': 'Dispute Initiated',
-                'dispute-initiation-desc': 'Buyer uploads evidence + description',
-                'ai-investigation': 'AI Investigation',
-                'ai-investigation-desc': 'Logy AI analyzes all evidence',
-                'ai-decision': 'AI Decision',
-                'ai-decision-desc': 'Full/partial refund or rejection',
-                'auto-execution': 'Auto Execution',
-                'auto-execution-desc': 'Pi Network executes the decision',
-                'revenue-projections': 'Revenue Projections',
-                'users-1k': 'At 1,000 users',
-                'users-10k': 'At 10,000 users',
-                'users-100k': 'At 100,000 users',
-                'users-1m': 'At 1M users',
-                'monthly-pi': 'Pi monthly',
-                'revenue-note': '* Assuming 5% commission, 1000 Pi average transaction, 30% monthly user activity',
-                'implementation-plan': 'Implementation Plan',
-                'weeks-1-2': 'Weeks 1-2',
-                'critical-fixes': 'Critical Fixes',
-                'aws-migration': 'AWS SDK v3 Migration',
-                'pi-security': 'Pi Payment Security Fix',
-                'sql-protection': 'SQL Injection Protection',
-                'weeks-3-6': 'Weeks 3-6',
-                'ai-engine': 'AI Engine Development',
-                'computer-vision': 'Computer Vision Model',
-                'price-prediction': 'Price Prediction Engine',
-                'fraud-detection': 'Fraud Detection System',
-                'dispute-ai': 'Dispute Resolution AI',
-                'weeks-7-8': 'Weeks 7-8',
-                'autonomous-flow': 'Autonomous Flow',
-                'auto-order': 'Auto Order Processing',
-                'auto-release': 'Auto Fund Release',
-                'commission-system': 'Commission System',
-                'months-3-4': 'Months 3-4',
-                'mobile-apps': 'Mobile Apps + Scale',
-                'react-native': 'React Native iOS/Android',
-                'push-notifications': 'Push Notifications',
-                'global-deployment': 'Global Deployment',
-                'months-5-6': 'Months 5-6',
-                'go-global': 'Go Global',
-                'multi-language': 'Multi-Language (10+ languages)',
-                'marketing-launch': 'Marketing Launch',
-                'strategic-partnerships': 'Strategic Partnerships',
-                'scale-users': 'Scale to 100K users',
-                'final-goal': 'The Final Goal',
-                'ultimate-vision': 'The world\'s first e-commerce platform',
-                'fully-autonomous': '100% AI-operated',
-                'no-human-intervention': 'No human intervention required',
-                'competitor-comparison': 'Competitors: Amazon (manual) | eBay (manual) | AliExpress (manual)',
-                'our-advantage': 'Us: 100% Autonomous ⚡',
-                'start-now': '🚀 Start Implementation Now',
-                'ai-greeting': 'Hello! I\'m Logy AI, your autonomous marketplace assistant. How can I help you today?',
-                'ai-suggestion-1': 'Show implementation plan',
-                'ai-suggestion-2': 'Explain revenue model',
-                'ai-suggestion-3': 'Get started guide',
-                'chat-placeholder': 'Ask Logy AI anything about the autonomous marketplace...'
-            },
-            ar: {
-                'autonomous-vision': 'فorsale AI - السوق الإلكتروني ذاتي التشغيل',
-                'autonomous-description': 'أول منصة تجارة إلكترونية في العالم تعمل 100% بالذكاء الاصطناعي. من إدراج المنتج إلى التسليم وحل النزاعات - كل شيء يحدث تلقائياً. مهمتك الوحيدة: جمع العمولات 💰',
-                'product-listing': 'إدراج المنتج',
-                'product-listing-desc': 'المستخدم يرفع الصور فقط',
-                'ai-analyzes': '↓ الذكاء الاصطناعي يحلل كل شيء',
-                'ai-analysis': 'تحليل الذكاء الاصطناعي',
-                'ai-analysis-desc': 'رؤية الحاسوب تستخرج جميع البيانات',
-                'auto-pricing': '↓ تسعير تلقائي',
-                'secure-payment': 'دفع آمن',
-                'secure-payment-desc': 'Pi Network + نظام الضمان',
-                'funds-held': '↓ الأموال محجوزة بأمان',
-                'smart-shipping': 'الشحن الذكي',
-                'smart-shipping-desc': 'تتبع لحظي + مراقبة بالذكاء الاصطناعي',
-                'delivery-process': '↓ توصيل ذاتي',
-                'auto-confirmation': 'تأكيد تلقائي',
-                'auto-confirmation-desc': '48 ساعة للمشتري للاعتراض',
-                'no-contest': '↓ لا اعتراض؟',
-                'auto-release': 'تحرير الأموال تلقائياً',
-                'auto-release-desc': 'البائع يحصل على 95% + أنت تحصل على 5%',
-                'complete': '✨ مكتمل تماماً',
-                'dispute-resolution': 'حل النزاعات بالذكاء الاصطناعي',
-                'dispute-description': 'عندما تظهر النزاعات، يتعامل نظام الذكاء الاصطناعي مع كل شيء تلقائياً دون تدخل بشري:',
-                'dispute-initiation': 'بدأ النزاع',
-                'dispute-initiation-desc': 'المشتري يرفع الأدلة + الوصف',
-                'ai-investigation': 'تحقيق الذكاء الاصطناعي',
-                'ai-investigation-desc': 'Logy AI يحلل جميع الأدلة',
-                'ai-decision': 'قرار الذكاء الاصطناعي',
-                'ai-decision-desc': 'استرداد كامل/جزئي أو رفض',
-                'auto-execution': 'تنفيذ تلقائي',
-                'auto-execution-desc': 'شبكة Pi تنفذ القرار',
-                'revenue-projections': 'توقعات الإيرادات',
-                'users-1k': 'عند 1,000 مستخدم',
-                'users-10k': 'عند 10,000 مستخدم',
-                'users-100k': 'عند 100,000 مستخدم',
-                'users-1m': 'عند مليون مستخدم',
-                'monthly-pi': 'باي شهرياً',
-                'revenue-note': '* بافتراض عمولة 5%، معاملة متوسطة 1000 باي، نشاط 30% من المستخدمين شهرياً',
-                'implementation-plan': 'خطة التنفيذ',
-                'weeks-1-2': 'الأسبوع 1-2',
-                'critical-fixes': 'إصلاحات حرجة',
-                'aws-migration': 'ترحيل AWS SDK v3',
-                'pi-security': 'إصلاح أمن دفعات Pi',
-                'sql-protection': 'حماية من حقن SQL',
-                'weeks-3-6': 'الأسبوع 3-6',
-                'ai-engine': 'تطوير محرك الذكاء الاصطناعي',
-                'computer-vision': 'نموذج رؤية الحاسوب',
-                'price-prediction': 'محرك تنبؤ الأسعار',
-                'fraud-detection': 'نظام كشف الاحتيال',
-                'dispute-ai': 'ذكاء اصطناعي لحل النزاعات',
-                'weeks-7-8': 'الأسبوع 7-8',
-                'autonomous-flow': 'التدفق الذاتي',
-                'auto-order': 'معالجة الطلبات تلقائياً',
-                'auto-release': 'تحرير الأموال تلقائياً',
-                'commission-system': 'نظام العمولات',
-                'months-3-4': 'الشهر 3-4',
-                'mobile-apps': 'تطبيقات الجوال + التوسع',
-                'react-native': 'React Native iOS/Android',
-                'push-notifications': 'إشعارات فورية',
-                'global-deployment': 'نشر عالمي',
-                'months-5-6': 'الشهر 5-6',
-                'go-global': 'التوسع العالمي',
-                'multi-language': 'تعدد اللغات (10+ لغات)',
-                'marketing-launch': 'الإطلاق التسويقي',
-                'strategic-partnerships': 'شراكات استراتيجية',
-                'scale-users': 'التوسع إلى 100 ألف مستخدم',
-                'final-goal': 'الهدف النهائي',
-                'ultimate-vision': 'أول منصة تجارة إلكترونية في العالم',
-                'fully-autonomous': 'تعمل 100% بالذكاء الاصطناعي',
-                'no-human-intervention': 'بدون تدخل بشري مطلقاً',
-                'competitor-comparison': 'المنافسون: أمازون (يدوي) | eBay (يدوي) | علي إكسبريس (يدوي)',
-                'our-advantage': 'نحن: 100% ذاتي التشغيل ⚡',
-                'start-now': '🚀 ابدأ التنفيذ الآن',
-                'ai-greeting': 'مرحباً! أنا Logy AI، مساعدك في السوق الإلكتروني الذاتي. كيف يمكنني مساعدتك؟',
-                'ai-suggestion-1': 'عرض خطة التنفيذ',
-                'ai-suggestion-2': 'شرح نموذج الإيرادات',
-                'ai-suggestion-3': 'دليل البدء',
-                'chat-placeholder': 'اسأل Logy AI أي شيء عن السوق الإلكتروني الذاتي...'
-            },
-            zh: {
-                'autonomous-vision': 'Forsale AI - 自主运营的市场',
-                'autonomous-description': '全球首个100%人工智能驱动的电子商务平台。从产品上架到交付和纠纷解决 - 一切自动完成。您的唯一任务：收取佣金 💰',
-                'product-listing': '产品上架',
-                'product-listing-desc': '用户仅上传照片',
-                'ai-analyzes': '↓ 人工智能分析一切',
-                'ai-analysis': '人工智能分析',
-                'ai-analysis-desc': '计算机视觉提取所有数据',
-                'auto-pricing': '↓ 自动定价',
-                'secure-payment': '安全支付',
-                'secure-payment-desc': 'Pi网络 + 资金托管系统',
-                'funds-held': '↓ 资金安全托管',
-                'smart-shipping': '智能物流',
-                'smart-shipping-desc': '实时追踪 + 人工智能监控',
-                'delivery-process': '↓ 自主交付',
-                'auto-confirmation': '自动确认',
-                'auto-confirmation-desc': '48小时买家争议期',
-                'no-contest': '↓ 无争议？',
-                'auto-release': '自动资金释放',
-                'auto-release-desc': '卖家获得95% + 您获得5%',
-                'complete': '✨ 完全完成',
-                'dispute-resolution': '人工智能纠纷解决',
-                'dispute-description': '当出现纠纷时，我们的人工智能系统会自动处理一切，无需人工干预：',
-                'dispute-initiation': '纠纷发起',
-                'dispute-initiation-desc': '买家上传证据 + 说明',
-                'ai-investigation': '人工智能调查',
-                'ai-investigation-desc': 'Logy AI分析所有证据',
-                'ai-decision': '人工智能决策',
-                'ai-decision-desc': '全额/部分退款或拒绝',
-                'auto-execution': '自动执行',
-                'auto-execution-desc': 'Pi网络执行决策',
-                'revenue-projections': '收入预测',
-                'users-1k': '1,000用户时',
-                'users-10k': '10,000用户时',
-                'users-100k': '100,000用户时',
-                'users-1m': '100万用户时',
-                'monthly-pi': '每月Pi',
-                'revenue-note': '* 假设5%佣金，1000 Pi平均交易额，30%月活跃用户',
-                'implementation-plan': '实施计划',
-                'weeks-1-2': '第1-2周',
-                'critical-fixes': '关键修复',
-                'aws-migration': 'AWS SDK v3迁移',
-                'pi-security': 'Pi支付安全修复',
-                'sql-protection': 'SQL注入防护',
-                'weeks-3-6': '第3-6周',
-                'ai-engine': '人工智能引擎开发',
-                'computer-vision': '计算机视觉模型',
-                'price-prediction': '价格预测引擎',
-                'fraud-detection': '欺诈检测系统',
-                'dispute-ai': '纠纷解决人工智能',
-                'weeks-7-8': '第7-8周',
-                'autonomous-flow': '自主流程',
-                'auto-order': '自动订单处理',
-                'auto-release': '自动资金释放',
-                'commission-system': '佣金系统',
-                'months-3-4': '第3-4个月',
-                'mobile-apps': '移动应用 + 扩展',
-                'react-native': 'React Native iOS/Android',
-                'push-notifications': '推送通知',
-                'global-deployment': '全球部署',
-                'months-5-6': '第5-6个月',
-                'go-global': '走向全球',
-                'multi-language': '多语言支持（10+种语言）',
-                'marketing-launch': '营销启动',
-                'strategic-partnerships': '战略合作伙伴关系',
-                'scale-users': '扩展到10万用户',
-                'final-goal': '最终目标',
-                'ultimate-vision': '全球首个电子商务平台',
-                'fully-autonomous': '100%人工智能运营',
-                'no-human-intervention': '无需人工干预',
-                'competitor-comparison': '竞争对手：亚马逊（手动）| eBay（手动）| 速卖通（手动）',
-                'our-advantage': '我们：100%自主运营 ⚡',
-                'start-now': '🚀 立即开始实施',
-                'ai-greeting': '您好！我是Logy AI，您自主市场的助手。今天我能帮您什么？',
-                'ai-suggestion-1': '显示实施计划',
-                'ai-suggestion-2': '解释收入模型',
-                'ai-suggestion-3': '入门指南',
-                'chat-placeholder': '向Logy AI询问关于自主市场的任何问题...'
-            },
-            es: {
-                'autonomous-vision': 'Forsale AI - El Mercado Auto-Operativo',
-                'autonomous-description': 'La primera plataforma de comercio electrónico del mundo impulsada 100% por IA. Desde el listado de productos hasta la entrega y resolución de disputas - todo sucede automáticamente. Tu único trabajo: recoger comisiones 💰',
-                'product-listing': 'Listado de Productos',
-                'product-listing-desc': 'El usuario sube solo fotos',
-                'ai-analyzes': '↓ La IA analiza todo',
-                'ai-analysis': 'Análisis de IA',
-                'ai-analysis-desc': 'Visión por computadora extrae todos los datos',
-                'auto-pricing': '↓ Precios automáticos',
-                'secure-payment': 'Pago Seguro',
-                'secure-payment-desc': 'Pi Network + Sistema de Escrow',
-                'funds-held': '↓ Fondos retenidos de forma segura',
-                'smart-shipping': 'Envío Inteligente',
-                'smart-shipping-desc': 'Seguimiento en tiempo real + monitoreo por IA',
-                'delivery-process': '↓ Entrega autónoma',
-                'auto-confirmation': 'Confirmación Automática',
-                'auto-confirmation-desc': '48 horas para que el comprador dispute',
-                'no-contest': '↓ ¿Sin disputa?',
-                'auto-release': 'Liberación Automática de Fondos',
-                'auto-release-desc': 'El vendedor obtiene 95% + Tú obtienes 5%',
-                'complete': '✨ Completamente Finalizado',
-                'dispute-resolution': 'Resolución de Disputas por IA',
-                'dispute-description': 'Cuando surgen disputas, nuestro sistema de IA lo maneja todo automáticamente sin intervención humana:',
-                'dispute-initiation': 'Disputa Iniciada',
-                'dispute-initiation-desc': 'Comprador sube evidencia + descripción',
-                'ai-investigation': 'Investigación por IA',
-                'ai-investigation-desc': 'Logy AI analiza toda la evidencia',
-                'ai-decision': 'Decisión por IA',
-                'ai-decision-desc': 'Reembolso total/parcial o rechazo',
-                'auto-execution': 'Ejecución Automática',
-                'auto-execution-desc': 'Pi Network ejecuta la decisión',
-                'revenue-projections': 'Proyecciones de Ingresos',
-                'users-1k': 'Con 1,000 usuarios',
-                'users-10k': 'Con 10,000 usuarios',
-                'users-100k': 'Con 100,000 usuarios',
-                'users-1m': 'Con 1 millón de usuarios',
-                'monthly-pi': 'Pi mensuales',
-                'revenue-note': '* Asumiendo 5% de comisión, transacción promedio de 1000 Pi, 30% de actividad mensual de usuarios',
-                'implementation-plan': 'Plan de Implementación',
-                'weeks-1-2': 'Semanas 1-2',
-                'critical-fixes': 'Correcciones Críticas',
-                'aws-migration': 'Migración AWS SDK v3',
-                'pi-security': 'Corrección de Seguridad de Pagos Pi',
-                'sql-protection': 'Protección contra Inyección SQL',
-                'weeks-3-6': 'Semanas 3-6',
-                'ai-engine': 'Desarrollo del Motor de IA',
-                'computer-vision': 'Modelo de Visión por Computadora',
-                'price-prediction': 'Motor de Predicción de Precios',
-                'fraud-detection': 'Sistema de Detección de Fraude',
-                'dispute-ai': 'IA para Resolución de Disputas',
-                'weeks-7-8': 'Semanas 7-8',
-                'autonomous-flow': 'Flujo Autónomo',
-                'auto-order': 'Procesamiento Automático de Pedidos',
-                'auto-release': 'Liberación Automática de Fondos',
-                'commission-system': 'Sistema de Comisiones',
-                'months-3-4': 'Meses 3-4',
-                'mobile-apps': 'Aplicaciones Móviles + Escalabilidad',
-                'react-native': 'React Native iOS/Android',
-                'push-notifications': 'Notificaciones Push',
-                'global-deployment': 'Despliegue Global',
-                'months-5-6': 'Meses 5-6',
-                'go-global': 'Expansión Global',
-                'multi-language': 'Multi-idioma (10+ idiomas)',
-                'marketing-launch': 'Lanzamiento de Marketing',
-                'strategic-partnerships': 'Alianzas Estratégicas',
-                'scale-users': 'Escalar a 100K usuarios',
-                'final-goal': 'El Objetivo Final',
-                'ultimate-vision': 'La primera plataforma de comercio electrónico del mundo',
-                'fully-autonomous': 'Operada 100% por IA',
-                'no-human-intervention': 'Sin intervención humana requerida',
-                'competitor-comparison': 'Competidores: Amazon (manual) | eBay (manual) | AliExpress (manual)',
-                'our-advantage': 'Nosotros: 100% Autónomos ⚡',
-                'start-now': '🚀 Comenzar Implementación Ahora',
-                'ai-greeting': '¡Hola! Soy Logy AI, tu asistente de mercado autónomo. ¿Cómo puedo ayudarte hoy?',
-                'ai-suggestion-1': 'Mostrar plan de implementación',
-                'ai-suggestion-2': 'Explicar modelo de ingresos',
-                'ai-suggestion-3': 'Guía de inicio',
-                'chat-placeholder': 'Pregunta a Logy AI cualquier cosa sobre el mercado autónomo...'
-            },
-            fr: {
-                'autonomous-vision': 'Forsale AI - La Marketplace Auto-Opérante',
-                'autonomous-description': 'La première plateforme de commerce électronique au monde alimentée à 100% par l\'IA. De la mise en ligne des produits à la livraison et la résolution des litiges - tout se déroule automatiquement. Votre seul travail: collecter les commissions 💰',
-                'product-listing': 'Mise en Ligne de Produits',
-                'product-listing-desc': 'L\'utilisateur téléverse uniquement des photos',
-                'ai-analyzes': '↓ L\'IA analyse tout',
-                'ai-analysis': 'Analyse par IA',
-                'ai-analysis-desc': 'La vision par ordinateur extrait toutes les données',
-                'auto-pricing': '↓ Tarification automatique',
-                'secure-payment': 'Paiement Sécurisé',
-                'secure-payment-desc': 'Pi Network + Système d\'Escrow',
-                'funds-held': '↓ Fonds détenus en sécurité',
-                'smart-shipping': 'Expédition Intelligente',
-                'smart-shipping-desc': 'Suivi en temps réel + surveillance par IA',
-                'delivery-process': '↓ Livraison autonome',
-                'auto-confirmation': 'Confirmation Automatique',
-                'auto-confirmation-desc': '48 heures pour que l\'acheteur conteste',
-                'no-contest': '↓ Pas de contestation?',
-                'auto-release': 'Libération Automatique des Fonds',
-                'auto-release-desc': 'Le vendeur reçoit 95% + Vous recevez 5%',
-                'complete': '✨ Entièrement Complété',
-                'dispute-resolution': 'Résolution des Litiges par IA',
-                'dispute-description': 'Lorsque des litiges surviennent, notre système d\'IA gère tout automatiquement sans intervention humaine:',
-                'dispute-initiation': 'Litige Initié',
-                'dispute-initiation-desc': 'L\'acheteur téléverse des preuves + description',
-                'ai-investigation': 'Investigation par IA',
-                'ai-investigation-desc': 'Logy AI analyse toutes les preuves',
-                'ai-decision': 'Décision par IA',
-                'ai-decision-desc': 'Remboursement total/partiel ou rejet',
-                'auto-execution': 'Exécution Automatique',
-                'auto-execution-desc': 'Pi Network exécute la décision',
-                'revenue-projections': 'Projections de Revenus',
-                'users-1k': 'Avec 1,000 utilisateurs',
-                'users-10k': 'Avec 10,000 utilisateurs',
-                'users-100k': 'Avec 100,000 utilisateurs',
-                'users-1m': 'Avec 1 million d\'utilisateurs',
-                'monthly-pi': 'Pi mensuels',
-                'revenue-note': '* En supposant 5% de commission, transaction moyenne de 1000 Pi, 30% d\'activité mensuelle des utilisateurs',
-                'implementation-plan': 'Plan de Mise en Œuvre',
-                'weeks-1-2': 'Semaines 1-2',
-                'critical-fixes': 'Correctifs Critiques',
-                'aws-migration': 'Migration AWS SDK v3',
-                'pi-security': 'Correction de Sécurité des Paiements Pi',
-                'sql-protection': 'Protection contre l\'Injection SQL',
-                'weeks-3-6': 'Semaines 3-6',
-                'ai-engine': 'Développement du Moteur d\'IA',
-                'computer-vision': 'Modèle de Vision par Ordinateur',
-                'price-prediction': 'Moteur de Prédiction de Prix',
-                'fraud-detection': 'Système de Détection de Fraude',
-                'dispute-ai': 'IA pour Résolution de Litiges',
-                'weeks-7-8': 'Semaines 7-8',
-                'autonomous-flow': 'Flux Autonome',
-                'auto-order': 'Traitement Automatique des Commandes',
-                'auto-release': 'Libération Automatique des Fonds',
-                'commission-system': 'Système de Commissions',
-                'months-3-4': 'Mois 3-4',
-                'mobile-apps': 'Applications Mobiles + Scalabilité',
-                'react-native': 'React Native iOS/Android',
-                'push-notifications': 'Notifications Push',
-                'global-deployment': 'Déploiement Mondial',
-                'months-5-6': 'Mois 5-6',
-                'go-global': 'Développement Mondial',
-                'multi-language': 'Multi-langues (10+ langues)',
-                'marketing-launch': 'Lancement Marketing',
-                'strategic-partnerships': 'Partenariats Stratégiques',
-                'scale-users': 'Monter à 100K utilisateurs',
-                'final-goal': 'L\'Objectif Final',
-                'ultimate-vision': 'La première plateforme de commerce électronique au monde',
-                'fully-autonomous': '100% Opérée par IA',
-                'no-human-intervention': 'Aucune intervention humaine requise',
-                'competitor-comparison': 'Concurrents: Amazon (manuel) | eBay (manuel) | AliExpress (manuel)',
-                'our-advantage': 'Nous: 100% Autonome ⚡',
-                'start-now': '🚀 Commencer la Mise en Œuvre Maintenant',
-                'ai-greeting': 'Bonjour! Je suis Logy AI, votre assistant de marketplace autonome. Comment puis-je vous aider aujourd\'hui?',
-                'ai-suggestion-1': 'Afficher le plan de mise en œuvre',
-                'ai-suggestion-2': 'Expliquer le modèle de revenus',
-                'ai-suggestion-3': 'Guide de démarrage',
-                'chat-placeholder': 'Demandez à Logy AI n\'importe quoi sur la marketplace autonome...'
-            },
-            hi: {
-                'autonomous-vision': 'Forsale AI - स्वचालित बाजार',
-                'autonomous-description': 'दुनिया का पहला 100% AI-संचालित ई-कॉमर्स प्लेटफॉर्म। उत्पाद सूची से डिलीवरी और विवाद समाधान तक - सब कुछ स्वचालित रूप से होता है। आपका एकमात्र काम: कमीशन एकत्र करना 💰',
-                'product-listing': 'उत्पाद सूची',
-                'product-listing-desc': 'उपयोगकर्ता केवल तस्वीरें अपलोड करता है',
-                'ai-analyzes': '↓ AI सब कुछ विश्लेषण करता है',
-                'ai-analysis': 'AI विश्लेषण',
-                'ai-analysis-desc': 'कंप्यूटर विज़न सभी डेटा निकालता है',
-                'auto-pricing': '↓ स्वतः मूल्य निर्धारण',
-                'secure-payment': 'सुरक्षित भुगतान',
-                'secure-payment-desc': 'Pi नेटवर्क + एस्क्रो सिस्टम',
-                'funds-held': '↓ धन सुरक्षित रूप से रखा जाता है',
-                'smart-shipping': 'स्मार्ट शिपिंग',
-                'smart-shipping-desc': 'रीयल-टाइम ट्रैकिंग + AI निगरानी',
-                'delivery-process': '↓ स्वायत्त डिलीवरी',
-                'auto-confirmation': 'स्वतः पुष्टि',
-                'auto-confirmation-desc': 'खरीददार के पास 48 घंटे विवाद करने के लिए',
-                'no-contest': '↓ कोई विवाद नहीं?',
-                'auto-release': 'स्वतः धन रिलीज',
-                'auto-release-desc': 'विक्रेता को 95% + आपको 5%',
-                'complete': '✨ पूर्णतः पूर्ण',
-                'dispute-resolution': 'AI विवाद समाधान',
-                'dispute-description': 'जब विवाद उत्पन्न होते हैं, तो हमारी AI प्रणाली बिना मानव हस्तक्षेप के स्वचालित रूप से सब कुछ संभालती है:',
-                'dispute-initiation': 'विवाद प्रारंभ किया गया',
-                'dispute-initiation-desc': 'खरीददार प्रमाण + विवरण अपलोड करता है',
-                'ai-investigation': 'AI जांच',
-                'ai-investigation-desc': 'Logy AI सभी प्रमाणों का विश्लेषण करता है',
-                'ai-decision': 'AI निर्णय',
-                'ai-decision-desc': 'पूर्ण/आंशिक धनवापसी या अस्वीकृति',
-                'auto-execution': 'स्वतः कार्यान्वयन',
-                'auto-execution-desc': 'Pi नेटवर्क निर्णय को लागू करता है',
-                'revenue-projections': 'राजस्व अनुमान',
-                'users-1k': '1,000 उपयोगकर्ताओं पर',
-                'users-10k': '10,000 उपयोगकर्ताओं पर',
-                'users-100k': '100,000 उपयोगकर्ताओं पर',
-                'users-1m': '1 मिलियन उपयोगकर्ताओं पर',
-                'monthly-pi': 'मासिक Pi',
-                'revenue-note': '* 5% कमीशन, 1000 Pi औसत लेनदेन, 30% मासिक उपयोगकर्ता गतिविधि मानते हुए',
-                'implementation-plan': 'कार्यान्वयन योजना',
-                'weeks-1-2': 'सप्ताह 1-2',
-                'critical-fixes': 'महत्वपूर्ण ठीक',
-                'aws-migration': 'AWS SDK v3 प्रवास',
-                'pi-security': 'Pi भुगतान सुरक्षा ठीक',
-                'sql-protection': 'SQL इंजेक्शन संरक्षण',
-                'weeks-3-6': 'सप्ताह 3-6',
-                'ai-engine': 'AI इंजन विकास',
-                'computer-vision': 'कंप्यूटर विज़न मॉडल',
-                'price-prediction': 'मूल्य भविष्यवाणी इंजन',
-                'fraud-detection': 'धोखाधड़ी पहचान प्रणाली',
-                'dispute-ai': 'विवाद समाधान AI',
-                'weeks-7-8': 'सप्ताह 7-8',
-                'autonomous-flow': 'स्वायत्त प्रवाह',
-                'auto-order': 'स्वतः आदेश प्रसंस्करण',
-                'auto-release': 'स्वतः धन रिलीज',
-                'commission-system': 'कमीशन प्रणाली',
-                'months-3-4': 'महीने 3-4',
-                'mobile-apps': 'मोबाइल ऐप्स + स्केल',
-                'react-native': 'React Native iOS/Android',
-                'push-notifications': 'पुश सूचनाएं',
-                'global-deployment': 'वैश्विक परिनियोजन',
-                'months-5-6': 'महीने 5-6',
-                'go-global': 'वैश्विक स्तर पर जाएं',
-                'multi-language': 'बहुभाषी (10+ भाषाएं)',
-                'marketing-launch': 'विपणन लॉन्च',
-                'strategic-partnerships': 'रणनीतिक साझेदारी',
-                'scale-users': '100K उपयोगकर्ताओं तक स्केल करें',
-                'final-goal': 'अंतिम लक्ष्य',
-                'ultimate-vision': 'दुनिया का पहला ई-कॉमर्स प्लेटफॉर्म',
-                'fully-autonomous': '100% AI-संचालित',
-                'no-human-intervention': 'मानव हस्तक्षेप की आवश्यकता नहीं',
-                'competitor-comparison': 'प्रतियोगी: Amazon (मैनुअल) | eBay (मैनुअल) | AliExpress (मैनुअल)',
-                'our-advantage': 'हम: 100% स्वायत्त ⚡',
-                'start-now': '🚀 अभी कार्यान्वयन शुरू करें',
-                'ai-greeting': 'नमस्ते! मैं Logy AI हूं, आपका स्वायत्त मार्केटप्लेस सहायक। मैं आज आपकी कैसे मदद कर सकता हूं?',
-                'ai-suggestion-1': 'कार्यान्वयन योजना दिखाएं',
-                'ai-suggestion-2': 'राजस्व मॉडल समझाएं',
-                'ai-suggestion-3': 'शुरू करने की गाइड',
-                'chat-placeholder': 'स्वायत्त मार्केटप्लेस के बारे में Logy AI से कुछ भी पूछें...'
-            }
-        };
-        
-        return translations[lang] || translations['en'];
-    }
-
-    function updateDirectionStyles(lang) {
-        // Update text alignment for RTL languages
-        if (lang === 'ar') {
-            document.body.classList.add('rtl');
-        } else {
-            document.body.classList.remove('rtl');
-        }
-    }
-
     function setupChatFunctionality() {
         // Send message functionality
         document.getElementById('logy-input')?.addEventListener('keypress', function(e) {
@@ -2232,9 +1877,11 @@
             hideTypingIndicator();
             
             const responses = {
-                'plan': 'Our implementation plan is divided into 6 phases over 6 months. We start with critical security fixes, then build the AI engine, implement autonomous flows, develop mobile apps, and finally scale globally with multi-language support and marketing.',
-                'revenue': 'Our revenue model is simple: 5% commission on every transaction. With 1,000 active users making average 1000 Pi transactions, that\'s 1,500 Pi monthly. At scale (1M users), we project 1.5M Pi monthly with minimal operational costs due to full automation.',
-                'get started': 'To get started with Forsale AI, you need to complete the login process. After login, you\'ll have access to the autonomous marketplace dashboard where you can monitor your earnings, view the implementation progress, and interact with Logy AI for any assistance.'
+                'hello': 'Hello! I\'m Logy AI. How can I help you today?',
+                'how are you': 'I\'m excellent! Ready to help you with your shopping needs.',
+                'price': 'I can help you find the best prices! Just tell me what product you\'re interested in.',
+                'shipping': 'I provide real-time shipping updates and tracking for all your orders.',
+                'product': 'I can analyze products to give you detailed insights about quality, value, and authenticity!'
             };
             
             let response = 'I understand you\'re asking about "' + message + '". Let me help you with that!';
@@ -2253,7 +1900,7 @@
     }
 
     function addMessage(text, sender) {
-        const chatArea = document.querySelector('.chats-container');
+        const chatArea = document.getElementById('chat-container');
         const messageElement = document.createElement('div');
         messageElement.className = `message-bubble msg-${sender}`;
         messageElement.textContent = text;
@@ -2265,7 +1912,7 @@
     }
 
     function showTypingIndicator() {
-        const chatArea = document.querySelector('.chats-container');
+        const chatArea = document.getElementById('chat-container');
         const indicator = document.createElement('div');
         indicator.className = 'message-bubble msg-ai typing-indicator';
         indicator.innerHTML = '<i class="fa-solid fa-ellipsis"></i> Logy AI is typing...';
@@ -2304,50 +1951,25 @@
         }, 3000);
     }
 
-    function initLanguageUI() {
-        const savedLang = localStorage.getItem('forsale_lang') || 'en';
-        updateLanguageUI(savedLang);
-    }
-
     function updateLanguageUI(lang) {
-        // Update language button text
+        // Update current language display
         document.getElementById('current-language').textContent = lang.toUpperCase();
         
-        // Update suggestion buttons
-        const translations = getTranslations(lang);
-        
-        if (document.querySelector('.suggestion-btn')) {
-            document.querySelector('.suggestion-btn').textContent = translations['ai-suggestion-1'];
-            document.querySelectorAll('.suggestion-btn')[1].textContent = translations['ai-suggestion-2'];
-            document.querySelectorAll('.suggestion-btn')[2].textContent = translations['ai-suggestion-3'];
+        // Update fingerprint text based on language
+        const fingerprintText = document.querySelector('.fingerprint-text');
+        if (fingerprintText) {
+            fingerprintText.textContent = lang === 'ar' ? 'تسجيل الدخول بالبصمة' : 'Biometric Pi Login';
         }
     }
 
-    function startImplementation() {
-        showNotification('Implementation started! Logy AI is now managing your autonomous marketplace.', 'success');
-        
-        // Hide auth container and show app
-        document.getElementById('auth-container').style.display = 'none';
-        document.getElementById('app-container').style.display = 'block';
-        
-        // Save user data
-        const user = {
-            id: 'user123',
-            name: 'Pi User',
-            email: 'user@forsale.ai',
-            trustScore: 98,
-            region: localStorage.getItem('forsale_region') || 'global',
-            language: localStorage.getItem('forsale_lang') || 'en'
-        };
-        
-        localStorage.setItem('forsale_user', JSON.stringify(user));
-    }
-
-    // Initialize notification system
-    document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(() => {
-            showNotification('Welcome to Forsale AI - The world\'s first 100% autonomous marketplace!', 'info');
-        }, 1000);
+    // Pi Network SDK initialization
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof Pi !== 'undefined') {
+            Pi.init({ version: "2.0", sandbox: true });
+            console.log('✅ Pi SDK initialized successfully');
+        } else {
+            console.log('⚠️ Pi SDK not available - using fallback authentication');
+        }
     });
 </script>
 
