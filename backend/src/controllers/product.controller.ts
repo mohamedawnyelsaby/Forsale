@@ -1,5 +1,5 @@
 // ============================================
-// 📄 FILENAME: product.controller.ts (ENHANCED)
+// 📄 FILENAME: product.controller.ts (FIXED)
 // 📍 PATH: backend/src/controllers/product.controller.ts
 // ============================================
 
@@ -7,26 +7,49 @@ import { Request, Response, NextFunction } from 'express';
 import { ProductService } from '../services/product.service';
 import { AuthRequest } from '../middleware/auth';
 import { AppError } from '../utils/AppError';
+import { prisma } from '../config/database';
+import { AIService } from '../services/ai.service';
 
 const productService = new ProductService();
+const aiService = new AIService();
 
 export class ProductController {
   
   // ============================================
-  // ENHANCED SEARCH with AI & Filters
+  // GET ALL PRODUCTS (Fixed)
+  // ============================================
+  
+  async getAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      
+      const result = await productService.getAll({ page, limit });
+      
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  
+  // ============================================
+  // ENHANCED SEARCH (Fixed with Prisma)
   // ============================================
   
   async search(req: Request, res: Response, next: NextFunction) {
     try {
       const {
-        q,                    // Search query
-        category,             // Category filter
-        minPrice,             // Min price in Pi
-        maxPrice,             // Max price in Pi
-        condition,            // new, used_like_new, used_good, used_fair
-        location,             // Location filter
-        brand,                // Brand filter
-        sortBy,               // relevance, price_low, price_high, newest, popular
+        q,
+        category,
+        minPrice,
+        maxPrice,
+        condition,
+        location,
+        brand,
+        sortBy = 'newest',
         page = 1,
         limit = 20
       } = req.query;
@@ -36,7 +59,7 @@ export class ProductController {
         stock: { gt: 0 }
       };
       
-      // Text search (title & description)
+      // Text search
       if (q) {
         where.OR = [
           { title: { contains: q as string, mode: 'insensitive' } },
@@ -49,7 +72,7 @@ export class ProductController {
         where.category = category;
       }
       
-      // Price range filter
+      // Price range
       if (minPrice !== undefined || maxPrice !== undefined) {
         where.price_pi = {};
         if (minPrice !== undefined) {
@@ -60,32 +83,8 @@ export class ProductController {
         }
       }
       
-      // Condition filter (stored in ai_meta)
-      if (condition && condition !== 'all') {
-        where.ai_meta = {
-          path: ['condition'],
-          equals: condition
-        };
-      }
-      
-      // Location filter (stored in ai_meta)
-      if (location && location !== 'all') {
-        where.ai_meta = {
-          path: ['location'],
-          equals: location
-        };
-      }
-      
-      // Brand filter (stored in ai_meta)
-      if (brand && brand !== 'all') {
-        where.ai_meta = {
-          path: ['brand'],
-          equals: brand
-        };
-      }
-      
       // Determine sort order
-      let orderBy: any = { created_at: 'desc' }; // Default: newest
+      let orderBy: any = { created_at: 'desc' };
       
       switch (sortBy) {
         case 'price_low':
@@ -94,22 +93,15 @@ export class ProductController {
         case 'price_high':
           orderBy = { price_pi: 'desc' };
           break;
-        case 'popular':
-          orderBy = { views: { _count: 'desc' } };
-          break;
         case 'newest':
           orderBy = { created_at: 'desc' };
           break;
-        case 'relevance':
-        default:
-          // For relevance, we'll use a mix of factors
-          // In production, you'd use Elasticsearch or similar
-          orderBy = { created_at: 'desc' };
       }
       
-      // Execute search
+      // Calculate pagination
       const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
       
+      // Execute query
       const [products, total] = await Promise.all([
         prisma.product.findMany({
           where,
@@ -123,36 +115,11 @@ export class ProductController {
                 name: true,
                 email: true
               }
-            },
-            _count: {
-              select: {
-                reviews: true,
-                views: true
-              }
             }
           }
         }),
         prisma.product.count({ where })
       ]);
-      
-      // Save search query to history (if user is authenticated)
-      if (q && req.user) {
-        await prisma.searchHistory.create({
-          data: {
-            user_id: req.user.id,
-            query: q as string,
-            filters: {
-              category,
-              minPrice,
-              maxPrice,
-              condition,
-              location,
-              brand,
-              sortBy
-            }
-          }
-        });
-      }
       
       res.json({
         success: true,
@@ -168,160 +135,19 @@ export class ProductController {
       });
       
     } catch (error) {
+      console.error('Search error:', error);
       next(error);
     }
   }
   
   // ============================================
-  // AI SEARCH SUGGESTIONS
-  // ============================================
-  
-  async getSearchSuggestions(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { query } = req.body;
-      
-      if (!query || query.length < 3) {
-        return res.json({
-          success: true,
-          data: []
-        });
-      }
-      
-      // Get popular searches
-      const popularSearches = await prisma.searchHistory.groupBy({
-        by: ['query'],
-        _count: {
-          query: true
-        },
-        where: {
-          query: {
-            contains: query,
-            mode: 'insensitive'
-          }
-        },
-        orderBy: {
-          _count: {
-            query: 'desc'
-          }
-        },
-        take: 5
-      });
-      
-      // Get matching products
-      const products = await prisma.product.findMany({
-        where: {
-          OR: [
-            { title: { contains: query, mode: 'insensitive' } },
-            { description: { contains: query, mode: 'insensitive' } }
-          ],
-          stock: { gt: 0 }
-        },
-        select: {
-          title: true
-        },
-        distinct: ['title'],
-        take: 3
-      });
-      
-      // Combine suggestions
-      const suggestions = [
-        ...popularSearches.map(s => ({
-          type: 'popular',
-          text: s.query
-        })),
-        ...products.map(p => ({
-          type: 'product',
-          text: p.title
-        }))
-      ];
-      
-      res.json({
-        success: true,
-        data: suggestions
-      });
-      
-    } catch (error) {
-      next(error);
-    }
-  }
-  
-  // ============================================
-  // VISUAL SEARCH (Image-based)
-  // ============================================
-  
-  async visualSearch(req: AuthRequest, res: Response, next: NextFunction) {
-    try {
-      if (!req.file) {
-        throw new AppError('No image provided', 400);
-      }
-      
-      // Call AI service for image analysis
-      const aiAnalysis = await aiService.analyzeImage(req.file.buffer);
-      
-      if (!aiAnalysis || !aiAnalysis.category) {
-        throw new AppError('Could not analyze image', 400);
-      }
-      
-      // Search for similar products
-      const products = await prisma.product.findMany({
-        where: {
-          category: aiAnalysis.category,
-          stock: { gt: 0 },
-          OR: [
-            { title: { contains: aiAnalysis.description, mode: 'insensitive' } },
-            { description: { contains: aiAnalysis.description, mode: 'insensitive' } }
-          ]
-        },
-        take: 20,
-        include: {
-          seller: {
-            select: {
-              id: true,
-              name: true
-            }
-          }
-        }
-      });
-      
-      res.json({
-        success: true,
-        data: {
-          analysis: aiAnalysis,
-          products
-        }
-      });
-      
-    } catch (error) {
-      next(error);
-    }
-  }
-  
-  // ============================================
-  // GET ALL PRODUCTS (With Basic Filters)
-  // ============================================
-  
-  async getAll(req: Request, res: Response, next: NextFunction) {
-    try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 20;
-      
-      const result = await productService.getAll({ page, limit });
-      res.json({
-        success: true,
-        data: result
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-  
-  // ============================================
-  // GET BY ID (With View Tracking)
+  // GET BY ID
   // ============================================
   
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
       const product = await productService.getById(parseInt(req.params.id));
+      
       res.json({
         success: true,
         data: product
@@ -342,6 +168,7 @@ export class ProductController {
       const limit = parseInt(req.query.limit as string) || 20;
       
       const result = await productService.getByCategory(category, { page, limit });
+      
       res.json({
         success: true,
         data: result
@@ -422,7 +249,7 @@ export class ProductController {
   }
   
   // ============================================
-  // GET MY PRODUCTS (Seller)
+  // GET MY PRODUCTS
   // ============================================
   
   async getMyProducts(req: AuthRequest, res: Response, next: NextFunction) {
