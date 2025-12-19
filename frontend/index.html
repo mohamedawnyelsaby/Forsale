@@ -81,16 +81,9 @@
                 <input type="text" placeholder="ابحث بذكاء اصطناعي أو صف منتج أحلامك...">
             </div>
             
-            <div class="cats-scroll" id="level1-scroll"></div>
-
-            <div class="dynamic-filters glass-panel" id="filter-panel">
-                <div class="sub-chips" id="level2-chips"> </div>
-                <div id="level3-area"> </div>
-            </div>
-
             <h2 style="font-size: 20px; color: var(--text-main); margin: 0 0 15px;">اقتراحات Logy AI</h2>
             
-            <div class="products-grid" id="products-grid"> </div>
+            <div class="products-grid" id="products-grid"></div>
         </div>
     </div>
 
@@ -106,140 +99,42 @@
 
             <h3 class="ai-section-title"><i class="fa-solid fa-microchip"></i> تحليل Logy AI للسعر</h3>
             <div class="glass-panel ai-price-card">
-                <div class="stat-box" id="ai-score-box">
+                <div class="stat-box">
                     <div class="value" id="ai-score">9.2</div>
-                    <div class="label">نقطة قوة العرض (10 هي الأفضل)</div>
+                    <div class="label">نقطة قوة العرض</div>
                 </div>
                 <div class="stat-box">
                     <div class="value" id="ai-market-price">0 Pi</div>
-                    <div class="label">متوسط السعر السوقي (AI)</div>
+                    <div class="label">متوسط السوق</div>
                 </div>
             </div>
-            <div class="price-chart-mock"><div class="chart-line"></div></div>
-            <p id="ai-summary" style="font-size: 13px; color: var(--text-muted); margin-top: 10px; padding: 0 15px;">السعر ممتاز! التوصيل خلال 3-5 أيام.</p>
 
-            <h3 class="ai-section-title"><i class="fa-solid fa-truck-fast"></i> لوجستيات الشحن (AI Secured)</h3>
-            <div class="glass-panel ai-logistics-card">
-                <div class="step">
-                    <div class="step-icon"><i class="fa-solid fa-calendar-alt"></i></div>
-                    <div class="step-text">زمن التوصيل المقدر: <span id="shipping-eta" style="font-weight: bold; color:var(--accent);">3-5 أيام</span></div>
-                </div>
-                <div class="step">
-                    <div class="step-icon"><i class="fa-solid fa-shield-alt"></i></div>
-                    <div class="step-text">إدارة المشاكل: <span id="shipping-problem" style="color:var(--text-main);">مراقبة شحن مدارة بالذكاء الاصطناعي</span></div>
-                </div>
-                <div class="step">
-                    <div class="step-icon"><i class="fa-solid fa-box"></i></div>
-                    <div class="step-text">الناقل: <span id="shipping-carrier" style="font-weight: bold; color:var(--primary);">Logy AI Express</span></div>
-                </div>
-            </div>
-            
             <div class="detail-tabs-container glass-panel">
                 <div class="detail-tabs-scroll">
-                    <div class="detail-tab-item active" data-tab="description" onclick="showDetailTab('description', this)">
-                        <i class="fa-solid fa-file-alt"></i> الوصف والتفاصيل 
+                    <div class="detail-tab-item active" onclick="showDetailTab('description', this)">
+                        <i class="fa-solid fa-file-alt"></i> الوصف
                     </div>
-                    <div class="detail-tab-item" data-tab="specs" onclick="showDetailTab('specs', this)">
-                        <i class="fa-solid fa-cogs"></i> المواصفات الفنية 
-                    </div>
-                    <div class="detail-tab-item" data-tab="reviews" onclick="showDetailTab('reviews', this)">
-                        <i class="fa-solid fa-comments"></i> آراء المشترين 
+                    <div class="detail-tab-item" onclick="showDetailTab('specs', this)">
+                        <i class="fa-solid fa-cogs"></i> المواصفات
                     </div>
                 </div>
                 <div class="detail-tab-content" id="detail-description">
                     <p id="detail-desc" style="line-height: 1.8; color: var(--text-main); font-size: 14px;"></p>
                 </div>
                 <div class="detail-tab-content" id="detail-specs" style="display:none;">
-                    <ul id="specs-list" style="list-style: none; padding: 0; margin: 0;"></ul>
-                </div>
-                <div class="detail-tab-content" id="detail-reviews" style="display:none;">
-                    <p style="color:var(--text-muted);">نظام المراجعات قريباً. Logy AI يحلل المشترين لضمان المصداقية.</p>
-                </div>
-            </div>
-
-            <h3 class="ai-section-title"><i class="fa-solid fa-lock"></i> نظام الضمان والمدفوعات الآمنة (Escrow)</h3>
-            <div class="glass-panel" style="padding: 15px;">
-                <div class="escrow-step active">
-                    <div class="escrow-step-icon"><i class="fa-solid fa-wallet"></i></div>
-                    <div class="escrow-step-text"><strong>1. الدفع والاحتجاز:</strong> يتم حجز (Escrow) قيمة المنتج في محفظة مؤمنة بالذكاء الاصطناعي.</div>
-                </div>
-                <div class="escrow-step">
-                    <div class="escrow-step-icon"><i class="fa-solid fa-box"></i></div>
-                    <div class="escrow-step-text"><strong>2. الشحن والتتبع:</strong> البائع يشحن المنتج، ويراقب Logy AI كل مرحلة.</div>
-                </div>
-                <div class="escrow-step">
-                    <div class="escrow-step-icon"><i class="fa-solid fa-check"></i></div>
-                    <div class="escrow-step-text"><strong>3. التأكيد والتحرير:</strong> عند تأكيد الاستلام، يتم تحرير دفعة Pi للبائع.</div>
+                    <p style="color:var(--text-muted);">المواصفات الفنية</p>
                 </div>
             </div>
         </div>
         <div class="buy-fixed-bar">
             <div class="content-wrapper">
-                <button class="buy-btn" id="buy-btn" onclick="openCheckoutModal()"><i class="fa-solid fa-shopping-cart"></i> شراء المنتج الآن</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="ai-upload-modal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-microchip"></i> إدراج منتج جديد</div>
-            <div class="icon-btn" onclick="closeAiUploadModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--accent); margin: 15px 0;">أطلق منتجك إلى العالم بواسطة Logy AI</h2>
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-image"></i> تحميل الصور</h4>
-                <p>قم بتحميل 3-5 صور واضحة لمنتجك. Logy AI سيقوم بتحليل الجودة، والمواصفات، والحالة.</p>
-                <input type="file" id="product-images" accept="image/*" multiple style="display: none;">
-                <button class="primary" onclick="document.getElementById('product-images').click()" style="background: var(--primary); color: black;">
-                    <i class="fa-solid fa-cloud-upload-alt"></i> اختر ملفات الصور
+                <button class="buy-btn" onclick="openCheckoutModal()">
+                    <i class="fa-solid fa-shopping-cart"></i> شراء المنتج الآن
                 </button>
-                <p id="image-count-label" style="margin-top: 10px; font-size: 12px; color: var(--accent);">لم يتم اختيار أي ملفات.</p>
             </div>
-            
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-keyboard"></i> معلومات أساسية</h4>
-                <div class="filter-group">
-                    <label for="manual-desc">وصف مختصر للمنتج (بالكلمات):</label>
-                    <textarea id="manual-desc" rows="3" placeholder="مثال: آيفون 15 برو مستعمل، لون أبيض، سعة 256 جيجا" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:var(--text-main); font-size:14px;"></textarea>
-                </div>
-                <div class="filter-group" style="margin-top: 15px;">
-                    <label>السعر الذي تقترحه (اختياري):</label>
-                    <input type="number" id="manual-price" placeholder="Pi" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:var(--text-main); font-size:14px;">
-                </div>
-            </div>
-            
-            <button class="buy-btn" onclick="startAiAnalysis()" id="start-analysis-btn" style="margin-top: 20px;" disabled>
-                <i class="fa-solid fa-microchip"></i> تحليل وإدراج المنتج الآن بواسطة AI
-            </button>
         </div>
     </div>
 
-    <div id="settingsModal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-gear"></i> الإعدادات</div>
-            <div class="icon-btn" onclick="closeSettingsModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">إعدادات الحساب والتطبيق</h2>
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-user-circle"></i> الحساب العام</h4>
-                <p>إدارة ملفك الشخصي وإعدادات الأمان.</p>
-                <button class="primary" onclick="alert('جاري التوجه لصفحة إدارة الملف الشخصي')">تعديل الملف الشخصي</button>
-            </div>
-
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-lock"></i> الأمان والخصوصية</h4>
-                <p>إعدادات المصادقة الثنائية وتفضيلات البيانات.</p>
-                <button class="accent" onclick="alert('تم تفعيل المصادقة الثنائية بواسطة Logy AI.')">تفعيل المصادقة الثنائية</button>
-            </div>
-            
-            <button class="buy-btn" style="background:var(--danger); margin-top: 30px;" onclick="alert('تم تسجيل الخروج بنجاح. سنفتقدك!')">
-                <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
-            </button>
-        </div>
-    </div>
-    
     <div id="checkoutModal">
         <div class="detail-header">
             <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-credit-card"></i> تأكيد الدفع</div>
@@ -255,14 +150,8 @@
             </div>
             
             <div class="settings-group">
-                <h4><i class="fa-solid fa-map-location-dot"></i> عنوان الشحن</h4>
-                <p>الاسم: <span style="font-weight: bold;">مستخدم Pi</span></p>
-                <p>العنوان: سيتم تحديده بعد تأكيد الطلب</p>
-            </div>
-            
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-shield-alt"></i> حماية المشتري (Logy AI Escrow)</h4>
-                <p style="color:var(--success-color); font-weight: bold;">أمنة: سيتم حجز (Escrow) المبلغ حتى تستلم المنتج وتؤكد مطابقته للمواصفات.</p>
+                <h4><i class="fa-solid fa-shield-alt"></i> حماية المشتري (Escrow)</h4>
+                <p style="color:var(--success-color); font-weight: bold;">سيتم حجز المبلغ حتى تستلم المنتج وتؤكد مطابقته.</p>
             </div>
 
             <div class="buy-fixed-bar">
@@ -274,60 +163,77 @@
             </div>
         </div>
     </div>
-    
+
+    <div id="settingsModal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-gear"></i> الإعدادات</div>
+            <div class="icon-btn" onclick="closeSettingsModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">إعدادات الحساب</h2>
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-user-circle"></i> الحساب</h4>
+                <p>إدارة ملفك الشخصي</p>
+            </div>
+        </div>
+    </div>
+
     <div id="ordersModal">
         <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-cart-shopping"></i> Logy AI Orders</div>
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-cart-shopping"></i> الطلبات</div>
             <div class="icon-btn" onclick="closeOrdersModal()"><i class="fa-solid fa-xmark"></i></div>
         </div>
         <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">الطلبات المدارة بالذكاء الاصطناعي</h2>
+            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">طلباتك</h2>
             <div class="settings-group">
-                <h4><i class="fa-solid fa-check-circle" style="color:var(--success-color);"></i> لا توجد طلبات بعد</h4>
-                <p style="color:var(--text-muted);">قم بشراء منتجك الأول الآن!</p>
+                <p style="color:var(--text-muted); text-align:center;">لا توجد طلبات بعد</p>
             </div>
         </div>
     </div>
 
     <div id="walletModal">
         <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-wallet"></i> Pi Wallet</div>
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-wallet"></i> المحفظة</div>
             <div class="icon-btn" onclick="closeWalletModal()"><i class="fa-solid fa-xmark"></i></div>
         </div>
         <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0 10px;">رصيد Pi الحالي</h2>
-            <div class="glass-panel" style="padding: 25px; text-align: center; border-color: var(--pi-purple);">
-                <div style="font-size: 14px; color: var(--text-muted);">الرصيد الكلي</div>
-                <div style="font-size: 40px; font-weight: 900; color: var(--pi-purple); margin-top: 5px;">
-                    -- Pi
-                </div>
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">(مدار بواسطة Logy AI)</p>
+            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">رصيدك</h2>
+            <div class="glass-panel" style="padding: 25px; text-align: center;">
+                <div style="font-size: 40px; font-weight: 900; color: var(--pi-purple);">-- Pi</div>
             </div>
         </div>
     </div>
-    
+
     <div id="notificationsModal">
         <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-bell"></i> إشعارات Logy AI</div>
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-bell"></i> الإشعارات</div>
             <div class="icon-btn" onclick="closeNotificationsModal()"><i class="fa-solid fa-xmark"></i></div>
         </div>
         <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">أحدث التنبيهات</h2>
-            <div class="glass-panel" style="padding: 10px;">
-                <p style="color:var(--text-muted); text-align:center; padding:20px;">لا توجد إشعارات حالياً</p>
-            </div>
+            <p style="color:var(--text-muted); text-align:center; padding:20px;">لا توجد إشعارات</p>
         </div>
     </div>
-    
+
+    <div id="ai-upload-modal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-microchip"></i> إدراج منتج</div>
+            <div class="icon-btn" onclick="closeAiUploadModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 20px; color: var(--accent); margin: 15px 0;">أطلق منتجك</h2>
+            <p style="color:var(--text-muted);">قريباً: تحليل تلقائي بالذكاء الاصطناعي</p>
+        </div>
+    </div>
+
     <div id="logyAiModal">
         <div class="logy-chat-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-robot"></i> Logy AI Chat</div>
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-robot"></i> Logy AI</div>
             <div class="icon-btn" onclick="closeLogyAiModal()"><i class="fa-solid fa-xmark"></i></div>
         </div>
-        <div class="logy-chat-area" id="logy-chat-area"></div>
+        <div class="logy-chat-area"></div>
         <div class="logy-input-bar">
-            <input type="text" id="logy-input" placeholder="اطلب من Logy AI مساعدتك في أي شيء..." autofocus>
-            <div class="logy-send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></div>
+            <input type="text" placeholder="اسأل Logy AI...">
+            <div class="logy-send-btn"><i class="fa-solid fa-paper-plane"></i></div>
         </div>
     </div>
 
