@@ -1,286 +1,122 @@
-// ============================================
-// 📄 FILENAME: script.js (FIXED WITH DEBUG)
-// 📍 PATH: frontend/script.js
-// ============================================
-
+/************************
+ * GLOBAL CONFIG
+ ************************/
 const API_BASE = "https://forsale-production.up.railway.app";
 
 let selectedProduct = null;
+let paymentInProgress = false;
 let currentUser = null;
-let currentPage = 1;
 
-// ============================================
-// INITIALIZATION
-// ============================================
+/************************
+ * MOCK PRODUCTS DATA
+ ************************/
+const MOCK_PRODUCTS = [
+  {
+    id: 1,
+    name: "iPhone 15 Pro (Titanium)",
+    price: 0.01,
+    description: "iPhone 15 Pro في حالة ممتازة مع جميع الملحقات. ضمان لمدة 6 أشهر.",
+    image: "https://images.unsplash.com/photo-1592286927505-b86dc33748b5?w=400",
+    category: "electronics"
+  },
+  {
+    id: 2,
+    name: "MacBook Pro M3",
+    price: 0.05,
+    description: "MacBook Pro M3 جديد بالكرتونة مع ضمان Apple رسمي.",
+    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
+    category: "electronics"
+  },
+  {
+    id: 3,
+    name: "AirPods Pro 2",
+    price: 0.02,
+    description: "AirPods Pro الجيل الثاني مع خاصية إلغاء الضوضاء.",
+    image: "https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=400",
+    category: "electronics"
+  }
+];
 
-document.addEventListener('DOMContentLoaded', async () => {
-  console.log("🚀 Forsale AI initializing...");
-  console.log("📍 API Base:", API_BASE);
-  
+/************************
+ * PI BROWSER DETECTION
+ ************************/
+function isPiBrowser() {
+  return typeof window.Pi !== "undefined";
+}
+
+/************************
+ * PI AUTHENTICATION
+ ************************/
+async function authenticateUser() {
+  if (!isPiBrowser()) {
+    console.warn("⚠️ Not in Pi Browser");
+    return null;
+  }
+
   try {
-    // Initialize app
-    initializeApp();
+    const scopes = ['username', 'payments'];
     
-    // Load products
-    await loadProducts();
+    function onIncompletePaymentFound(payment) {
+      console.log("⚠️ Incomplete payment found:", payment);
+    }
     
-    // Setup event listeners
-    setupEventListeners();
+    const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
+    currentUser = auth.user;
     
-    // Show app
-    document.getElementById("auth-container").style.display = "none";
-    document.getElementById("app-container").style.display = "block";
-    
-    console.log("✅ App initialized successfully");
+    console.log("✅ Authenticated:", currentUser.username);
+    return currentUser;
     
   } catch (error) {
-    console.error("❌ Initialization failed:", error);
-    showError("Failed to initialize app: " + error.message);
-  }
-});
-
-// ============================================
-// APP INITIALIZATION
-// ============================================
-
-function initializeApp() {
-  if (typeof i18n !== 'undefined') {
-    i18n.init();
-    renderLanguageSelector();
-  }
-  
-  if (typeof searchUI !== 'undefined') {
-    searchUI.init();
-  }
-  
-  if (typeof cart !== 'undefined') {
-    cart.init();
-  }
-  
-  updateAllUI();
-}
-
-function updateAllUI() {
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (typeof i18n !== 'undefined') {
-      el.textContent = i18n.t(key);
-    }
-  });
-  
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-    const key = el.getAttribute('data-i18n-placeholder');
-    if (typeof i18n !== 'undefined') {
-      el.placeholder = i18n.t(key);
-    }
-  });
-}
-
-// ============================================
-// PRODUCT LOADING (FIXED)
-// ============================================
-
-async function loadProducts(page = 1) {
-  try {
-    console.log(`📦 Loading products... (Page ${page})`);
-    showLoading();
-    currentPage = page;
-    
-    // Try API first
-    try {
-      const url = `${API_BASE}/api/products?page=${page}&limit=20`;
-      console.log("📡 Fetching:", url);
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      });
-      
-      console.log("📡 Response status:", response.status);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      console.log("📦 Products received:", data);
-      
-      if (data.success && data.data) {
-        displayProducts(data.data.products || []);
-        displayPagination(data.data.pagination);
-        console.log("✅ Products loaded successfully");
-        return;
-      }
-      
-    } catch (apiError) {
-      console.warn("⚠️ API failed:", apiError.message);
-      console.log("🔄 Falling back to mock data...");
-    }
-    
-    // Fallback to mock data
-    displayProducts(MOCK_PRODUCTS);
-    displayPagination({
-      page: 1,
-      limit: 20,
-      total: MOCK_PRODUCTS.length,
-      pages: 1
-    });
-    console.log("✅ Mock products loaded");
-    
-  } catch (error) {
-    console.error('❌ Load products failed:', error);
-    showError('Failed to load products: ' + error.message);
-    
-    // Show mock products as last resort
-    displayProducts(MOCK_PRODUCTS);
-    
-  } finally {
-    hideLoading();
+    console.error("❌ Authentication failed:", error);
+    return null;
   }
 }
 
-// ============================================
-// DISPLAY FUNCTIONS
-// ============================================
-
-function displayProducts(products) {
+/************************
+ * DISPLAY PRODUCTS
+ ************************/
+function displayProducts() {
   const grid = document.getElementById("products-grid");
-  if (!grid) {
-    console.error("❌ products-grid element not found");
-    return;
-  }
+  if (!grid) return;
   
-  console.log("🎨 Displaying", products.length, "products");
-  
-  if (!products || products.length === 0) {
-    grid.innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
-        <i class="fa-solid fa-box-open" style="font-size: 60px; color: var(--text-muted); opacity: 0.5;"></i>
-        <p style="color: var(--text-muted); margin-top: 15px; font-size: 16px;">No products found</p>
-        <button class="main-btn" onclick="loadProducts(1)" style="margin-top: 20px;">
-          Reload Products
-        </button>
-      </div>
-    `;
-    return;
-  }
-  
-  grid.innerHTML = products.map(product => {
-    const id = product.id;
-    const name = product.name || product.title || 'Untitled Product';
-    const price = product.price || product.price_pi || 0;
-    const image = product.image || (product.images && product.images[0]) || 'https://via.placeholder.com/400';
-    const condition = product.condition || '';
-    
-    return `
-      <div class="product-card glass-panel" onclick="openProductDetail(${id})">
-        <div class="p-img-box">
-          <img src="${image}" alt="${name}" onerror="this.src='https://via.placeholder.com/400'">
-          <div class="ai-tag">
-            <i class="fa-solid fa-microchip"></i>
-            <span>AI Verified</span>
-          </div>
-          ${condition ? `<div class="condition-badge">${condition}</div>` : ''}
+  grid.innerHTML = MOCK_PRODUCTS.map(product => `
+    <div class="product-card glass-panel" onclick="openProductDetail(${product.id})">
+      <div class="p-img-box">
+        <img src="${product.image}" alt="${product.name}">
+        <div class="ai-tag">
+          <i class="fa-solid fa-microchip"></i> AI Verified
         </div>
-        <div class="p-details">
-          <div class="p-name">${name}</div>
-          <div class="p-price">${price} Pi</div>
-        </div>
-        <button class="quick-add-btn" onclick="event.stopPropagation(); quickAddToCart(${id})">
-          <i class="fa-solid fa-cart-plus"></i>
-        </button>
       </div>
-    `;
-  }).join('');
-  
-  console.log("✅ Products displayed");
+      <div class="p-details">
+        <div class="p-name">${product.name}</div>
+        <div class="p-price">${product.price} Pi</div>
+      </div>
+    </div>
+  `).join('');
 }
 
-function displayPagination(pagination) {
-  const container = document.getElementById('pagination-container');
-  if (!container || !pagination) return;
-  
-  const { page, pages, total } = pagination;
-  
-  if (pages <= 1) {
-    container.innerHTML = '';
-    return;
-  }
-  
-  let html = `
-    <button class="pagination-btn" onclick="loadProducts(${page - 1})" ${page === 1 ? 'disabled' : ''}>
-      <i class="fa-solid fa-chevron-left"></i>
-    </button>
-  `;
-  
-  for (let i = 1; i <= Math.min(pages, 5); i++) {
-    html += `
-      <button class="pagination-btn ${i === page ? 'active' : ''}" onclick="loadProducts(${i})">
-        ${i}
-      </button>
-    `;
-  }
-  
-  html += `
-    <button class="pagination-btn" onclick="loadProducts(${page + 1})" ${page === pages ? 'disabled' : ''}>
-      <i class="fa-solid fa-chevron-right"></i>
-    </button>
-  `;
-  
-  container.innerHTML = html;
-}
-
-// ============================================
-// UI HELPERS
-// ============================================
-
-function showLoading() {
-  const indicator = document.getElementById('loading-indicator');
-  if (indicator) {
-    indicator.style.display = 'flex';
-  }
-}
-
-function hideLoading() {
-  const indicator = document.getElementById('loading-indicator');
-  if (indicator) {
-    indicator.style.display = 'none';
-  }
-}
-
-function showError(message) {
-  console.error("❌", message);
-  alert('❌ ' + message);
-}
-
-function showSuccess(message) {
-  console.log("✅", message);
-  alert('✅ ' + message);
-}
-
-// ============================================
-// PRODUCT DETAIL
-// ============================================
-
+/************************
+ * PRODUCT DETAIL MODAL
+ ************************/
 function openProductDetail(id) {
-  console.log("📄 Opening product:", id);
-  const product = findProductById(id);
-  
+  const product = MOCK_PRODUCTS.find(p => p.id === id);
   if (!product) {
-    showError("Product not found");
+    alert("❌ المنتج غير موجود");
     return;
   }
-  
+
   selectedProduct = product;
+
+  document.getElementById("detail-title").innerText = product.name;
+  document.getElementById("detail-price").innerText = product.price + " Pi";
+  document.getElementById("detail-img").src = product.image;
+  document.getElementById("detail-desc").innerText = product.description;
   
-  document.getElementById("detail-title").innerText = product.name || product.title;
-  document.getElementById("detail-price").innerText = (product.price || product.price_pi) + " Pi";
-  document.getElementById("detail-img").src = product.image || product.images?.[0] || 'https://via.placeholder.com/400';
-  document.getElementById("detail-desc").innerText = product.description || 'No description available';
-  
+  document.getElementById("ai-score").innerText = "9.2";
+  document.getElementById("ai-market-price").innerText = product.price + " Pi";
+  document.getElementById("ai-summary").innerText = 
+    "السعر ممتاز! أقل من المتوسط السوقي بنسبة 5%. التوصيل خلال 3-5 أيام.";
+
   document.getElementById("product-detail-modal").style.display = "block";
 }
 
@@ -289,154 +125,354 @@ function closeProductDetailModal() {
   selectedProduct = null;
 }
 
-function findProductById(id) {
-  // Try to find in current displayed products first
-  return MOCK_PRODUCTS.find(p => p.id === id);
-}
-
-// ============================================
-// CART FUNCTIONS
-// ============================================
-
-function quickAddToCart(productId) {
-  const product = findProductById(productId);
-  if (!product) return;
-  
-  if (typeof cart !== 'undefined') {
-    cart.addItem(product, 1);
-  } else {
-    showSuccess('Added to cart!');
+/************************
+ * CHECKOUT MODAL
+ ************************/
+function openCheckoutModal() {
+  if (!selectedProduct) {
+    alert("❌ لم يتم اختيار منتج");
+    return;
   }
+  
+  document.getElementById("checkout-product-name").innerText = selectedProduct.name;
+  document.getElementById("checkout-product-price").innerText = selectedProduct.price + " Pi";
+  document.getElementById("checkout-amount").innerText = selectedProduct.price;
+  
+  document.getElementById("product-detail-modal").style.display = "none";
+  document.getElementById("checkoutModal").style.display = "block";
 }
 
-// ============================================
-// EVENT LISTENERS
-// ============================================
+function closeCheckoutModal() {
+  document.getElementById("checkoutModal").style.display = "none";
+  document.getElementById("product-detail-modal").style.display = "block";
+}
 
-function setupEventListeners() {
-  // Close modals on outside click
-  document.querySelectorAll('.modal').forEach(modal => {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.style.display = 'none';
-      }
+/************************
+ * PI PAYMENT FLOW
+ ************************/
+async function checkout() {
+  if (paymentInProgress) {
+    alert("⚠️ عملية دفع جارية بالفعل");
+    return;
+  }
+
+  if (!isPiBrowser()) {
+    alert("⚠️ يجب فتح التطبيق من Pi Browser\n\nافتح: minepi.com/blackstyle");
+    return;
+  }
+
+  if (!selectedProduct) {
+    alert("❌ لم يتم اختيار منتج");
+    return;
+  }
+
+  if (!currentUser) {
+    console.log("🔐 Authenticating user...");
+    currentUser = await authenticateUser();
+    if (!currentUser) {
+      alert("❌ فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.");
+      return;
+    }
+  }
+
+  try {
+    paymentInProgress = true;
+    disableBuyButton(true);
+    
+    console.log("🔄 Creating payment for:", selectedProduct);
+
+    const response = await fetch(`${API_BASE}/api/pi/create-payment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        productId: selectedProduct.id,
+        amount: selectedProduct.price,
+        memo: `Forsale | ${selectedProduct.name}`
+      })
     });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "فشل إنشاء الدفع");
+    }
+
+    const result = await response.json();
+    const payment = result.data;
+    
+    console.log("✅ Payment created:", payment.identifier);
+
+    Pi.createPayment(
+      {
+        amount: payment.amount,
+        memo: payment.memo,
+        metadata: payment.metadata
+      },
+      {
+        onReadyForServerApproval: async function(paymentId) {
+          console.log("🟡 Ready for approval:", paymentId);
+          
+          try {
+            const approveRes = await fetch(`${API_BASE}/api/pi/approve-payment`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ paymentId })
+            });
+            
+            if (approveRes.ok) {
+              console.log("✅ Payment approved");
+            } else {
+              console.error("❌ Approval failed");
+            }
+          } catch (err) {
+            console.error("❌ Approval error:", err);
+          }
+        },
+
+        onReadyForServerCompletion: async function(paymentId, txid) {
+          console.log("🟢 Ready for completion:", paymentId, txid);
+          
+          try {
+            const completeRes = await fetch(`${API_BASE}/api/pi/complete-payment`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ paymentId, txid })
+            });
+            
+            if (completeRes.ok) {
+              console.log("✅ Payment completed successfully");
+              
+              showSuccessMessage();
+              
+              setTimeout(() => {
+                resetPaymentState();
+                closeCheckoutModal();
+                closeProductDetailModal();
+                openOrdersModal();
+              }, 2000);
+              
+            } else {
+              throw new Error("فشل إتمام الدفع");
+            }
+          } catch (err) {
+            console.error("❌ Completion error:", err);
+            alert("⚠️ حدث خطأ في إتمام الدفع. سيتم مراجعة الطلب.");
+            resetPaymentState();
+          }
+        },
+
+        onCancel: function(paymentId) {
+          console.log("❌ Payment cancelled:", paymentId);
+          alert("❌ تم إلغاء الدفع");
+          resetPaymentState();
+        },
+
+        onError: function(error, payment) {
+          console.error("❌ Payment error:", error, payment);
+          alert("⚠️ حدث خطأ: " + (error.message || "خطأ غير معروف"));
+          resetPaymentState();
+        }
+      }
+    );
+
+  } catch (error) {
+    console.error("❌ Checkout error:", error);
+    alert("❌ فشل بدء عملية الدفع:\n" + error.message);
+    resetPaymentState();
+  }
+}
+
+/************************
+ * SUCCESS MESSAGE
+ ************************/
+function showSuccessMessage() {
+  const successDiv = document.createElement('div');
+  successDiv.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #2ECC71, #27AE60);
+    color: white;
+    padding: 30px;
+    border-radius: 20px;
+    z-index: 10000;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(46, 204, 113, 0.5);
+  `;
+  
+  successDiv.innerHTML = `
+    <div style="font-size: 50px; margin-bottom: 15px;">✅</div>
+    <h2 style="margin: 0 0 10px 0; font-size: 24px;">تم الدفع بنجاح!</h2>
+    <p style="margin: 0; font-size: 16px;">الطلب قيد المعالجة الآن</p>
+  `;
+  
+  document.body.appendChild(successDiv);
+  
+  setTimeout(() => {
+    successDiv.remove();
+  }, 2000);
+}
+
+/************************
+ * UI HELPERS
+ ************************/
+function disableBuyButton(state) {
+  const btn = document.querySelector("#checkoutModal .buy-btn");
+  if (!btn) return;
+
+  btn.disabled = state;
+  btn.style.opacity = state ? "0.5" : "1";
+  btn.innerHTML = state 
+    ? '<i class="fa-solid fa-spinner fa-spin"></i> جاري المعالجة...'
+    : '<i class="fa-solid fa-wallet"></i> تأكيد ودفع ' + (selectedProduct?.price || 0) + ' Pi';
+}
+
+function resetPaymentState() {
+  paymentInProgress = false;
+  disableBuyButton(false);
+}
+
+/************************
+ * MODAL CONTROLS
+ ************************/
+function showApp(tab) {
+  console.log("Navigate to:", tab);
+}
+
+function openLogyAiModal() {
+  document.getElementById("logyAiModal").style.display = "flex";
+}
+
+function closeLogyAiModal() {
+  document.getElementById("logyAiModal").style.display = "none";
+}
+
+function openOrdersModal() {
+  document.getElementById("ordersModal").style.display = "block";
+}
+
+function closeOrdersModal() {
+  document.getElementById("ordersModal").style.display = "none";
+}
+
+function openWalletModal() {
+  document.getElementById("walletModal").style.display = "block";
+}
+
+function closeWalletModal() {
+  document.getElementById("walletModal").style.display = "none";
+}
+
+function openSettingsModal() {
+  document.getElementById("settingsModal").style.display = "block";
+}
+
+function closeSettingsModal() {
+  document.getElementById("settingsModal").style.display = "none";
+}
+
+function openNotificationsModal() {
+  document.getElementById("notificationsModal").style.display = "block";
+}
+
+function closeNotificationsModal() {
+  document.getElementById("notificationsModal").style.display = "none";
+}
+
+function openAiUploadModal() {
+  document.getElementById("ai-upload-modal").style.display = "block";
+}
+
+function closeAiUploadModal() {
+  document.getElementById("ai-upload-modal").style.display = "none";
+}
+
+function showDetailTab(tab, element) {
+  document.querySelectorAll('.detail-tab-content').forEach(el => {
+    el.style.display = 'none';
   });
+  
+  document.querySelectorAll('.detail-tab-item').forEach(el => {
+    el.classList.remove('active');
+  });
+  
+  document.getElementById('detail-' + tab).style.display = 'block';
+  element.classList.add('active');
 }
 
-// ============================================
-// LANGUAGE FUNCTIONS
-// ============================================
-
-function renderLanguageSelector() {
-  if (typeof i18n === 'undefined') return;
-  
-  const list = document.getElementById('language-list');
-  if (!list) return;
-  
-  const languages = i18n.getAvailableLanguages();
-  
-  list.innerHTML = languages.map(lang => `
-    <div class="language-item ${lang.code === i18n.currentLang ? 'active' : ''}"
-         onclick="changeLanguage('${lang.code}')">
-      <span class="language-flag">${lang.flag}</span>
-      <span class="language-name">${lang.name}</span>
-      ${lang.code === i18n.currentLang ? '<i class="fa-solid fa-check language-check"></i>' : ''}
-    </div>
-  `).join('');
+function sendMessage() {
+  console.log("Logy AI message sent");
 }
 
-function changeLanguage(langCode) {
-  if (typeof i18n === 'undefined') return;
+function startAiAnalysis() {
+  console.log("AI Analysis started");
+}
+
+function showRegister() {
+  alert("صفحة التسجيل قريباً!");
+}
+
+/************************
+ * APP INITIALIZATION
+ ************************/
+document.addEventListener('DOMContentLoaded', async () => {
+  console.log("🚀 Forsale AI loaded");
+  console.log("📱 Pi App: blackstyle");
   
-  const success = i18n.setLanguage(langCode);
-  if (success) {
-    renderLanguageSelector();
-    updateAllUI();
-    closeLanguageModal();
-    loadProducts();
+  displayProducts();
+  
+  if (isPiBrowser()) {
+    console.log("✅ Running in Pi Browser");
+    
+    document.getElementById("auth-container").style.display = "none";
+    document.getElementById("app-container").style.display = "block";
+    
+    try {
+      await authenticateUser();
+    } catch (error) {
+      console.log("⚠️ Auto-auth failed, will prompt when needed");
+    }
+    
+  } else {
+    console.log("⚠️ Not in Pi Browser - Demo mode");
+    console.log("🔗 Open: minepi.com/blackstyle");
+    
+    document.getElementById("auth-container").style.display = "none";
+    document.getElementById("app-container").style.display = "block";
   }
-}
+});
 
-function openLanguageModal() {
-  document.getElementById('languageModal').style.display = 'block';
-}
-
-function closeLanguageModal() {
-  document.getElementById('languageModal').style.display = 'none';
-}
-
-// ============================================
-// MOCK DATA
-// ============================================
-
-const MOCK_PRODUCTS = [
-  {
-    id: 1,
-    name: "iPhone 15 Pro Max",
-    title: "iPhone 15 Pro Max",
-    price: 0.05,
-    price_pi: 0.05,
-    description: "Brand new iPhone 15 Pro Max with all accessories",
-    image: "https://images.unsplash.com/photo-1592286927505-b86dc33748b5?w=400",
-    category: "electronics",
-    condition: "New"
-  },
-  {
-    id: 2,
-    name: "MacBook Pro M3",
-    title: "MacBook Pro M3",
-    price: 0.1,
-    price_pi: 0.1,
-    description: "Latest MacBook Pro with M3 chip",
-    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
-    category: "electronics",
-    condition: "New"
-  },
-  {
-    id: 3,
-    name: "AirPods Pro 2",
-    title: "AirPods Pro 2",
-    price: 0.02,
-    price_pi: 0.02,
-    description: "AirPods Pro Gen 2 with Active Noise Cancellation",
-    image: "https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=400",
-    category: "electronics",
-    condition: "New"
-  },
-  {
-    id: 4,
-    name: "Nike Air Max 2024",
-    title: "Nike Air Max 2024",
-    price: 0.015,
-    price_pi: 0.015,
-    description: "Latest Nike Air Max sneakers",
-    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400",
-    category: "fashion",
-    condition: "New"
-  },
-  {
-    id: 5,
-    name: "Sony WH-1000XM5",
-    title: "Sony WH-1000XM5",
-    price: 0.025,
-    price_pi: 0.025,
-    description: "Premium noise-cancelling headphones",
-    image: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=400",
-    category: "electronics",
-    condition: "Like New"
-  },
-  {
-    id: 6,
-    name: "Gaming Chair RGB",
-    title: "Gaming Chair RGB",
-    price: 0.03,
-    price_pi: 0.03,
-    description: "Ergonomic gaming chair with RGB lighting",
-    image: "https://images.unsplash.com/photo-1598550476439-6847785fcea6?w=400",
-    category: "home",
-    condition: "New"
+/************************
+ * LOGIN HANDLERS
+ ************************/
+document.getElementById('login-btn')?.addEventListener('click', async () => {
+  if (isPiBrowser()) {
+    const user = await authenticateUser();
+    if (user) {
+      document.getElementById("auth-container").style.display = "none";
+      document.getElementById("app-container").style.display = "block";
+    }
+  } else {
+    alert("⚠️ يجب فتح التطبيق من Pi Browser\n\nافتح: minepi.com/blackstyle");
   }
-];
+});
 
-console.log("✅ Script loaded with", MOCK_PRODUCTS.length, "mock products");
+document.getElementById('pi-login-btn')?.addEventListener('click', () => {
+  if (!isPiBrowser()) {
+    window.location.href = "https://minepi.com/blackstyle";
+  } else {
+    authenticateUser();
+  }
+});
+
+document.getElementById('fingerprint-login-btn')?.addEventListener('click', async () => {
+  if (isPiBrowser()) {
+    const user = await authenticateUser();
+    if (user) {
+      document.getElementById("auth-container").style.display = "none";
+      document.getElementById("app-container").style.display = "block";
+    }
+  } else {
+    alert("⚠️ يجب فتح التطبيق من Pi Browser");
+  }
+});
