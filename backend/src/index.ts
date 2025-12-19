@@ -25,21 +25,10 @@ const wsService = new WebSocketService(server);
 // Security & Performance Middleware
 app.use(helmet());
 app.use(compression());
-
-// ✅ إعدادات CORS المحدثة (للإنتاج و Pi Network)
 app.use(cors({
-  origin: [
-    config.CORS_ORIGIN,               // القيمة من ملف البيئة
-    'https://pi-forsale.vercel.app',  // رابط الفرونت إند
-    'https://minepi.com',             // متصفح باي
-    'http://localhost:5173',          // اللوكل هوست
-    /\.vercel\.app$/                  // أي صب دومين
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  origin: config.CORS_ORIGIN,
+  credentials: true
 }));
-
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -50,15 +39,6 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP'
 });
 app.use('/api/', limiter);
-
-// ✅ نقطة البداية (Root Endpoint) لضمان عمل Railway
-app.get('/', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    message: 'Forsale AI Backend Ready 🚀',
-    timestamp: new Date().toISOString() 
-  });
-});
 
 // Health Check
 app.get('/health', (req, res) => {
