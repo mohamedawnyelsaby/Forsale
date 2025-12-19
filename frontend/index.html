@@ -88,16 +88,14 @@
             <span>or continue with</span>
         </div>
 
-        <div class="pi-auth-options">
-            <div class="auth-option" id="fingerprint-login-btn">
-                <i class="fa-solid fa-fingerprint fingerprint-icon"></i>
-                <span>Biometric Pi Login</span>
-            </div>
-
-            <button class="auth-btn pi-btn" id="pi-login-btn">
-                <i class="fa-solid fa-network-wired"></i> Pi Network Login
-            </button>
+        <div class="fingerprint-login-btn" id="fingerprint-login-btn">
+            <i class="fa-solid fa-fingerprint fingerprint-icon"></i>
+            <span class="fingerprint-text">Biometric Pi Login</span>
         </div>
+
+        <button class="auth-btn pi-btn" id="pi-login-btn">
+            <i class="fa-solid fa-network-wired"></i> Pi Network Login
+        </button>
 
         <div class="auth-footer">
             <p>New here? <a href="#" class="auth-link" onclick="showRegister()">Create Account</a></p>
@@ -265,22 +263,22 @@
     </div>
 
     <!-- Product Detail Modal -->
-    <div id="product-detail-modal">
-        <div class="detail-header">
+    <div id="product-detail-modal" class="modal">
+        <div class="modal-header">
             <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-eye"></i> Product Details</div>
             <div class="icon-btn" onclick="closeProductDetailModal()"><i class="fa-solid fa-xmark"></i></div>
         </div>
         <div class="content-wrapper">
             <div class="detail-gallery">
-                <img id="detail-img" class="detail-img" src="" alt="Product Image">
+                <img id="detail-img" class="detail-img" src="assets/placeholder-1.jpg" alt="Product Image">
                 <div class="gallery-thumbnails">
                     <img src="assets/placeholder-1.jpg" class="thumbnail active" alt="Thumbnail 1">
                     <img src="assets/placeholder-2.jpg" class="thumbnail" alt="Thumbnail 2">
                     <img src="assets/placeholder-3.jpg" class="thumbnail" alt="Thumbnail 3">
                 </div>
             </div>
-            <div class="detail-title" id="detail-title"></div>
-            <div class="detail-price" id="detail-price"></div>
+            <div class="detail-title" id="detail-title">iPhone 15 Pro - 256GB</div>
+            <div class="detail-price" id="detail-price">0.01 Pi</div>
             <div class="trust-score-badge" id="product-trust-score">Trust Score: 98%</div>
 
             <h3 class="ai-section-title"><i class="fa-solid fa-microchip"></i> Logy AI Price Analysis</h3>
@@ -290,7 +288,7 @@
                     <div class="label">Offer Strength Score (10 is best)</div>
                 </div>
                 <div class="stat-box">
-                    <div class="value" id="ai-market-price">0 Pi</div>
+                    <div class="value" id="ai-market-price">0.012 Pi</div>
                     <div class="label">Global Market Average (AI)</div>
                 </div>
             </div>
@@ -350,10 +348,17 @@
                     </div>
                 </div>
                 <div class="detail-tab-content" id="detail-description">
-                    <p id="detail-desc" class="product-description"></p>
+                    <p id="detail-desc" class="product-description">The iPhone 15 Pro features a stunning Super Retina XDR display with ProMotion technology, A17 Pro chip for unprecedented performance, a professional camera system with 48MP main camera, and all-day battery life. Crafted from aerospace-grade titanium, it's both beautiful and durable.</p>
                 </div>
                 <div class="detail-tab-content" id="detail-specs" style="display:none;">
-                    <ul id="specs-list" class="specs-list"></ul>
+                    <ul id="specs-list" class="specs-list">
+                        <li><strong>Display:</strong> 6.1-inch Super Retina XDR</li>
+                        <li><strong>Processor:</strong> A17 Pro chip</li>
+                        <li><strong>Camera:</strong> 48MP main, 12MP ultra wide, 12MP telephoto</li>
+                        <li><strong>Storage:</strong> 256GB</li>
+                        <li><strong>Battery:</strong> Up to 23 hours video playback</li>
+                        <li><strong>Material:</strong> Aerospace-grade titanium</li>
+                    </ul>
                 </div>
                 <div class="detail-tab-content" id="detail-reviews" style="display:none;">
                     <div class="reviews-container">
@@ -438,8 +443,8 @@
     </div>
 
     <!-- AI Upload Modal -->
-    <div id="ai-upload-modal">
-        <div class="detail-header">
+    <div id="ai-upload-modal" class="modal">
+        <div class="modal-header">
             <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-microchip"></i> New Product Listing</div>
             <div class="icon-btn" onclick="closeAiUploadModal()"><i class="fa-solid fa-xmark"></i></div>
         </div>
@@ -448,7 +453,7 @@
             <div class="settings-group">
                 <h4><i class="fa-solid fa-image"></i> Upload Product Images</h4>
                 <p>Upload 3-5 clear images of your product. Logy AI will analyze quality, specifications, and condition.</p>
-                <input type="file" id="product-images" accept="image/*" multiple>
+                <input type="file" id="product-images" accept="image/*" multiple style="display: none;">
                 <button class="primary upload-btn" onclick="document.getElementById('product-images').click()">
                     <i class="fa-solid fa-cloud-upload-alt"></i> Select Image Files
                 </button>
@@ -504,8 +509,8 @@
     </div>
 
     <!-- Settings Modal -->
-    <div id="settingsModal">
-        <div class="detail-header">
+    <div id="settingsModal" class="modal settings-modal">
+        <div class="modal-header">
             <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-gear"></i> Settings</div>
             <div class="icon-btn" onclick="closeSettingsModal()"><i class="fa-solid fa-xmark"></i></div>
         </div>
@@ -603,8 +608,8 @@
     </div>
     
     <!-- Checkout Modal -->
-    <div id="checkoutModal">
-        <div class="detail-header">
+    <div id="checkoutModal" class="modal">
+        <div class="modal-header">
             <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-credit-card"></i> Checkout</div>
             <div class="icon-btn" onclick="closeCheckoutModal()"><i class="fa-solid fa-xmark"></i></div>
         </div>
@@ -699,8 +704,8 @@
     </div>
     
     <!-- Orders Modal -->
-    <div id="ordersModal">
-        <div class="detail-header">
+    <div id="ordersModal" class="modal">
+        <div class="modal-header">
             <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-cart-shopping"></i> My Orders</div>
             <div class="icon-btn" onclick="closeOrdersModal()"><i class="fa-solid fa-xmark"></i></div>
         </div>
@@ -732,8 +737,8 @@
     </div>
 
     <!-- Wallet Modal -->
-    <div id="walletModal">
-        <div class="detail-header">
+    <div id="walletModal" class="modal">
+        <div class="modal-header">
             <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-wallet"></i> Pi Wallet</div>
             <div class="icon-btn" onclick="closeWalletModal()"><i class="fa-solid fa-xmark"></i></div>
         </div>
@@ -765,8 +770,8 @@
     </div>
     
     <!-- Notifications Modal -->
-    <div id="notificationsModal">
-        <div class="detail-header">
+    <div id="notificationsModal" class="modal notifications-modal">
+        <div class="modal-header">
             <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-bell"></i> Notifications</div>
             <div class="icon-btn" onclick="closeNotificationsModal()"><i class="fa-solid fa-xmark"></i></div>
         </div>
@@ -791,7 +796,7 @@
     </div>
     
     <!-- Logy AI Chat Modal -->
-    <div id="logyAiModal">
+    <div id="logyAiModal" class="modal">
         <div class="logy-chat-header">
             <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-robot"></i> Logy AI Chat</div>
             <div class="icon-btn" onclick="closeLogyAiModal()"><i class="fa-solid fa-xmark"></i></div>
@@ -799,11 +804,11 @@
         <div class="logy-chat-area" id="logy-chat-area">
             <div class="message-bubble msg-ai">
                 <p>Hello! I'm Logy AI, your personal shopping assistant. How can I help you today?</p>
-                <span class="ai-suggestions">
+                <div class="ai-suggestions">
                     <button class="suggestion-btn">Find similar products</button>
                     <button class="suggestion-btn">Price comparison</button>
                     <button class="suggestion-btn">Shipping information</button>
-                </span>
+                </div>
             </div>
         </div>
         <div class="logy-input-bar">
@@ -815,8 +820,8 @@
     </div>
     
     <!-- Cart Modal -->
-    <div id="cartModal">
-        <div class="detail-header">
+    <div id="cartModal" class="modal">
+        <div class="modal-header">
             <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-shopping-cart"></i> Shopping Cart</div>
             <div class="icon-btn" onclick="closeCartModal()"><i class="fa-solid fa-xmark"></i></div>
         </div>
@@ -873,10 +878,12 @@
         <i class="fa-solid fa-globe"></i>
         <span>Forsale AI Global Network</span>
     </div>
+    
+    <!-- Notification Toast -->
+    <div id="global-notification" class="notification"></div>
 </div>
 
 <script src="script.js"></script>
-<script src="ai-integration.js"></script>
 <script src="globalization.js"></script>
 
 </body>
