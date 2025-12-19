@@ -1,478 +1,307 @@
-/************************
- * GLOBAL CONFIG
- ************************/
-const API_BASE = "https://forsale-production.up.railway.app";
-
-let selectedProduct = null;
-let paymentInProgress = false;
-let currentUser = null;
-
-/************************
- * MOCK PRODUCTS DATA
- ************************/
-const MOCK_PRODUCTS = [
-  {
-    id: 1,
-    name: "iPhone 15 Pro (Titanium)",
-    price: 0.01,
-    description: "iPhone 15 Pro في حالة ممتازة مع جميع الملحقات. ضمان لمدة 6 أشهر.",
-    image: "https://images.unsplash.com/photo-1592286927505-b86dc33748b5?w=400",
-    category: "electronics"
-  },
-  {
-    id: 2,
-    name: "MacBook Pro M3",
-    price: 0.05,
-    description: "MacBook Pro M3 جديد بالكرتونة مع ضمان Apple رسمي.",
-    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
-    category: "electronics"
-  },
-  {
-    id: 3,
-    name: "AirPods Pro 2",
-    price: 0.02,
-    description: "AirPods Pro الجيل الثاني مع خاصية إلغاء الضوضاء.",
-    image: "https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=400",
-    category: "electronics"
-  }
-];
-
-/************************
- * PI BROWSER DETECTION
- ************************/
-function isPiBrowser() {
-  return typeof window.Pi !== "undefined";
+/* Global Variables */
+:root {
+  --primary: #FFD700;
+  --accent: #00f2ff;
+  --glass-bg: rgba(255,255,255,0.05);
+  --glass-border: rgba(255,255,255,0.1);
+  --text-main: #ffffff;
+  --text-muted: #a0a0a0;
+  --radius: 14px;
+  --bg-dark: #0a1128;
+  --success-color: #2ECC71;
+  --danger: #FF5252;
+  --pi-purple: #9453A9;
 }
 
-/************************
- * PI AUTHENTICATION
- ************************/
-async function authenticateUser() {
-  if (!isPiBrowser()) {
-    console.warn("⚠️ Not in Pi Browser");
-    return null;
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  try {
-    const scopes = ['username', 'payments'];
-    
-    function onIncompletePaymentFound(payment) {
-      console.log("⚠️ Incomplete payment found:", payment);
-    }
-    
-    const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
-    currentUser = auth.user;
-    
-    console.log("✅ Authenticated:", currentUser.username);
-    return currentUser;
-    
-  } catch (error) {
-    console.error("❌ Authentication failed:", error);
-    return null;
-  }
+html, body {
+  width: 100%; max-width: 100vw; overflow-x: hidden;
+  background: radial-gradient(circle at top left, #1a2e44 0%, #000 100%);
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  color: var(--text-main);
+  min-height: 100vh;
 }
 
-/************************
- * DISPLAY PRODUCTS
- ************************/
-function displayProducts() {
-  const grid = document.getElementById("products-grid");
-  if (!grid) return;
-  
-  grid.innerHTML = MOCK_PRODUCTS.map(product => `
-    <div class="product-card glass-panel" onclick="openProductDetail(${product.id})">
-      <div class="p-img-box">
-        <img src="${product.image}" alt="${product.name}">
-        <div class="ai-tag">
-          <i class="fa-solid fa-microchip"></i> AI Verified
-        </div>
-      </div>
-      <div class="p-details">
-        <div class="p-name">${product.name}</div>
-        <div class="p-price">${product.price} Pi</div>
-      </div>
-    </div>
-  `).join('');
+body { padding-top: 80px; padding-bottom: 70px; }
+
+.content-wrapper {
+  padding: 0 15px;
+  width: 100%;
+  margin: 0 auto;
 }
 
-/************************
- * PRODUCT DETAIL MODAL
- ************************/
-function openProductDetail(id) {
-  const product = MOCK_PRODUCTS.find(p => p.id === id);
-  if (!product) {
-    alert("❌ المنتج غير موجود");
-    return;
-  }
-
-  selectedProduct = product;
-
-  document.getElementById("detail-title").innerText = product.name;
-  document.getElementById("detail-price").innerText = product.price + " Pi";
-  document.getElementById("detail-img").src = product.image;
-  document.getElementById("detail-desc").innerText = product.description;
-  
-  document.getElementById("ai-score").innerText = "9.2";
-  document.getElementById("ai-market-price").innerText = product.price + " Pi";
-  document.getElementById("ai-summary").innerText = 
-    "السعر ممتاز! أقل من المتوسط السوقي بنسبة 5%. التوصيل خلال 3-5 أيام.";
-
-  document.getElementById("product-detail-modal").style.display = "block";
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
 }
 
-function closeProductDetailModal() {
-  document.getElementById("product-detail-modal").style.display = "none";
-  selectedProduct = null;
+/* Auth Container */
+#auth-container {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: radial-gradient(circle, #1a2e44 0%, #000 100%);
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 20px; z-index: 2000;
 }
 
-/************************
- * CHECKOUT MODAL
- ************************/
-function openCheckoutModal() {
-  if (!selectedProduct) {
-    alert("❌ لم يتم اختيار منتج");
-    return;
-  }
-  
-  document.getElementById("checkout-product-name").innerText = selectedProduct.name;
-  document.getElementById("checkout-product-price").innerText = selectedProduct.price + " Pi";
-  document.getElementById("checkout-amount").innerText = selectedProduct.price;
-  
-  document.getElementById("product-detail-modal").style.display = "none";
-  document.getElementById("checkoutModal").style.display = "block";
+.auth-logo {
+  font-size: 35px; font-weight: 900; color: var(--primary);
+  margin-bottom: 10px;
 }
 
-function closeCheckoutModal() {
-  document.getElementById("checkoutModal").style.display = "none";
-  document.getElementById("product-detail-modal").style.display = "block";
+.auth-card {
+  background: var(--glass-bg); backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border); border-radius: var(--radius);
+  padding: 25px; width: 100%; max-width: 400px; text-align: center;
 }
 
-/************************
- * PI PAYMENT FLOW
- ************************/
-async function checkout() {
-  if (paymentInProgress) {
-    alert("⚠️ عملية دفع جارية بالفعل");
-    return;
-  }
-
-  if (!isPiBrowser()) {
-    alert("⚠️ يجب فتح التطبيق من Pi Browser\n\nافتح: minepi.com/blackstyle");
-    return;
-  }
-
-  if (!selectedProduct) {
-    alert("❌ لم يتم اختيار منتج");
-    return;
-  }
-
-  if (!currentUser) {
-    console.log("🔐 Authenticating user...");
-    currentUser = await authenticateUser();
-    if (!currentUser) {
-      alert("❌ فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.");
-      return;
-    }
-  }
-
-  try {
-    paymentInProgress = true;
-    disableBuyButton(true);
-    
-    console.log("🔄 Creating payment for:", selectedProduct);
-
-    const response = await fetch(`${API_BASE}/api/pi/create-payment`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        productId: selectedProduct.id,
-        amount: selectedProduct.price,
-        memo: `Forsale | ${selectedProduct.name}`
-      })
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "فشل إنشاء الدفع");
-    }
-
-    const result = await response.json();
-    const payment = result.data;
-    
-    console.log("✅ Payment created:", payment.identifier);
-
-    Pi.createPayment(
-      {
-        amount: payment.amount,
-        memo: payment.memo,
-        metadata: payment.metadata
-      },
-      {
-        onReadyForServerApproval: async function(paymentId) {
-          console.log("🟡 Ready for approval:", paymentId);
-          
-          try {
-            const approveRes = await fetch(`${API_BASE}/api/pi/approve-payment`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ paymentId })
-            });
-            
-            if (approveRes.ok) {
-              console.log("✅ Payment approved");
-            } else {
-              console.error("❌ Approval failed");
-            }
-          } catch (err) {
-            console.error("❌ Approval error:", err);
-          }
-        },
-
-        onReadyForServerCompletion: async function(paymentId, txid) {
-          console.log("🟢 Ready for completion:", paymentId, txid);
-          
-          try {
-            const completeRes = await fetch(`${API_BASE}/api/pi/complete-payment`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ paymentId, txid })
-            });
-            
-            if (completeRes.ok) {
-              console.log("✅ Payment completed successfully");
-              
-              showSuccessMessage();
-              
-              setTimeout(() => {
-                resetPaymentState();
-                closeCheckoutModal();
-                closeProductDetailModal();
-                openOrdersModal();
-              }, 2000);
-              
-            } else {
-              throw new Error("فشل إتمام الدفع");
-            }
-          } catch (err) {
-            console.error("❌ Completion error:", err);
-            alert("⚠️ حدث خطأ في إتمام الدفع. سيتم مراجعة الطلب.");
-            resetPaymentState();
-          }
-        },
-
-        onCancel: function(paymentId) {
-          console.log("❌ Payment cancelled:", paymentId);
-          alert("❌ تم إلغاء الدفع");
-          resetPaymentState();
-        },
-
-        onError: function(error, payment) {
-          console.error("❌ Payment error:", error, payment);
-          alert("⚠️ حدث خطأ: " + (error.message || "خطأ غير معروف"));
-          resetPaymentState();
-        }
-      }
-    );
-
-  } catch (error) {
-    console.error("❌ Checkout error:", error);
-    alert("❌ فشل بدء عملية الدفع:\n" + error.message);
-    resetPaymentState();
-  }
+.input-group {
+  position: relative; margin-bottom: 15px;
 }
 
-/************************
- * SUCCESS MESSAGE
- ************************/
-function showSuccessMessage() {
-  const successDiv = document.createElement('div');
-  successDiv.style.cssText = `
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: linear-gradient(135deg, #2ECC71, #27AE60);
-    color: white;
-    padding: 30px;
-    border-radius: 20px;
-    z-index: 10000;
-    text-align: center;
-    box-shadow: 0 10px 40px rgba(46, 204, 113, 0.5);
-  `;
-  
-  successDiv.innerHTML = `
-    <div style="font-size: 50px; margin-bottom: 15px;">✅</div>
-    <h2 style="margin: 0 0 10px 0; font-size: 24px;">تم الدفع بنجاح!</h2>
-    <p style="margin: 0; font-size: 16px;">الطلب قيد المعالجة الآن</p>
-  `;
-  
-  document.body.appendChild(successDiv);
-  
-  setTimeout(() => {
-    successDiv.remove();
-  }, 2000);
+.input-group input {
+  width: 100%; padding: 12px 45px 12px 15px;
+  border-radius: 50px; border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,0.05); color: white; font-size: 14px;
 }
 
-/************************
- * UI HELPERS
- ************************/
-function disableBuyButton(state) {
-  const btn = document.querySelector("#checkoutModal .buy-btn");
-  if (!btn) return;
-
-  btn.disabled = state;
-  btn.style.opacity = state ? "0.5" : "1";
-  btn.innerHTML = state 
-    ? '<i class="fa-solid fa-spinner fa-spin"></i> جاري المعالجة...'
-    : '<i class="fa-solid fa-wallet"></i> تأكيد ودفع ' + (selectedProduct?.price || 0) + ' Pi';
+.input-group i {
+  position: absolute; right: 15px; top: 14px; color: var(--accent);
 }
 
-function resetPaymentState() {
-  paymentInProgress = false;
-  disableBuyButton(false);
+.main-btn {
+  width: 100%; padding: 14px; border-radius: 50px; border: none;
+  background: var(--primary); color: black; font-weight: 700;
+  font-size: 16px; cursor: pointer; margin-top: 10px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: transform 0.3s;
 }
 
-/************************
- * MODAL CONTROLS
- ************************/
-function showApp(tab) {
-  console.log("Navigate to:", tab);
+.main-btn:hover { transform: translateY(-2px); }
+
+.pi-btn {
+  background: linear-gradient(90deg, var(--pi-purple), #612F74);
+  color: white;
 }
 
-function openLogyAiModal() {
-  document.getElementById("logyAiModal").style.display = "flex";
+.fingerprint-scan {
+  font-size: 40px; color: var(--accent); margin: 20px 0;
+  cursor: pointer; animation: pulse 2s infinite;
 }
 
-function closeLogyAiModal() {
-  document.getElementById("logyAiModal").style.display = "none";
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
 }
 
-function openOrdersModal() {
-  document.getElementById("ordersModal").style.display = "block";
+/* Header */
+.fixed-header-wrapper {
+  position: fixed; top: 0; left: 0; width: 100%; z-index: 100;
 }
 
-function closeOrdersModal() {
-  document.getElementById("ordersModal").style.display = "none";
+.header {
+  padding: 15px 0; background: rgba(10,17,40,0.95);
+  border-bottom: 1px solid var(--glass-border);
 }
 
-function openWalletModal() {
-  document.getElementById("walletModal").style.display = "block";
+.header .content-wrapper {
+  display: flex; justify-content: space-between; align-items: center;
 }
 
-function closeWalletModal() {
-  document.getElementById("walletModal").style.display = "none";
+.logo {
+  font-size: 22px; font-weight: 900; color: var(--primary);
+  display: flex; align-items: center; gap: 8px;
 }
 
-function openSettingsModal() {
-  document.getElementById("settingsModal").style.display = "block";
+.ai-badge {
+  font-size: 10px; background: var(--accent); color: var(--bg-dark);
+  padding: 2px 6px; border-radius: 4px; font-weight: bold;
 }
 
-function closeSettingsModal() {
-  document.getElementById("settingsModal").style.display = "none";
+.icon-btn {
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  color: white; width: 35px; height: 35px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: 0.2s;
 }
 
-function openNotificationsModal() {
-  document.getElementById("notificationsModal").style.display = "block";
+.icon-btn.primary { background: var(--primary); color: black; }
+
+/* Products Grid */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px; width: 100%;
 }
 
-function closeNotificationsModal() {
-  document.getElementById("notificationsModal").style.display = "none";
+.product-card {
+  overflow: hidden; display: flex; flex-direction: column;
+  cursor: pointer; transition: 0.2s;
 }
 
-function openAiUploadModal() {
-  document.getElementById("ai-upload-modal").style.display = "block";
+.product-card:hover { transform: translateY(-3px); }
+
+.p-img-box {
+  width: 100%; height: 140px; background: #000; position: relative;
 }
 
-function closeAiUploadModal() {
-  document.getElementById("ai-upload-modal").style.display = "none";
+.p-img-box img { width: 100%; height: 100%; object-fit: cover; }
+
+.ai-tag {
+  position: absolute; top: 8px; left: 8px;
+  background: rgba(0,0,0,0.7); color: var(--accent);
+  font-size: 10px; padding: 3px 8px; border-radius: 4px;
+  border: 1px solid var(--accent);
 }
 
-function showDetailTab(tab, element) {
-  document.querySelectorAll('.detail-tab-content').forEach(el => {
-    el.style.display = 'none';
-  });
-  
-  document.querySelectorAll('.detail-tab-item').forEach(el => {
-    el.classList.remove('active');
-  });
-  
-  document.getElementById('detail-' + tab).style.display = 'block';
-  element.classList.add('active');
+.p-details { padding: 10px; }
+
+.p-name {
+  font-size: 13px; font-weight: bold;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-function sendMessage() {
-  console.log("Logy AI message sent");
+.p-price {
+  color: var(--primary); font-weight: bold; font-size: 15px;
 }
 
-function startAiAnalysis() {
-  console.log("AI Analysis started");
+/* Modals */
+#product-detail-modal, #checkoutModal, #settingsModal, #ordersModal,
+#walletModal, #notificationsModal, #ai-upload-modal {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: var(--bg-dark); z-index: 200; overflow-y: auto;
+  display: none; padding-bottom: 140px;
 }
 
-function showRegister() {
-  alert("صفحة التسجيل قريباً!");
+#logyAiModal {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: var(--bg-dark); z-index: 600; display: none;
+  flex-direction: column;
 }
 
-/************************
- * APP INITIALIZATION
- ************************/
-document.addEventListener('DOMContentLoaded', async () => {
-  console.log("🚀 Forsale AI loaded");
-  console.log("📱 Pi App: blackstyle");
-  
-  displayProducts();
-  
-  if (isPiBrowser()) {
-    console.log("✅ Running in Pi Browser");
-    
-    document.getElementById("auth-container").style.display = "none";
-    document.getElementById("app-container").style.display = "block";
-    
-    try {
-      await authenticateUser();
-    } catch (error) {
-      console.log("⚠️ Auto-auth failed, will prompt when needed");
-    }
-    
-  } else {
-    console.log("⚠️ Not in Pi Browser - Demo mode");
-    console.log("🔗 Open: minepi.com/blackstyle");
-    
-    document.getElementById("auth-container").style.display = "none";
-    document.getElementById("app-container").style.display = "block";
-  }
-});
+.detail-header {
+  position: sticky; top: 0; background: rgba(10,17,40,0.95);
+  padding: 15px; z-index: 10; display: flex;
+  justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--glass-border);
+}
 
-/************************
- * LOGIN HANDLERS
- ************************/
-document.getElementById('login-btn')?.addEventListener('click', async () => {
-  if (isPiBrowser()) {
-    const user = await authenticateUser();
-    if (user) {
-      document.getElementById("auth-container").style.display = "none";
-      document.getElementById("app-container").style.display = "block";
-    }
-  } else {
-    alert("⚠️ يجب فتح التطبيق من Pi Browser\n\nافتح: minepi.com/blackstyle");
-  }
-});
+.detail-img { width: 100%; height: 200px; object-fit: cover; margin-bottom: 15px; }
 
-document.getElementById('pi-login-btn')?.addEventListener('click', () => {
-  if (!isPiBrowser()) {
-    window.location.href = "https://minepi.com/blackstyle";
-  } else {
-    authenticateUser();
-  }
-});
+.detail-title { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
 
-document.getElementById('fingerprint-login-btn')?.addEventListener('click', async () => {
-  if (isPiBrowser()) {
-    const user = await authenticateUser();
-    if (user) {
-      document.getElementById("auth-container").style.display = "none";
-      document.getElementById("app-container").style.display = "block";
-    }
-  } else {
-    alert("⚠️ يجب فتح التطبيق من Pi Browser");
-  }
-});
+.detail-price { font-size: 28px; color: var(--primary); font-weight: 900; }
+
+.ai-section-title {
+  font-size: 16px; font-weight: bold; color: var(--accent);
+  margin: 20px 0 10px; display: flex; align-items: center; gap: 8px;
+}
+
+.ai-price-card {
+  padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+}
+
+.stat-box {
+  text-align: center; padding: 10px; border-radius: 8px;
+  border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03);
+}
+
+.stat-box .value { font-size: 20px; font-weight: bold; margin-bottom: 3px; }
+
+.stat-box .label { font-size: 11px; color: var(--text-muted); }
+
+.buy-fixed-bar {
+  position: fixed; bottom: 60px; width: 100%;
+  background: rgba(10,17,40,0.95); backdrop-filter: blur(10px);
+  padding: 10px 0; z-index: 20; border-top: 1px solid var(--glass-border);
+}
+
+.buy-btn {
+  width: 100%; padding: 15px; border: none; border-radius: 50px;
+  background: var(--primary); color: black; font-weight: bold;
+  font-size: 16px; cursor: pointer; display: flex;
+  justify-content: center; align-items: center; gap: 10px;
+  transition: 0.2s;
+}
+
+.buy-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Settings */
+.settings-group {
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  border-radius: var(--radius); padding: 15px; margin-bottom: 15px;
+}
+
+.settings-group h4 {
+  color: var(--primary); margin-top: 0; margin-bottom: 15px;
+  font-size: 16px; display: flex; align-items: center; gap: 8px;
+}
+
+/* Tabs */
+.detail-tabs-container { padding: 15px; margin-top: 20px; }
+
+.detail-tabs-scroll {
+  display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;
+  margin-bottom: 15px; border-bottom: 1px solid var(--glass-border);
+}
+
+.detail-tab-item {
+  padding: 10px 18px; border-radius: 25px;
+  background: rgba(255,255,255,0.08); border: 1px solid transparent;
+  font-size: 13px; color: var(--text-muted); cursor: pointer;
+  transition: 0.3s; display: flex; align-items: center; gap: 8px;
+}
+
+.detail-tab-item.active {
+  background: var(--primary); color: #000; font-weight: bold;
+}
+
+/* Footer Nav */
+.footer-nav {
+  position: fixed; bottom: 0; left: 0; width: 100%; height: 60px;
+  background: rgba(10,17,40,0.95); backdrop-filter: blur(10px);
+  border-top: 1px solid var(--glass-border); z-index: 500;
+  display: flex; justify-content: space-around; align-items: center;
+}
+
+.nav-item {
+  display: flex; flex-direction: column; align-items: center;
+  color: var(--text-muted); font-size: 11px; cursor: pointer;
+  transition: 0.2s; padding: 5px 0; min-width: 60px;
+}
+
+.nav-item i { font-size: 18px; margin-bottom: 3px; }
+
+.nav-item.active { color: var(--primary); }
+
+/* Chat */
+.logy-chat-header {
+  padding: 15px; background: rgba(10,17,40,0.95);
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.logy-chat-area {
+  flex-grow: 1; padding: 15px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.logy-input-bar {
+  padding: 10px 15px; background: rgba(10,17,40,0.95);
+  border-top: 1px solid var(--glass-border);
+  display: flex; gap: 10px; align-items: center;
+}
+
+.logy-input-bar input {
+  flex-grow: 1; padding: 10px; border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,0.05); color: white; font-size: 14px;
+}
+
+.logy-send-btn {
+  background: var(--primary); color: black; width: 40px; height: 40px;
+  border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; cursor: pointer;
+}
