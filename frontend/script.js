@@ -1,478 +1,297 @@
-/************************
- * GLOBAL CONFIG
- ************************/
-const API_BASE = "https://forsale-production.up.railway.app";
+// ============================================
+// 📄 FILENAME: script.js
+// 📍 PATH: frontend/script.js
+// 🌍 Core Application Functionality
+// ============================================
 
-let selectedProduct = null;
-let paymentInProgress = false;
-let currentUser = null;
-
-/************************
- * MOCK PRODUCTS DATA
- ************************/
-const MOCK_PRODUCTS = [
-  {
-    id: 1,
-    name: "iPhone 15 Pro (Titanium)",
-    price: 0.01,
-    description: "iPhone 15 Pro في حالة ممتازة مع جميع الملحقات. ضمان لمدة 6 أشهر.",
-    image: "https://images.unsplash.com/photo-1592286927505-b86dc33748b5?w=400",
-    category: "electronics"
-  },
-  {
-    id: 2,
-    name: "MacBook Pro M3",
-    price: 0.05,
-    description: "MacBook Pro M3 جديد بالكرتونة مع ضمان Apple رسمي.",
-    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
-    category: "electronics"
-  },
-  {
-    id: 3,
-    name: "AirPods Pro 2",
-    price: 0.02,
-    description: "AirPods Pro الجيل الثاني مع خاصية إلغاء الضوضاء.",
-    image: "https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=400",
-    category: "electronics"
-  }
-];
-
-/************************
- * PI BROWSER DETECTION
- ************************/
-function isPiBrowser() {
-  return typeof window.Pi !== "undefined";
-}
-
-/************************
- * PI AUTHENTICATION
- ************************/
-async function authenticateUser() {
-  if (!isPiBrowser()) {
-    console.warn("⚠️ Not in Pi Browser");
-    return null;
-  }
-
-  try {
-    const scopes = ['username', 'payments'];
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize core functionality
+    initCoreFunctionality();
     
-    function onIncompletePaymentFound(payment) {
-      console.log("⚠️ Incomplete payment found:", payment);
+    // Set up modals
+    setupModals();
+    
+    // Set up navigation
+    setupNavigation();
+    
+    // Set up product interactions
+    setupProductInteractions();
+    
+    // Set up form handling
+    setupFormHandling();
+    
+    // Check network status
+    checkNetworkStatus();
+});
+
+/**
+ * Initializes core application functionality
+ */
+function initCoreFunctionality() {
+    // Check if language overlay should be shown
+    if (!localStorage.getItem('forsale_lang')) {
+        document.getElementById('language-overlay').classList.remove('hidden');
     }
     
-    const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
-    currentUser = auth.user;
+    // Initialize trust badge
+    initTrustBadge();
     
-    console.log("✅ Authenticated:", currentUser.username);
-    return currentUser;
-    
-  } catch (error) {
-    console.error("❌ Authentication failed:", error);
-    return null;
-  }
+    // Load products
+    loadProducts();
 }
 
-/************************
- * DISPLAY PRODUCTS
- ************************/
-function displayProducts() {
-  const grid = document.getElementById("products-grid");
-  if (!grid) return;
-  
-  grid.innerHTML = MOCK_PRODUCTS.map(product => `
-    <div class="product-card glass-panel" onclick="openProductDetail(${product.id})">
-      <div class="p-img-box">
-        <img src="${product.image}" alt="${product.name}">
-        <div class="ai-tag">
-          <i class="fa-solid fa-microchip"></i> AI Verified
-        </div>
-      </div>
-      <div class="p-details">
-        <div class="p-name">${product.name}</div>
-        <div class="p-price">${product.price} Pi</div>
-      </div>
-    </div>
-  `).join('');
-}
-
-/************************
- * PRODUCT DETAIL MODAL
- ************************/
-function openProductDetail(id) {
-  const product = MOCK_PRODUCTS.find(p => p.id === id);
-  if (!product) {
-    alert("❌ المنتج غير موجود");
-    return;
-  }
-
-  selectedProduct = product;
-
-  document.getElementById("detail-title").innerText = product.name;
-  document.getElementById("detail-price").innerText = product.price + " Pi";
-  document.getElementById("detail-img").src = product.image;
-  document.getElementById("detail-desc").innerText = product.description;
-  
-  document.getElementById("ai-score").innerText = "9.2";
-  document.getElementById("ai-market-price").innerText = product.price + " Pi";
-  document.getElementById("ai-summary").innerText = 
-    "السعر ممتاز! أقل من المتوسط السوقي بنسبة 5%. التوصيل خلال 3-5 أيام.";
-
-  document.getElementById("product-detail-modal").style.display = "block";
-}
-
-function closeProductDetailModal() {
-  document.getElementById("product-detail-modal").style.display = "none";
-  selectedProduct = null;
-}
-
-/************************
- * CHECKOUT MODAL
- ************************/
-function openCheckoutModal() {
-  if (!selectedProduct) {
-    alert("❌ لم يتم اختيار منتج");
-    return;
-  }
-  
-  document.getElementById("checkout-product-name").innerText = selectedProduct.name;
-  document.getElementById("checkout-product-price").innerText = selectedProduct.price + " Pi";
-  document.getElementById("checkout-amount").innerText = selectedProduct.price;
-  
-  document.getElementById("product-detail-modal").style.display = "none";
-  document.getElementById("checkoutModal").style.display = "block";
-}
-
-function closeCheckoutModal() {
-  document.getElementById("checkoutModal").style.display = "none";
-  document.getElementById("product-detail-modal").style.display = "block";
-}
-
-/************************
- * PI PAYMENT FLOW
- ************************/
-async function checkout() {
-  if (paymentInProgress) {
-    alert("⚠️ عملية دفع جارية بالفعل");
-    return;
-  }
-
-  if (!isPiBrowser()) {
-    alert("⚠️ يجب فتح التطبيق من Pi Browser\n\nافتح: minepi.com/blackstyle");
-    return;
-  }
-
-  if (!selectedProduct) {
-    alert("❌ لم يتم اختيار منتج");
-    return;
-  }
-
-  if (!currentUser) {
-    console.log("🔐 Authenticating user...");
-    currentUser = await authenticateUser();
-    if (!currentUser) {
-      alert("❌ فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.");
-      return;
-    }
-  }
-
-  try {
-    paymentInProgress = true;
-    disableBuyButton(true);
-    
-    console.log("🔄 Creating payment for:", selectedProduct);
-
-    const response = await fetch(`${API_BASE}/api/pi/create-payment`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        productId: selectedProduct.id,
-        amount: selectedProduct.price,
-        memo: `Forsale | ${selectedProduct.name}`
-      })
+/**
+ * Sets up modal functionality
+ */
+function setupModals() {
+    // Close buttons
+    document.querySelectorAll('.modal .icon-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            if (modal) modal.style.display = 'none';
+        });
     });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "فشل إنشاء الدفع");
-    }
-
-    const result = await response.json();
-    const payment = result.data;
     
-    console.log("✅ Payment created:", payment.identifier);
+    // Open product detail modal
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.addEventListener('click', function() {
+            document.getElementById('product-detail-modal').style.display = 'block';
+        });
+    });
+    
+    // Open AI upload modal
+    document.querySelector('.icon-btn.primary')?.addEventListener('click', function() {
+        document.getElementById('ai-upload-modal').style.display = 'block';
+    });
+    
+    // Open settings modal
+    document.querySelector('.icon-btn[data-tooltip="Settings"]')?.addEventListener('click', function() {
+        document.getElementById('settingsModal').style.display = 'block';
+    });
+}
 
-    Pi.createPayment(
-      {
-        amount: payment.amount,
-        memo: payment.memo,
-        metadata: payment.metadata
-      },
-      {
-        onReadyForServerApproval: async function(paymentId) {
-          console.log("🟡 Ready for approval:", paymentId);
-          
-          try {
-            const approveRes = await fetch(`${API_BASE}/api/pi/approve-payment`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ paymentId })
+/**
+ * Sets up navigation functionality
+ */
+function setupNavigation() {
+    // Footer navigation
+    document.querySelectorAll('.footer-nav .nav-item').forEach(item => {
+        item.addEventListener('click', function() {
+            // Remove active class from all items
+            document.querySelectorAll('.footer-nav .nav-item').forEach(i => {
+                i.classList.remove('active');
             });
             
-            if (approveRes.ok) {
-              console.log("✅ Payment approved");
-            } else {
-              console.error("❌ Approval failed");
+            // Add active class to clicked item
+            this.classList.add('active');
+            
+            // Handle navigation (this would be expanded in a real app)
+            const section = this.getAttribute('data-section');
+            if (section) {
+                navigateToSection(section);
             }
-          } catch (err) {
-            console.error("❌ Approval error:", err);
-          }
-        },
+        });
+    });
+    
+    // Language button
+    document.getElementById('language-btn')?.addEventListener('click', function() {
+        document.getElementById('language-overlay').classList.remove('hidden');
+    });
+}
 
-        onReadyForServerCompletion: async function(paymentId, txid) {
-          console.log("🟢 Ready for completion:", paymentId, txid);
-          
-          try {
-            const completeRes = await fetch(`${API_BASE}/api/pi/complete-payment`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ paymentId, txid })
+/**
+ * Sets up product interactions
+ */
+function setupProductInteractions() {
+    // Category selection
+    document.querySelectorAll('.category-item').forEach(item => {
+        item.addEventListener('click', function() {
+            // Remove active class from all items
+            document.querySelectorAll('.category-item').forEach(i => {
+                i.classList.remove('active');
             });
             
-            if (completeRes.ok) {
-              console.log("✅ Payment completed successfully");
-              
-              showSuccessMessage();
-              
-              setTimeout(() => {
-                resetPaymentState();
-                closeCheckoutModal();
-                closeProductDetailModal();
-                openOrdersModal();
-              }, 2000);
-              
-            } else {
-              throw new Error("فشل إتمام الدفع");
-            }
-          } catch (err) {
-            console.error("❌ Completion error:", err);
-            alert("⚠️ حدث خطأ في إتمام الدفع. سيتم مراجعة الطلب.");
-            resetPaymentState();
-          }
-        },
+            // Add active class to clicked item
+            this.classList.add('active');
+            
+            // Filter products (would be implemented in a real app)
+            const category = this.getAttribute('data-category');
+            filterProductsByCategory(category);
+        });
+    });
+    
+    // Tab selection
+    document.querySelectorAll('.detail-tab-item').forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Remove active class from all tabs
+            document.querySelectorAll('.detail-tab-item').forEach(t => {
+                t.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            this.classList.add('active');
+            
+            // Show corresponding content
+            const tabName = this.getAttribute('data-tab');
+            document.querySelectorAll('.detail-tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.getElementById(`detail-${tabName}`).style.display = 'block';
+        });
+    });
+}
 
-        onCancel: function(paymentId) {
-          console.log("❌ Payment cancelled:", paymentId);
-          alert("❌ تم إلغاء الدفع");
-          resetPaymentState();
-        },
-
-        onError: function(error, payment) {
-          console.error("❌ Payment error:", error, payment);
-          alert("⚠️ حدث خطأ: " + (error.message || "خطأ غير معروف"));
-          resetPaymentState();
+/**
+ * Sets up form handling
+ */
+function setupFormHandling() {
+    // Login form
+    document.getElementById('login-btn')?.addEventListener('click', function() {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        
+        if (!email || !password) {
+            showNotification('Please enter both email and password', 'error');
+            return;
         }
-      }
-    );
-
-  } catch (error) {
-    console.error("❌ Checkout error:", error);
-    alert("❌ فشل بدء عملية الدفع:\n" + error.message);
-    resetPaymentState();
-  }
-}
-
-/************************
- * SUCCESS MESSAGE
- ************************/
-function showSuccessMessage() {
-  const successDiv = document.createElement('div');
-  successDiv.style.cssText = `
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: linear-gradient(135deg, #2ECC71, #27AE60);
-    color: white;
-    padding: 30px;
-    border-radius: 20px;
-    z-index: 10000;
-    text-align: center;
-    box-shadow: 0 10px 40px rgba(46, 204, 113, 0.5);
-  `;
-  
-  successDiv.innerHTML = `
-    <div style="font-size: 50px; margin-bottom: 15px;">✅</div>
-    <h2 style="margin: 0 0 10px 0; font-size: 24px;">تم الدفع بنجاح!</h2>
-    <p style="margin: 0; font-size: 16px;">الطلب قيد المعالجة الآن</p>
-  `;
-  
-  document.body.appendChild(successDiv);
-  
-  setTimeout(() => {
-    successDiv.remove();
-  }, 2000);
-}
-
-/************************
- * UI HELPERS
- ************************/
-function disableBuyButton(state) {
-  const btn = document.querySelector("#checkoutModal .buy-btn");
-  if (!btn) return;
-
-  btn.disabled = state;
-  btn.style.opacity = state ? "0.5" : "1";
-  btn.innerHTML = state 
-    ? '<i class="fa-solid fa-spinner fa-spin"></i> جاري المعالجة...'
-    : '<i class="fa-solid fa-wallet"></i> تأكيد ودفع ' + (selectedProduct?.price || 0) + ' Pi';
-}
-
-function resetPaymentState() {
-  paymentInProgress = false;
-  disableBuyButton(false);
-}
-
-/************************
- * MODAL CONTROLS
- ************************/
-function showApp(tab) {
-  console.log("Navigate to:", tab);
-}
-
-function openLogyAiModal() {
-  document.getElementById("logyAiModal").style.display = "flex";
-}
-
-function closeLogyAiModal() {
-  document.getElementById("logyAiModal").style.display = "none";
-}
-
-function openOrdersModal() {
-  document.getElementById("ordersModal").style.display = "block";
-}
-
-function closeOrdersModal() {
-  document.getElementById("ordersModal").style.display = "none";
-}
-
-function openWalletModal() {
-  document.getElementById("walletModal").style.display = "block";
-}
-
-function closeWalletModal() {
-  document.getElementById("walletModal").style.display = "none";
-}
-
-function openSettingsModal() {
-  document.getElementById("settingsModal").style.display = "block";
-}
-
-function closeSettingsModal() {
-  document.getElementById("settingsModal").style.display = "none";
-}
-
-function openNotificationsModal() {
-  document.getElementById("notificationsModal").style.display = "block";
-}
-
-function closeNotificationsModal() {
-  document.getElementById("notificationsModal").style.display = "none";
-}
-
-function openAiUploadModal() {
-  document.getElementById("ai-upload-modal").style.display = "block";
-}
-
-function closeAiUploadModal() {
-  document.getElementById("ai-upload-modal").style.display = "none";
-}
-
-function showDetailTab(tab, element) {
-  document.querySelectorAll('.detail-tab-content').forEach(el => {
-    el.style.display = 'none';
-  });
-  
-  document.querySelectorAll('.detail-tab-item').forEach(el => {
-    el.classList.remove('active');
-  });
-  
-  document.getElementById('detail-' + tab).style.display = 'block';
-  element.classList.add('active');
-}
-
-function sendMessage() {
-  console.log("Logy AI message sent");
-}
-
-function startAiAnalysis() {
-  console.log("AI Analysis started");
-}
-
-function showRegister() {
-  alert("صفحة التسجيل قريباً!");
-}
-
-/************************
- * APP INITIALIZATION
- ************************/
-document.addEventListener('DOMContentLoaded', async () => {
-  console.log("🚀 Forsale AI loaded");
-  console.log("📱 Pi App: blackstyle");
-  
-  displayProducts();
-  
-  if (isPiBrowser()) {
-    console.log("✅ Running in Pi Browser");
+        
+        // In a real app, this would call the authentication API
+        showNotification('Logging in...', 'info');
+        
+        // Simulate login success after 1 second
+        setTimeout(() => {
+            showNotification('Login successful!', 'success');
+            document.getElementById('auth-container').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+        }, 1000);
+    });
     
-    document.getElementById("auth-container").style.display = "none";
-    document.getElementById("app-container").style.display = "block";
+    // Register button
+    document.querySelector('.auth-footer a')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        showNotification('Registration coming soon', 'info');
+    });
     
-    try {
-      await authenticateUser();
-    } catch (error) {
-      console.log("⚠️ Auto-auth failed, will prompt when needed");
+    // AI analysis button
+    document.getElementById('start-analysis-btn')?.addEventListener('click', function() {
+        showNotification('Analyzing product with AI...', 'info');
+        
+        // Simulate AI analysis
+        setTimeout(() => {
+            showNotification('Product analysis complete!', 'success');
+            // In a real app, this would submit the product to the backend
+        }, 2000);
+    });
+}
+
+/**
+ * Initializes trust badge
+ */
+function initTrustBadge() {
+    const trustBadge = document.getElementById('user-trust-badge');
+    if (trustBadge) {
+        trustBadge.textContent = '98%';
+        trustBadge.style.background = 'linear-gradient(45deg, var(--trust-excellent), #1ABC9C)';
+    }
+}
+
+/**
+ * Loads products (simulated)
+ */
+function loadProducts() {
+    const productsGrid = document.getElementById('products-grid');
+    if (!productsGrid) return;
+    
+    // Clear skeleton loaders
+    productsGrid.innerHTML = '';
+    
+    // Add sample products
+    const products = [
+        { id: 1, title: 'iPhone 15 Pro', price: '0.01', image: 'assets/placeholder-1.jpg' },
+        { id: 2, title: 'Samsung Galaxy S24', price: '0.009', image: 'assets/placeholder-2.jpg' },
+        { id: 3, title: 'MacBook Air M3', price: '0.5', image: 'assets/placeholder-3.jpg' },
+        { id: 4, title: 'Sony WH-1000XM5', price: '0.05', image: 'assets/placeholder-4.jpg' }
+    ];
+    
+    products.forEach(product => {
+        const productCard = document.createElement('div');
+        productCard.className = 'product-card';
+        productCard.setAttribute('data-trust-score', '99%');
+        
+        productCard.innerHTML = `
+            <div class="p-img-box">
+                <img src="${product.image}" alt="${product.title}">
+                <div class="ai-tag"><i class="fa-solid fa-microchip"></i> AI Analyzed</div>
+            </div>
+            <div class="p-details">
+                <div class="p-name">${product.title}</div>
+                <div class="p-price">${product.price} Pi</div>
+            </div>
+        `;
+        
+        productsGrid.appendChild(productCard);
+    });
+}
+
+/**
+ * Filters products by category
+ * @param {string} category - Category to filter by
+ */
+function filterProductsByCategory(category) {
+    // In a real app, this would make an API call to filter products
+    showNotification(`Filtering by ${category}...`, 'info');
+}
+
+/**
+ * Navigates to a specific section
+ * @param {string} section - Section ID
+ */
+function navigateToSection(section) {
+    // In a real app, this would handle navigation to different sections
+    showNotification(`Navigating to ${section}...`, 'info');
+}
+
+/**
+ * Checks network status
+ */
+function checkNetworkStatus() {
+    const statusElement = document.getElementById('network-status');
+    
+    function updateStatus() {
+        if (navigator.onLine) {
+            statusElement.textContent = 'Online';
+            statusElement.className = 'network-status online';
+        } else {
+            statusElement.textContent = 'Offline';
+            statusElement.className = 'network-status offline';
+        }
     }
     
-  } else {
-    console.log("⚠️ Not in Pi Browser - Demo mode");
-    console.log("🔗 Open: minepi.com/blackstyle");
+    window.addEventListener('online', updateStatus);
+    window.addEventListener('offline', updateStatus);
+    updateStatus();
+}
+
+/**
+ * Shows notification message
+ * @param {string} message - Notification message
+ * @param {string} type - Notification type (success, error, info)
+ */
+function showNotification(message, type = 'info') {
+    let notification = document.getElementById('global-notification');
     
-    document.getElementById("auth-container").style.display = "none";
-    document.getElementById("app-container").style.display = "block";
-  }
-});
-
-/************************
- * LOGIN HANDLERS
- ************************/
-document.getElementById('login-btn')?.addEventListener('click', async () => {
-  if (isPiBrowser()) {
-    const user = await authenticateUser();
-    if (user) {
-      document.getElementById("auth-container").style.display = "none";
-      document.getElementById("app-container").style.display = "block";
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.id = 'global-notification';
+        notification.className = 'notification';
+        document.body.appendChild(notification);
     }
-  } else {
-    alert("⚠️ يجب فتح التطبيق من Pi Browser\n\nافتح: minepi.com/blackstyle");
-  }
-});
-
-document.getElementById('pi-login-btn')?.addEventListener('click', () => {
-  if (!isPiBrowser()) {
-    window.location.href = "https://minepi.com/blackstyle";
-  } else {
-    authenticateUser();
-  }
-});
-
-document.getElementById('fingerprint-login-btn')?.addEventListener('click', async () => {
-  if (isPiBrowser()) {
-    const user = await authenticateUser();
-    if (user) {
-      document.getElementById("auth-container").style.display = "none";
-      document.getElementById("app-container").style.display = "block";
-    }
-  } else {
-    alert("⚠️ يجب فتح التطبيق من Pi Browser");
-  }
-});
+    
+    notification.textContent = message;
+    notification.className = `notification ${type}`;
+    notification.style.opacity = '1';
+    
+    setTimeout(() => {
+        notification.style.opacity = '0';
+    }, 3000);
+}
