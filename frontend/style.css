@@ -1,6 +1,6 @@
 /* ========================================== */
 /* 🌍 GLOBAL DESIGN SYSTEM - Forsale AI */
-/* Version 5.0.0 - World-Class Responsive Design */
+/* Version 5.1.0 - Final Production Release */
 /* ========================================== */
 
 :root {
@@ -147,6 +147,111 @@ body {
 .glass-panel:hover {
     border-color: var(--glass-border-strong);
     transform: translateZ(0);
+}
+
+/* ========================================== */
+/* Language Selection System */
+/* ========================================== */
+
+.language-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 17, 40, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.language-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.language-container {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-large);
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: var(--shadow-xl);
+    animation: fadeInUp 0.6s ease;
+}
+
+.language-container h2 {
+    font-size: 24px;
+    margin-bottom: 25px;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.language-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.language-option {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 15px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.language-option:hover {
+    background: rgba(108, 75, 255, 0.2);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.language-flag {
+    width: 40px;
+    height: 30px;
+    object-fit: contain;
+    border-radius: 4px;
+    border: 1px solid var(--glass-border);
+}
+
+.language-option span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.language-skip-btn {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    padding: 10px 20px;
+    border-radius: var(--radius-small);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 14px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.language-skip-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
 }
 
 /* ========================================== */
@@ -882,6 +987,49 @@ html[dir="rtl"] .auth-footer {
 html[dir="rtl"] .fingerprint-text {
     direction: rtl;
     text-align: center;
+}
+
+/* ========================================== */
+/* Language-Specific Styling */
+/* ========================================== */
+
+/* Arabic Language Specific */
+html[data-lang="ar"] {
+    font-family: 'Tajawal', 'Segoe UI Arabic', Tahoma, sans-serif;
+}
+
+html[data-lang="ar"] .language-option {
+    direction: rtl;
+    text-align: right;
+}
+
+html[data-lang="ar"] .language-option span {
+    direction: rtl;
+    text-align: right;
+}
+
+html[data-lang="ar"] .language-option[data-lang="ar"] {
+    background: rgba(108, 75, 255, 0.2);
+}
+
+/* Chinese Language Specific */
+html[data-lang="zh"] {
+    font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimSun', sans-serif;
+}
+
+/* Hindi Language Specific */
+html[data-lang="hi"] {
+    font-family: 'Noto Sans Devanagari', 'Mangal', sans-serif;
+}
+
+/* Spanish Language Specific */
+html[data-lang="es"] {
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+
+/* French Language Specific */
+html[data-lang="fr"] {
+    font-family: 'Segoe UI', 'Arial', sans-serif;
 }
 
 /* ========================================== */
