@@ -1,6 +1,6 @@
 /* ========================================== */
 /* 🌍 GLOBAL DESIGN SYSTEM - Forsale AI */
-/* Version 4.0.0 - Final Production Release */
+/* Version 4.1.0 - Final Production Release */
 /* ========================================== */
 
 :root {
@@ -94,8 +94,8 @@
 
 * { 
     box-sizing: border-box; 
-    margin: 0;
-    padding: 0;
+    margin: 1px;
+    padding: 1px;
     -webkit-tap-highlight-color: transparent;
     outline: none;
 }
@@ -2002,6 +2002,7 @@ input:checked + .slider:before {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    height: calc(100vh - 150px);
 }
 
 .message-bubble {
@@ -2052,6 +2053,10 @@ input:checked + .slider:before {
 }
 
 .logy-input-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     padding: 10px 15px;
     background: rgba(10, 17, 40, 0.95);
     border-top: 1px solid var(--glass-border);
@@ -2059,6 +2064,7 @@ input:checked + .slider:before {
     gap: 10px;
     align-items: center;
     flex-shrink: 0;
+    height: 60px;
 }
 
 .logy-input-bar input {
@@ -2069,6 +2075,7 @@ input:checked + .slider:before {
     background: rgba(255, 255, 255, 0.05);
     color: white;
     font-size: 15px;
+    height: 36px;
 }
 
 .logy-send-btn {
@@ -2089,92 +2096,6 @@ input:checked + .slider:before {
 .logy-send-btn:hover {
     transform: scale(1.05);
     box-shadow: 0 0 15px rgba(108, 75, 255, 0.5);
-}
-
-/* ========================================== */
-/* New: Fixed Body Scroll Issue */
-/* ========================================== */
-
-body.no-scroll {
-    overflow: hidden;
-    height: 100vh;
-}
-
-#app-container {
-    display: none;
-}
-
-#auth-container {
-    display: block;
-}
-
-/* New: Fixed Header & Footer */
-.header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-}
-
-.footer-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-}
-
-/* New: Proper Modal Positioning */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1000;
-}
-
-/* New: Fixed Auth Container Positioning */
-#auth-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-    overflow: auto;
-}
-
-/* New: Fixed Scrolling Issue */
-body.scrolling {
-    overflow: hidden;
-    height: 100vh;
-}
-
-/* New: Fixed Body Height */
-body {
-    height: 100vh;
-    overflow: hidden;
-}
-
-.container {
-    height: calc(100vh - var(--header-height) - var(--footer-height));
-    overflow: auto;
-}
-
-/* New: Fixed Modal Positioning */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1000;
-    display: none;
-    overflow-y: auto;
 }
 
 /* New: Fixed Language Support */
@@ -2246,72 +2167,6 @@ body {
 
 [data-lang="ar"] .detail-tab-content {
     text-align: right;
-}
-
-/* New: Fixed Chat Modal */
-#logyAiModal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--bg-dark);
-    z-index: 600;
-    overflow-y: auto;
-    display: none;
-    flex-direction: column;
-    height: 100vh;
-}
-
-.logy-chat-area {
-    flex-grow: 1;
-    padding: 15px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    height: calc(100vh - 150px);
-}
-
-.logy-input-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 10px 15px;
-    background: rgba(10, 17, 40, 0.95);
-    border-top: 1px solid var(--glass-border);
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-shrink: 0;
-    height: 60px;
-}
-
-.logy-input-bar input {
-    flex-grow: 1;
-    padding: 12px 15px;
-    border-radius: 25px;
-    border: 1px solid var(--glass-border);
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
-    font-size: 15px;
-    height: 36px;
-}
-
-.logy-send-btn {
-    background: var(--primary);
-    color: white;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: all var(--transition-fast);
 }
 
 /* New: Fixed Product Listing Modal */
@@ -2393,84 +2248,89 @@ body {
     cursor: pointer;
 }
 
-#ai-upload-modal .settings-group {
-    margin-bottom: 20px;
-}
-
-#ai-upload-modal .input-row {
-    flex-direction: column;
-    gap: 15px;
-}
-
-#ai-upload-modal .input-column {
+/* New: Fixed Chat Input */
+#logyAiModal .logy-input-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
     width: 100%;
-}
-
-#ai-upload-modal .upload-btn {
-    width: 100%;
-    margin-top: 15px;
-}
-
-#ai-upload-modal .image-count {
-    text-align: center;
-    margin-top: 10px;
-}
-
-#ai-upload-modal .preview-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    padding: 10px 15px;
+    background: rgba(10, 17, 40, 0.95);
+    border-top: 1px solid var(--glass-border);
+    display: flex;
     gap: 10px;
-    margin-top: 15px;
+    align-items: center;
+    flex-shrink: 0;
+    height: 60px;
 }
 
-#ai-upload-modal .preview-item {
-    position: relative;
-    height: 100px;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-#ai-upload-modal .preview-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-#ai-upload-modal .remove-preview {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background: var(--danger);
+#logyAiModal .logy-input-bar input {
+    flex-grow: 1;
+    padding: 12px 15px;
+    border-radius: 25px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.05);
     color: white;
-    width: 20px;
-    height: 20px;
+    font-size: 15px;
+    height: 36px;
+}
+
+#logyAiModal .logy-send-btn {
+    background: var(--primary);
+    color: white;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 18px;
     cursor: pointer;
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
 }
 
-#ai-upload-modal .settings-group {
-    margin-bottom: 20px;
-}
-
-#ai-upload-modal .input-row {
-    flex-direction: column;
-    gap: 15px;
-}
-
-#ai-upload-modal .input-column {
+#logyAiModal .logy-input-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
     width: 100%;
+    padding: 10px 15px;
+    background: rgba(10, 17, 40, 0.95);
+    border-top: 1px solid var(--glass-border);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-shrink: 0;
+    height: 60px;
 }
 
-#ai-upload-modal .upload-btn {
-    width: 100%;
-    margin-top: 15px;
+#logyAiModal .logy-input-bar input {
+    flex-grow: 1;
+    padding: 12px 15px;
+    border-radius: 25px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    font-size: 15px;
+    height: 36px;
 }
 
-#ai-upload-modal .image-count {
-    text-align: center;
-    margin-top: 10px;
+#logyAiModal .logy-send-btn {
+    background: var(--primary);
+    color: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
 }
+
+#logyAiModal .logy-input-bar {
+    position: fixed;
+    bottom
