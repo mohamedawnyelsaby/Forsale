@@ -1,11 +1,11 @@
 /* ========================================== */
 /* 🌍 GLOBAL DESIGN SYSTEM - Forsale AI */
-/* Version 2.1.0 - World-Class Marketplace UI */
+/* Version 3.0.0 - Final Production Release */
 /* ========================================== */
 
 :root {
     /* Core Brand Colors */
-    --primary: #6C4BFF; /* Modern primary color for global audience */
+    --primary: #6C4BFF;
     --primary-dark: #5A3EDD;
     --accent: #00f2ff;
     --accent-dark: #00c1cc;
@@ -111,6 +111,8 @@ html, body {
     color: var(--text-main);
     min-height: 100vh;
     line-height: 1.5;
+    position: relative;
+    z-index: 0;
 }
 
 body {
@@ -119,8 +121,10 @@ body {
     padding-top: calc(var(--header-height) + 15px);
     padding-bottom: var(--footer-height);
     position: relative;
-    overflow-y: scroll;
+    overflow-y: auto;
     scroll-behavior: smooth;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .content-wrapper {
@@ -270,6 +274,8 @@ body {
     justify-content: center;
     padding: 20px;
     z-index: 2000;
+    overflow: auto;
+    height: 100vh;
 }
 
 .auth-logo {
@@ -313,6 +319,7 @@ body {
     text-align: center;
     box-shadow: var(--shadow-lg);
     animation: fadeInUp 0.6s ease;
+    margin-top: 20px;
 }
 
 .auth-title {
@@ -530,6 +537,8 @@ body {
     background: rgba(10, 17, 40, 0.95); 
     border-bottom: 1px solid var(--glass-border);
     width: 100%;
+    position: relative;
+    z-index: 100;
 }
 
 .header .content-wrapper { 
@@ -1450,7 +1459,7 @@ body {
     font-size: 15px;
     margin: 5px 0;
     appearance: none;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path fill="rgba(255,255,255,0.7)" d="M7 10l5 5 5-5z"/></svg>');
+    background-image: url('image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path fill="rgba(255,255,255,0.7)" d="M7 10l5 5 5-5z"/></svg>');
     background-repeat: no-repeat;
     background-position: right 10px top 50%;
     background-size: 16px;
@@ -2080,4 +2089,90 @@ input:checked + .slider:before {
 .logy-send-btn:hover {
     transform: scale(1.05);
     box-shadow: 0 0 15px rgba(108, 75, 255, 0.5);
+}
+
+/* ========================================== */
+/* New: Fixed Body Scroll Issue */
+/* ========================================== */
+
+body.no-scroll {
+    overflow: hidden;
+    height: 100vh;
+}
+
+#app-container {
+    display: none;
+}
+
+#auth-container {
+    display: block;
+}
+
+/* New: Fixed Header & Footer */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.footer-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+/* New: Proper Modal Positioning */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+}
+
+/* New: Proper Auth Container Positioning */
+#auth-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    overflow: auto;
+}
+
+/* New: Fixed Scrolling Issue */
+body.scrolling {
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* New: Fixed Body Height */
+body {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.container {
+    height: calc(100vh - var(--header-height) - var(--footer-height));
+    overflow: auto;
+}
+
+/* New: Fixed Modal Positioning */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: none;
+    overflow-y: auto;
 }
