@@ -1,839 +1,176 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Forsale AI - سوق عالمي ذكي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forsale AI - Global Smart Marketplace</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <style>
-        :root {
-            --primary: #FFD700;
-            --accent: #00f2ff;
-            --success: #2ECC71;
-            --danger: #FF5252;
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text-main: #ffffff;
-            --text-muted: #a0a0a0;
-            --radius: 14px;
-            --bg-dark: #0a1128;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle at top left, #1a2e44 0%, #000000 100%);
-            color: var(--text-main);
-            min-height: 100vh;
-            padding-top: 80px;
-            padding-bottom: 80px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px;
-        }
-
-        /* Header */
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(10, 17, 40, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 15px 20px;
-            z-index: 100;
-            border-bottom: 1px solid var(--glass-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--primary);
-        }
-
-        .ai-badge {
-            background: var(--accent);
-            color: black;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .icon-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .icon-btn:hover {
-            background: var(--accent);
-            color: black;
-            transform: scale(1.1);
-        }
-
-        /* Search */
-        .search-box {
-            position: relative;
-            margin: 20px 0;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 15px 50px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 50px;
-            color: var(--text-main);
-            font-size: 14px;
-            outline: none;
-        }
-
-        .search-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-        }
-
-        /* Categories */
-        .cats-scroll {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 15px 0;
-            scrollbar-width: none;
-        }
-
-        .cats-scroll::-webkit-scrollbar {
-            display: none;
-        }
-
-        .cat-item {
-            min-width: 100px;
-            padding: 12px 20px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 25px;
-            text-align: center;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.3s;
-        }
-
-        .cat-item.active {
-            background: var(--primary);
-            color: black;
-            border-color: var(--primary);
-        }
-
-        .cat-item:hover {
-            transform: translateY(-2px);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* Products Grid */
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .product-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 242, 255, 0.2);
-        }
-
-        .p-img-box {
-            position: relative;
-            width: 100%;
-            padding-top: 100%;
-            overflow: hidden;
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        .p-img-box img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .ai-tag {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background: var(--accent);
-            color: black;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .condition-badge {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: var(--success);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        .p-details {
-            padding: 12px;
-        }
-
-        .p-name {
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .p-price {
-            color: var(--primary);
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .quick-add-btn {
-            position: absolute;
-            bottom: 12px;
-            left: 12px;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: var(--success);
-            border: none;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            opacity: 0;
-        }
-
-        .product-card:hover .quick-add-btn {
-            opacity: 1;
-        }
-
-        .quick-add-btn:hover {
-            transform: scale(1.1);
-        }
-
-        /* Loading */
-        .loading-indicator {
-            text-align: center;
-            padding: 40px;
-            display: none;
-        }
-
-        .loading-indicator.show {
-            display: block;
-        }
-
-        .loading-indicator i {
-            font-size: 40px;
-            color: var(--accent);
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Empty State */
-        .empty-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .empty-state i {
-            font-size: 60px;
-            color: var(--text-muted);
-            opacity: 0.5;
-            margin-bottom: 20px;
-        }
-
-        .empty-state button {
-            margin-top: 20px;
-            padding: 12px 30px;
-            background: var(--accent);
-            color: black;
-            border: none;
-            border-radius: 25px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* Footer Nav */
-        .footer-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(10, 17, 40, 0.95);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--glass-border);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            z-index: 100;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            color: var(--text-muted);
-            font-size: 11px;
-            cursor: pointer;
-            transition: all 0.3s;
-            padding: 5px 15px;
-        }
-
-        .nav-item.active {
-            color: var(--accent);
-        }
-
-        .nav-item i {
-            font-size: 20px;
-        }
-
-        /* Filter Panel */
-        .filter-panel {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .filter-panel.show {
-            display: block;
-        }
-
-        .filter-toggle {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 25px;
-            padding: 12px 20px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: fit-content;
-        }
-
-        .filter-toggle i {
-            color: var(--accent);
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 200;
-            overflow-y: auto;
-        }
-
-        .modal.show {
-            display: block;
-        }
-
-        .modal-content {
-            background: var(--bg-dark);
-            max-width: 600px;
-            margin: 20px auto;
-            border-radius: var(--radius);
-            padding: 20px;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .modal-header h2 {
-            font-size: 20px;
-        }
-
-        .close-btn {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .detail-img {
-            width: 100%;
-            border-radius: var(--radius);
-            margin-bottom: 20px;
-        }
-
-        .detail-info {
-            margin-bottom: 20px;
-        }
-
-        .detail-title {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .detail-price {
-            font-size: 28px;
-            color: var(--primary);
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        .detail-desc {
-            color: var(--text-muted);
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .action-btns {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 15px;
-            border-radius: 50px;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: var(--accent);
-            color: black;
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <!-- Header -->
-    <div class="header">
+    <header class="header">
         <div class="logo">
             <span class="ai-badge">AI</span>
             <i class="fa-solid fa-store"></i>
             <span>Forsale</span>
         </div>
         <div class="header-actions">
-            <div class="icon-btn" onclick="openLanguage()">
+            <button class="icon-btn" onclick="openLanguageModal()" title="Change Language">
                 <i class="fa-solid fa-language"></i>
-            </div>
-            <div class="icon-btn" onclick="openCart()">
+            </button>
+            <button class="icon-btn" onclick="openCart()" title="Cart">
                 <i class="fa-solid fa-cart-shopping"></i>
-            </div>
+                <span class="badge" id="cart-count">0</span>
+            </button>
         </div>
-    </div>
+    </header>
 
     <!-- Main Container -->
     <div class="container">
-        <!-- Search -->
+        
+        <!-- Search Bar -->
         <div class="search-box">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" placeholder="ابحث بذكاء اصطناعي..." id="search-input">
+            <input type="text" 
+                   id="search-input" 
+                   data-i18n-placeholder="search_placeholder"
+                   placeholder="Search with AI or describe your dream product...">
+            <button class="visual-search-btn" onclick="openVisualSearch()" title="Search by Image">
+                <i class="fa-solid fa-camera"></i>
+            </button>
         </div>
 
         <!-- Categories -->
-        <div class="cats-scroll" id="categories"></div>
+        <div class="section-header">
+            <h2 data-i18n="nav_categories">Categories</h2>
+        </div>
+        <div class="cats-scroll" id="categories-scroll"></div>
 
-        <!-- Filter Toggle -->
-        <div class="filter-toggle" onclick="toggleFilters()">
-            <i class="fa-solid fa-filter"></i>
-            <span>الفلاتر</span>
+        <!-- Sort & Filter -->
+        <div class="controls-bar">
+            <select id="sort-select" onchange="handleSortChange(this.value)">
+                <option value="relevance" data-i18n="sort_relevance">Most Relevant</option>
+                <option value="newest" data-i18n="sort_newest">Newest First</option>
+                <option value="price_low" data-i18n="sort_price_low">Price: Low to High</option>
+                <option value="price_high" data-i18n="sort_price_high">Price: High to Low</option>
+                <option value="popular" data-i18n="sort_popular">Most Popular</option>
+                <option value="rating" data-i18n="sort_rating">Highest Rated</option>
+            </select>
+            
+            <button class="filter-toggle-btn" onclick="filterUI.toggle()">
+                <i class="fa-solid fa-filter"></i>
+                <span data-i18n="filter_show">Filters</span>
+                <span class="filter-badge" id="filter-count" style="display: none;">0</span>
+            </button>
         </div>
 
         <!-- Filter Panel -->
-        <div class="filter-panel" id="filter-panel">
-            <h3 style="margin-bottom: 15px;">خيارات الفلترة</h3>
-            <div style="display: flex; flex-direction: column; gap: 15px;">
-                <div>
-                    <label style="display: block; margin-bottom: 8px; color: var(--text-muted);">الترتيب حسب:</label>
-                    <select id="sort-select" style="width: 100%; padding: 12px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; color: var(--text-main);">
-                        <option value="newest">الأحدث</option>
-                        <option value="price-low">السعر: من الأقل للأعلى</option>
-                        <option value="price-high">السعر: من الأعلى للأقل</option>
-                        <option value="popular">الأكثر شعبية</option>
-                    </select>
-                </div>
-                <button onclick="applyFilters()" style="width: 100%; padding: 12px; background: var(--accent); color: black; border: none; border-radius: 25px; font-weight: bold; cursor: pointer;">
-                    تطبيق الفلاتر
-                </button>
-            </div>
-        </div>
+        <div id="filter-panel"></div>
 
         <!-- Products Grid -->
         <div class="products-grid" id="products-grid"></div>
 
-        <!-- Loading -->
-        <div class="loading-indicator" id="loading">
-            <i class="fa-solid fa-spinner"></i>
-            <p style="margin-top: 15px; color: var(--text-muted);">جاري التحميل...</p>
+        <!-- Loading Indicator -->
+        <div class="loading-indicator" id="loading-indicator" style="display: none;">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <p data-i18n="common_loading">Loading...</p>
         </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container" id="pagination-container"></div>
+
     </div>
 
-    <!-- Footer Nav -->
-    <div class="footer-nav">
-        <div class="nav-item active">
+    <!-- Footer Navigation -->
+    <nav class="footer-nav">
+        <div class="nav-item active" onclick="navigateTo('home')">
             <i class="fa-solid fa-house"></i>
-            <span>الرئيسية</span>
+            <span data-i18n="nav_home">Home</span>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" onclick="navigateTo('categories')">
             <i class="fa-solid fa-grid"></i>
-            <span>التصنيفات</span>
+            <span data-i18n="nav_categories">Categories</span>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" onclick="navigateTo('ai')">
             <i class="fa-solid fa-robot"></i>
-            <span>AI مساعد</span>
+            <span data-i18n="nav_ai_chat">AI Assistant</span>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" onclick="openCart()">
             <i class="fa-solid fa-cart-shopping"></i>
-            <span>السلة</span>
+            <span data-i18n="nav_cart">Cart</span>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" onclick="navigateTo('profile')">
             <i class="fa-solid fa-user"></i>
-            <span>الملف</span>
+            <span data-i18n="nav_profile">Profile</span>
+        </div>
+    </nav>
+
+    <!-- Language Modal -->
+    <div class="modal" id="languageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-language"></i> Select Language</h2>
+                <button class="close-btn" onclick="closeLanguageModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="language-list" id="language-list"></div>
         </div>
     </div>
 
     <!-- Product Detail Modal -->
-    <div class="modal" id="product-modal">
+    <div class="modal" id="product-detail-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modal-title">تفاصيل المنتج</h2>
-                <div class="close-btn" onclick="closeModal()">
+                <h2 id="detail-title"></h2>
+                <button class="close-btn" onclick="closeProductDetailModal()">
                     <i class="fa-solid fa-xmark"></i>
-                </div>
+                </button>
             </div>
-            <img id="modal-img" class="detail-img" src="" alt="">
+            <img id="detail-img" class="detail-img" src="" alt="">
             <div class="detail-info">
-                <div class="detail-title" id="modal-name"></div>
-                <div class="detail-price" id="modal-price"></div>
-                <div class="detail-desc" id="modal-desc"></div>
+                <div class="detail-price" id="detail-price"></div>
+                <div class="detail-desc" id="detail-desc"></div>
             </div>
             <div class="action-btns">
-                <button class="btn btn-primary" onclick="addToCart()">
+                <button class="btn btn-primary" onclick="addToCartFromDetail()">
                     <i class="fa-solid fa-cart-plus"></i>
-                    أضف للسلة
+                    <span data-i18n="detail_add_cart">Add to Cart</span>
                 </button>
                 <button class="btn btn-success" onclick="buyNow()">
                     <i class="fa-solid fa-bolt"></i>
-                    اشتر الآن
+                    <span data-i18n="detail_buy_now">Buy Now</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <script>
-        const API_BASE = 'https://forsale-production.up.railway.app';
-        
-        // Mock Products
-        const MOCK_PRODUCTS = [
-            {
-                id: 1,
-                name: "iPhone 15 Pro Max",
-                price: 0.05,
-                description: "آيفون 15 برو ماكس جديد بالكرتونة",
-                image: "https://images.unsplash.com/photo-1592286927505-b86dc33748b5?w=400",
-                category: "electronics",
-                condition: "جديد"
-            },
-            {
-                id: 2,
-                name: "MacBook Pro M3",
-                price: 0.1,
-                description: "ماك بوك برو بمعالج M3 الجديد",
-                image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
-                category: "electronics",
-                condition: "جديد"
-            },
-            {
-                id: 3,
-                name: "AirPods Pro 2",
-                price: 0.02,
-                description: "سماعات آيربودز برو الجيل الثاني",
-                image: "https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=400",
-                category: "electronics",
-                condition: "جديد"
-            },
-            {
-                id: 4,
-                name: "Nike Air Max 2024",
-                price: 0.015,
-                description: "حذاء نايكي اير ماكس الأحدث",
-                image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400",
-                category: "fashion",
-                condition: "جديد"
-            },
-            {
-                id: 5,
-                name: "Sony WH-1000XM5",
-                price: 0.025,
-                description: "سماعات سوني بتقنية إلغاء الضوضاء",
-                image: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=400",
-                category: "electronics",
-                condition: "مستعمل - ممتاز"
-            },
-            {
-                id: 6,
-                name: "Gaming Chair RGB",
-                price: 0.03,
-                description: "كرسي ألعاب بإضاءة RGB",
-                image: "https://images.unsplash.com/photo-1598550476439-6847785fcea6?w=400",
-                category: "home",
-                condition: "جديد"
-            }
-        ];
+    <!-- Cart Modal -->
+    <div class="modal" id="cart-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-cart-shopping"></i> <span data-i18n="nav_cart">Cart</span></h2>
+                <button class="close-btn" onclick="closeCart()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="cart-items" id="cart-items"></div>
+            <div class="cart-summary" id="cart-summary"></div>
+        </div>
+    </div>
 
-        const CATEGORIES = [
-            { id: 'all', name: 'الكل', icon: 'fa-grid' },
-            { id: 'electronics', name: 'إلكترونيات', icon: 'fa-mobile' },
-            { id: 'fashion', name: 'أزياء', icon: 'fa-shirt' },
-            { id: 'home', name: 'منزل', icon: 'fa-house' },
-            { id: 'sports', name: 'رياضة', icon: 'fa-dumbbell' },
-        ];
+    <!-- Cart Notification -->
+    <div class="cart-notification" id="cart-notification">
+        <i class="fa-solid fa-check-circle"></i>
+        <span>Added to cart!</span>
+    </div>
 
-        let currentCategory = 'all';
-        let selectedProduct = null;
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('🚀 Forsale AI تم التحميل');
-            loadCategories();
-            loadProducts();
-        });
-
-        // Load Categories
-        function loadCategories() {
-            const container = document.getElementById('categories');
-            container.innerHTML = CATEGORIES.map(cat => `
-                <div class="cat-item ${cat.id === currentCategory ? 'active' : ''}" 
-                     onclick="selectCategory('${cat.id}')">
-                    <i class="fa-solid ${cat.icon}"></i>
-                    <div>${cat.name}</div>
-                </div>
-            `).join('');
-        }
-
-        // Select Category
-        function selectCategory(categoryId) {
-            currentCategory = categoryId;
-            loadCategories();
-            loadProducts();
-        }
-
-        // Load Products
-        async function loadProducts() {
-            const grid = document.getElementById('products-grid');
-            const loading = document.getElementById('loading');
-            
-            loading.classList.add('show');
-            
-            try {
-                // Try API first
-                const response = await fetch(`${API_BASE}/api/products?page=1&limit=20`);
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success) {
-                        displayProducts(data.data.products || []);
-                        loading.classList.remove('show');
-                        return;
-                    }
-                }
-            } catch (error) {
-                console.warn('⚠️ API فشل، استخدام البيانات التجريبية');
-            }
-            
-            // Fallback to mock data
-            const filtered = currentCategory === 'all' 
-                ? MOCK_PRODUCTS 
-                : MOCK_PRODUCTS.filter(p => p.category === currentCategory);
-            
-            displayProducts(filtered);
-            loading.classList.remove('show');
-        }
-
-        // Display Products
-        function displayProducts(products) {
-            const grid = document.getElementById('products-grid');
-            
-            if (!products || products.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fa-solid fa-box-open"></i>
-                        <p style="color: var(--text-muted); margin-top: 10px;">لا توجد منتجات</p>
-                        <button onclick="loadProducts()">إعادة المحاولة</button>
-                    </div>
-                `;
-                return;
-            }
-
-            grid.innerHTML = products.map(p => `
-                <div class="product-card" onclick="openProduct(${p.id})">
-                    <div class="p-img-box">
-                        <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/400'">
-                        <div class="ai-tag">
-                            <i class="fa-solid fa-microchip"></i>
-                            موثق AI
-                        </div>
-                        ${p.condition ? `<div class="condition-badge">${p.condition}</div>` : ''}
-                    </div>
-                    <div class="p-details">
-                        <div class="p-name">${p.name}</div>
-                        <div class="p-price">${p.price} Pi</div>
-                    </div>
-                    <button class="quick-add-btn" onclick="event.stopPropagation(); quickAdd(${p.id})">
-                        <i class="fa-solid fa-cart-plus"></i>
-                    </button>
-                </div>
-            `).join('');
-
-            console.log('✅ تم عرض', products.length, 'منتج');
-        }
-
-        // Open Product Detail
-        function openProduct(id) {
-            selectedProduct = MOCK_PRODUCTS.find(p => p.id === id);
-            if (!selectedProduct) return;
-
-            document.getElementById('modal-name').textContent = selectedProduct.name;
-            document.getElementById('modal-price').textContent = selectedProduct.price + ' Pi';
-            document.getElementById('modal-desc').textContent = selectedProduct.description;
-            document.getElementById('modal-img').src = selectedProduct.image;
-            
-            document.getElementById('product-modal').classList.add('show');
-        }
-
-        function closeModal() {
-            document.getElementById('product-modal').classList.remove('show');
-        }
-
-        function quickAdd(id) {
-            alert('✅ تم إضافة المنتج إلى السلة!');
-        }
-
-        function addToCart() {
-            alert('✅ تم إضافة المنتج إلى السلة!');
-            closeModal();
-        }
-
-        function buyNow() {
-            alert('🛒 سيتم توجيهك لإتمام الشراء...');
-            closeModal();
-        }
-
-        function toggleFilters() {
-            document.getElementById('filter-panel').classList.toggle('show');
-        }
-
-        function applyFilters() {
-            const sortValue = document.getElementById('sort-select').value;
-            console.log('تطبيق فلتر:', sortValue);
-            toggleFilters();
-            loadProducts();
-        }
-
-        function openLanguage() {
-            alert('قريباً: تغيير اللغة');
-        }
-
-        function openCart() {
-            alert('قريباً: السلة');
-        }
-    </script>
+    <!-- Scripts -->
+    <script src="js/i18n.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="script.js"></script>
 
 </body>
 </html>
