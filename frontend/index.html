@@ -1,11 +1,24 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Forsale AI - سوق المستقبل</title>
+    <meta name="description" content="Forsale - The world's smartest marketplace powered by AI and Pi Network">
+    <meta name="keywords" content="marketplace, buy, sell, ai, pi network, cryptocurrency, e-commerce">
+    <meta name="theme-color" content="#0066FF">
+    
+    <title>Forsale - Smart Global Marketplace</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="style-new.css">
     
     <!-- Pi Network SDK -->
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
@@ -18,246 +31,400 @@
 </head>
 <body>
 
-<div id="auth-container">
-    <div class="auth-logo">
-        <span style="background:var(--accent);color:black;font-size:14px;padding:2px 8px;border-radius:6px">AI</span> 
-        Forsale
-    </div>
-    <p style="color:var(--text-muted);margin-bottom:30px;text-align:center">منصة المستقبل الذكية - مدعومة بـ Pi Network</p>
-
-    <div class="auth-card">
-        <h2 style="margin-bottom:20px">تسجيل الدخول الآمن</h2>
-        
-        <div class="input-group">
-            <i class="fa-solid fa-envelope"></i>
-            <input type="email" placeholder="البريد الإلكتروني" id="login-email">
+<!-- ========================================
+     AUTHENTICATION SCREEN
+     ======================================== -->
+<div id="auth-container" style="display: flex;">
+    <div style="text-align: center; max-width: 400px; width: 100%; padding: 20px;">
+        <!-- Logo -->
+        <div style="margin-bottom: 40px;">
+            <div class="logo" style="font-size: 48px; justify-content: center; margin-bottom: 10px;">
+                <div class="logo-icon">🛍️</div>
+                Forsale
+            </div>
+            <p style="color: var(--medium-gray); font-size: var(--text-lg);">
+                The World's Smartest Marketplace
+            </p>
+            <p style="color: var(--electric-blue); font-size: var(--text-sm); margin-top: 5px;">
+                Powered by AI & Pi Network
+            </p>
         </div>
         
-        <div class="input-group">
-            <i class="fa-solid fa-lock"></i>
-            <input type="password" placeholder="كلمة المرور" id="login-password">
+        <!-- Login Card -->
+        <div class="card" style="padding: var(--space-8); text-align: center;">
+            <h2 style="margin-bottom: var(--space-6); font-size: var(--text-3xl);">Welcome Back</h2>
+            
+            <!-- Email Input -->
+            <div style="position: relative; margin-bottom: var(--space-4);">
+                <input 
+                    type="email" 
+                    id="login-email" 
+                    placeholder="Email address"
+                    style="width: 100%; padding: 16px 48px 16px 16px; border-radius: var(--radius-full); border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; font-size: var(--text-base);">
+                <i class="fa-solid fa-envelope" style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: var(--electric-blue);"></i>
+            </div>
+            
+            <!-- Password Input -->
+            <div style="position: relative; margin-bottom: var(--space-6);">
+                <input 
+                    type="password" 
+                    id="login-password" 
+                    placeholder="Password"
+                    style="width: 100%; padding: 16px 48px 16px 16px; border-radius: var(--radius-full); border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; font-size: var(--text-base);">
+                <i class="fa-solid fa-lock" style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: var(--electric-blue);"></i>
+            </div>
+            
+            <!-- Login Button -->
+            <button class="btn btn-primary btn-lg btn-full" id="login-btn">
+                <span>Sign In</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            
+            <!-- Divider -->
+            <div style="margin: var(--space-6) 0; display: flex; align-items: center; gap: var(--space-4);">
+                <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+                <span style="color: var(--medium-gray); font-size: var(--text-sm);">OR</span>
+                <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+            </div>
+            
+            <!-- Biometric Login -->
+            <div 
+                id="fingerprint-login-btn"
+                style="cursor: pointer; margin-bottom: var(--space-4); padding: var(--space-4); border-radius: var(--radius-lg); background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); transition: var(--transition-base);"
+                onmouseover="this.style.background='rgba(255,255,255,0.08)'"
+                onmouseout="this.style.background='rgba(255,255,255,0.03)'">
+                <i class="fa-solid fa-fingerprint" style="font-size: 40px; color: var(--electric-blue); margin-bottom: 8px; animation: pulse 2s infinite;"></i>
+                <p style="font-size: var(--text-sm); color: var(--electric-blue); font-weight: 600;">
+                    Quick Login with Biometrics
+                </p>
+            </div>
+            
+            <!-- Pi Network Login -->
+            <button class="btn btn-secondary btn-full" id="pi-login-btn">
+                <i class="fa-solid fa-network-wired"></i>
+                <span>Continue with Pi Network</span>
+            </button>
+            
+            <!-- Sign Up Link -->
+            <p style="margin-top: var(--space-6); color: var(--medium-gray); font-size: var(--text-sm);">
+                Don't have an account? 
+                <a href="#" onclick="showRegister()" style="color: var(--electric-blue); font-weight: 600;">Sign Up</a>
+            </p>
         </div>
-
-        <button class="main-btn" id="login-btn">
-            دخول آمن <i class="fa-solid fa-arrow-left"></i>
-        </button>
-
-        <div style="margin-top:20px; cursor:pointer;" id="fingerprint-login-btn">
-            <i class="fa-solid fa-fingerprint fingerprint-scan"></i>
-            <p style="font-size:14px; color:var(--accent); font-weight:bold;">أو استخدم بصمة Pi Network</p>
-        </div>
-
-        <button class="main-btn pi-btn" id="pi-login-btn" style="margin-top:10px;">
-            <i class="fa-solid fa-network-wired"></i> تسجيل الدخول عبر Pi Browser
-        </button>
-
-        <div class="auth-footer">
-            <p>ليس لديك حساب؟ <a href="#" onclick="showRegister()">سجل الآن</a></p>
+        
+        <!-- Language Selector -->
+        <div style="margin-top: var(--space-6);">
+            <select id="language-selector" class="language-select" onchange="changeLanguage(this.value)">
+                <option value="en">🇬🇧 English</option>
+                <option value="ar">🇸🇦 العربية</option>
+                <option value="es">🇪🇸 Español</option>
+                <option value="fr">🇫🇷 Français</option>
+                <option value="de">🇩🇪 Deutsch</option>
+                <option value="zh">🇨🇳 中文</option>
+                <option value="hi">🇮🇳 हिन्दी</option>
+                <option value="pt">🇧🇷 Português</option>
+                <option value="ru">🇷🇺 Русский</option>
+                <option value="ja">🇯🇵 日本語</option>
+            </select>
         </div>
     </div>
 </div>
 
-<div id="app-container">
-    <div class="fixed-header-wrapper">
-        <div class="header" id="main-header">
-            <div class="content-wrapper">
-                <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-store"></i> Forsale</div>
-                <div style="display:flex; gap:10px;">
-                    <div class="icon-btn primary" onclick="openAiUploadModal()"><i class="fa-solid fa-plus"></i></div>
-                    <div class="notification-icon-container">
-                        <div class="notification-dot" id="notification-dot"></div>
-                        <div class="icon-btn" onclick="openNotificationsModal()"><i class="fa-solid fa-bell"></i></div>
-                    </div>
-                    <div class="icon-btn" onclick="openSettingsModal()"><i class="fa-solid fa-gear"></i></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="content-wrapper">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" placeholder="ابحث بذكاء اصطناعي أو صف منتج أحلامك...">
+<!-- ========================================
+     MAIN APP
+     ======================================== -->
+<div id="app-container" class="app-container" style="display: none;">
+    
+    <!-- ============ HEADER ============ -->
+    <header class="header">
+        <div class="header-container container">
+            <div class="logo">
+                <div class="logo-icon">🛍️</div>
+                <span>Forsale</span>
             </div>
             
-            <h2 style="font-size: 20px; color: var(--text-main); margin: 0 0 15px;">اقتراحات Logy AI</h2>
-            
-            <div class="products-grid" id="products-grid"></div>
-        </div>
-    </div>
-
-    <div id="product-detail-modal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-eye"></i> تفاصيل المنتج</div>
-            <div class="icon-btn" onclick="closeProductDetailModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <img id="detail-img" class="detail-img" src="" alt="صورة المنتج">
-            <div class="detail-title" id="detail-title"></div>
-            <div class="detail-price" id="detail-price"></div>
-
-            <h3 class="ai-section-title"><i class="fa-solid fa-microchip"></i> تحليل Logy AI للسعر</h3>
-            <div class="glass-panel ai-price-card">
-                <div class="stat-box">
-                    <div class="value" id="ai-score">9.2</div>
-                    <div class="label">نقطة قوة العرض</div>
-                </div>
-                <div class="stat-box">
-                    <div class="value" id="ai-market-price">0 Pi</div>
-                    <div class="label">متوسط السوق</div>
-                </div>
-            </div>
-
-            <div class="detail-tabs-container glass-panel">
-                <div class="detail-tabs-scroll">
-                    <div class="detail-tab-item active" onclick="showDetailTab('description', this)">
-                        <i class="fa-solid fa-file-alt"></i> الوصف
-                    </div>
-                    <div class="detail-tab-item" onclick="showDetailTab('specs', this)">
-                        <i class="fa-solid fa-cogs"></i> المواصفات
+            <div class="header-actions">
+                <!-- Language Switcher -->
+                <div class="language-switcher" style="position: relative;">
+                    <button class="icon-btn" onclick="toggleLanguageMenu()" title="Change Language">
+                        <i class="fa-solid fa-globe"></i>
+                    </button>
+                    <div id="language-menu" class="language-menu" style="display: none;">
+                        <div class="language-menu-item" onclick="changeLanguage('en')">🇬🇧 English</div>
+                        <div class="language-menu-item" onclick="changeLanguage('ar')">🇸🇦 العربية</div>
+                        <div class="language-menu-item" onclick="changeLanguage('es')">🇪🇸 Español</div>
+                        <div class="language-menu-item" onclick="changeLanguage('fr')">🇫🇷 Français</div>
+                        <div class="language-menu-item" onclick="changeLanguage('de')">🇩🇪 Deutsch</div>
+                        <div class="language-menu-item" onclick="changeLanguage('zh')">🇨🇳 中文</div>
+                        <div class="language-menu-item" onclick="changeLanguage('hi')">🇮🇳 हिन्दी</div>
+                        <div class="language-menu-item" onclick="changeLanguage('pt')">🇧🇷 Português</div>
                     </div>
                 </div>
-                <div class="detail-tab-content" id="detail-description">
-                    <p id="detail-desc" style="line-height: 1.8; color: var(--text-main); font-size: 14px;"></p>
-                </div>
-                <div class="detail-tab-content" id="detail-specs" style="display:none;">
-                    <p style="color:var(--text-muted);">المواصفات الفنية</p>
-                </div>
-            </div>
-        </div>
-        <div class="buy-fixed-bar">
-            <div class="content-wrapper">
-                <button class="buy-btn" onclick="openCheckoutModal()">
-                    <i class="fa-solid fa-shopping-cart"></i> شراء المنتج الآن
+                
+                <button class="icon-btn primary" onclick="openAiUpload()" title="Sell Item">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                
+                <button class="icon-btn" onclick="openNotifications()" title="Notifications">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
+                
+                <button class="icon-btn" onclick="openSettings()" title="Settings">
+                    <i class="fa-solid fa-gear"></i>
                 </button>
             </div>
         </div>
-    </div>
-
-    <div id="checkoutModal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-credit-card"></i> تأكيد الدفع</div>
-            <div class="icon-btn" onclick="closeCheckoutModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">ملخص عملية الشراء</h2>
-            
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-box"></i> المنتج</h4>
-                <p id="checkout-product-name" style="font-weight: bold; font-size: 15px; margin-bottom: 5px;">iPhone 15 Pro</p>
-                <p>السعر: <span id="checkout-product-price" style="font-weight: bold; color:var(--primary);">0.01 Pi</span></p>
-            </div>
-            
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-shield-alt"></i> حماية المشتري (Escrow)</h4>
-                <p style="color:var(--success-color); font-weight: bold;">سيتم حجز المبلغ حتى تستلم المنتج وتؤكد مطابقته.</p>
-            </div>
-
-            <div class="buy-fixed-bar">
-                <div class="content-wrapper">
-                    <button class="buy-btn" style="background:var(--success-color); color:black;" onclick="checkout()">
-                        <i class="fa-solid fa-wallet"></i> تأكيد ودفع <span id="checkout-amount">0.01</span> Pi
+    </header>
+    
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="container">
+        
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    placeholder="Search with AI or describe your dream product..."
+                    aria-label="Search products"
+                    data-i18n="search_placeholder">
+                <div class="search-actions">
+                    <button class="search-action-btn" title="Voice Search">
+                        <i class="fa-solid fa-microphone"></i>
                     </button>
+                    <button class="search-action-btn" title="Image Search">
+                        <i class="fa-solid fa-camera"></i>
+                    </button>
+                </div>
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            </div>
+        </div>
+        
+        <!-- Categories -->
+        <section class="categories-container">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">
+                        <i class="fa-solid fa-grid"></i>
+                        <span data-i18n="categories">Categories</span>
+                    </h2>
+                </div>
+            </div>
+            <div class="categories-scroll" id="categories-scroll">
+                <!-- Categories will be rendered here by JS -->
+            </div>
+        </section>
+        
+        <!-- Hot Deals -->
+        <section style="margin-top: var(--space-8);">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">
+                        <i class="fa-solid fa-fire"></i>
+                        <span data-i18n="hot_deals">Hot Deals</span>
+                    </h2>
+                    <p class="section-subtitle" data-i18n="limited_time">Limited time offers</p>
+                </div>
+                <a href="#" style="color: var(--electric-blue); font-weight: 600; font-size: var(--text-sm);" data-i18n="see_all">
+                    See All →
+                </a>
+            </div>
+            
+            <div class="products-grid" id="products-grid">
+                <!-- Products will be rendered here by JS -->
+            </div>
+        </section>
+        
+        <!-- AI Recommendations -->
+        <section style="margin-top: var(--space-8);">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">
+                        <i class="fa-solid fa-sparkles"></i>
+                        <span data-i18n="ai_picks">AI Picks for You</span>
+                    </h2>
+                    <p class="section-subtitle" data-i18n="personalized">Personalized recommendations</p>
+                </div>
+            </div>
+            
+            <div class="products-grid">
+                <!-- AI recommended products -->
+            </div>
+        </section>
+        
+    </main>
+    
+    <!-- ============ BOTTOM NAVIGATION ============ -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="this.classList.add('active')">
+            <i class="fa-solid fa-house nav-icon"></i>
+            <span class="nav-label" data-i18n="home">Home</span>
+        </div>
+        
+        <div class="nav-item" onclick="openLogyAi()">
+            <i class="fa-solid fa-robot nav-icon"></i>
+            <span class="nav-label" data-i18n="ai_search">AI Search</span>
+        </div>
+        
+        <div class="nav-item-add" onclick="openAiUpload()">
+            <i class="fa-solid fa-plus"></i>
+        </div>
+        
+        <div class="nav-item" onclick="openOrders()">
+            <i class="fa-solid fa-box nav-icon"></i>
+            <span class="nav-label" data-i18n="orders">Orders</span>
+        </div>
+        
+        <div class="nav-item" onclick="openWallet()">
+            <i class="fa-solid fa-wallet nav-icon"></i>
+            <span class="nav-label" data-i18n="wallet">Wallet</span>
+        </div>
+    </nav>
+    
+</div>
+
+<!-- ========================================
+     PRODUCT DETAIL MODAL
+     ======================================== -->
+<div id="product-detail-modal" class="modal">
+    <div class="modal-header">
+        <div class="modal-title">
+            <i class="fa-solid fa-eye"></i>
+            <span data-i18n="product_details">Product Details</span>
+        </div>
+        <button class="icon-btn" onclick="closeProductDetail()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+    
+    <div class="modal-content">
+        <img id="detail-img" src="" alt="Product" style="width: 100%; height: 300px; object-fit: cover; border-radius: var(--radius-lg); margin-bottom: var(--space-4);">
+        
+        <h1 id="detail-title" style="font-size: var(--text-3xl); margin-bottom: var(--space-2);"></h1>
+        <div id="detail-price" style="font-size: var(--text-4xl); color: var(--electric-blue); font-weight: 900; margin-bottom: var(--space-6);"></div>
+        
+        <!-- AI Analysis -->
+        <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-4);">
+            <h3 style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); color: var(--purple-accent);">
+                <i class="fa-solid fa-robot"></i>
+                <span data-i18n="ai_price_intelligence">AI Price Intelligence</span>
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                <div style="text-align: center; padding: var(--space-4); background: rgba(139, 92, 246, 0.1); border-radius: var(--radius-md); border: 1px solid var(--purple-accent);">
+                    <div id="ai-score" style="font-size: var(--text-3xl); font-weight: 900; color: var(--purple-accent);">9.2</div>
+                    <div style="font-size: var(--text-xs); color: var(--medium-gray); margin-top: 4px;" data-i18n="deal_score">Deal Score</div>
+                </div>
+                <div style="text-align: center; padding: var(--space-4); background: rgba(0, 102, 255, 0.1); border-radius: var(--radius-md); border: 1px solid var(--electric-blue);">
+                    <div id="ai-market-price" style="font-size: var(--text-3xl); font-weight: 900; color: var(--electric-blue);">0.65 Pi</div>
+                    <div style="font-size: var(--text-xs); color: var(--medium-gray); margin-top: 4px;" data-i18n="market_avg">Market Avg</div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div id="settingsModal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-gear"></i> الإعدادات</div>
-            <div class="icon-btn" onclick="closeSettingsModal()"><i class="fa-solid fa-xmark"></i></div>
+        
+        <!-- Description -->
+        <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-4);">
+            <h3 style="margin-bottom: var(--space-3);">
+                <i class="fa-solid fa-file-lines"></i>
+                <span data-i18n="description">Description</span>
+            </h3>
+            <p id="detail-desc" style="line-height: 1.8; color: var(--medium-gray);"></p>
         </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">إعدادات الحساب</h2>
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-user-circle"></i> الحساب</h4>
-                <p>إدارة ملفك الشخصي</p>
+        
+        <!-- Seller Info -->
+        <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-20);">
+            <h3 style="margin-bottom: var(--space-3);">
+                <i class="fa-solid fa-user"></i>
+                <span data-i18n="seller_info">Seller Information</span>
+            </h3>
+            <div style="display: flex; align-items: center; gap: var(--space-3);">
+                <div style="width: 48px; height: 48px; border-radius: var(--radius-full); background: linear-gradient(135deg, var(--electric-blue), var(--purple-accent)); display: flex; align-items: center; justify-content: center; font-size: var(--text-xl);">
+                    👤
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; margin-bottom: 4px;">Ahmed Mohamed</div>
+                    <div style="font-size: var(--text-sm); color: var(--success-green);">
+                        <i class="fa-solid fa-check-circle"></i> 
+                        <span data-i18n="verified_seller">Verified Seller</span>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: var(--text-xl); font-weight: 700;">4.9⭐</div>
+                    <div style="font-size: var(--text-xs); color: var(--medium-gray);">1,234 <span data-i18n="sales">sales</span></div>
+                </div>
             </div>
+            <button class="btn btn-secondary btn-full" style="margin-top: var(--space-4);">
+                <i class="fa-solid fa-message"></i>
+                <span data-i18n="message_seller">Message Seller</span>
+            </button>
         </div>
     </div>
-
-    <div id="ordersModal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-cart-shopping"></i> الطلبات</div>
-            <div class="icon-btn" onclick="closeOrdersModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">طلباتك</h2>
-            <div class="settings-group">
-                <p style="color:var(--text-muted); text-align:center;">لا توجد طلبات بعد</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="walletModal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-wallet"></i> المحفظة</div>
-            <div class="icon-btn" onclick="closeWalletModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">رصيدك</h2>
-            <div class="glass-panel" style="padding: 25px; text-align: center;">
-                <div style="font-size: 40px; font-weight: 900; color: var(--pi-purple);">-- Pi</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="notificationsModal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-bell"></i> الإشعارات</div>
-            <div class="icon-btn" onclick="closeNotificationsModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <p style="color:var(--text-muted); text-align:center; padding:20px;">لا توجد إشعارات</p>
-        </div>
-    </div>
-
-    <div id="ai-upload-modal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-microchip"></i> إدراج منتج</div>
-            <div class="icon-btn" onclick="closeAiUploadModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--accent); margin: 15px 0;">أطلق منتجك</h2>
-            <p style="color:var(--text-muted);">قريباً: تحليل تلقائي بالذكاء الاصطناعي</p>
-        </div>
-    </div>
-
-    <div id="logyAiModal">
-        <div class="logy-chat-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-robot"></i> Logy AI</div>
-            <div class="icon-btn" onclick="closeLogyAiModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="logy-chat-area"></div>
-        <div class="logy-input-bar">
-            <input type="text" placeholder="اسأل Logy AI...">
-            <div class="logy-send-btn"><i class="fa-solid fa-paper-plane"></i></div>
-        </div>
-    </div>
-
-    <div class="footer-nav">
-        <div class="nav-item active" onclick="showApp('home')">
-            <i class="fa-solid fa-house"></i>
-            <span>الرئيسية</span>
-        </div>
-        <div class="nav-item" onclick="openLogyAiModal()">
-            <i class="fa-solid fa-robot"></i>
-            <span>Logy AI</span>
-        </div>
-        <div class="nav-item" onclick="openOrdersModal()">
-            <i class="fa-solid fa-box"></i>
-            <span>الطلبات</span>
-        </div>
-        <div class="nav-item" onclick="openWalletModal()">
-            <i class="fa-solid fa-wallet"></i>
-            <span>المحفظة</span>
-        </div>
+    
+    <!-- Fixed Buy Button -->
+    <div style="position: fixed; bottom: 0; left: 0; right: 0; padding: var(--space-4); background: rgba(10, 22, 40, 0.98); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.1); z-index: 100;">
+        <button class="btn btn-success btn-lg btn-full" onclick="openCheckout()">
+            <i class="fa-solid fa-shopping-cart"></i>
+            <span data-i18n="buy_now">Buy Now</span>
+        </button>
     </div>
 </div>
 
-<script src="script.js"></script>
+<!-- Additional modals remain the same structure but with data-i18n attributes -->
+
+<!-- Language Menu Styles -->
+<style>
+.language-select {
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-full);
+    color: white;
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.language-select:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--electric-blue);
+}
+
+.language-menu {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: rgba(10, 22, 40, 0.98);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    min-width: 180px;
+    box-shadow: var(--shadow-xl);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.language-menu-item {
+    padding: 12px 16px;
+    color: white;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    font-size: var(--text-sm);
+}
+
+.language-menu-item:hover {
+    background: rgba(0, 102, 255, 0.1);
+    color: var(--electric-blue);
+}
+
+.language-menu-item.active {
+    background: var(--electric-blue);
+    color: white;
+}
+</style>
+
+<!-- JavaScript -->
+<script src="script-new.js"></script>
+<script src="i18n.js"></script>
 
 </body>
 </html>
