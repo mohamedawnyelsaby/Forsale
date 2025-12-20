@@ -2,107 +2,263 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="Forsale - The world's smartest marketplace powered by AI and Pi Network">
-    <meta name="theme-color" content="#0066FF">
-    
-    <title>Forsale - Smart Global Marketplace</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forsale - Global Marketplace</title>
     
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Icons - IMPORTANT! -->
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- Your CSS - CHECK THE PATH! -->
-    <link rel="stylesheet" href="style.css">
-    
-    <!-- Pi Network SDK -->
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0A1628 0%, #1a2744 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        /* Auth Page */
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .auth-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .logo { font-size: 48px; font-weight: 900; color: #0066FF; text-align: center; margin-bottom: 10px; }
+        .subtitle { color: #8F9BB3; text-align: center; margin-bottom: 30px; }
+        
+        input {
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 50px;
+            border: 2px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-size: 16px;
+        }
+        
+        input:focus { outline: none; border-color: #0066FF; }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 50px;
+            border: none;
+            background: #0066FF;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 0;
+            transition: 0.3s;
+        }
+        
+        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        .btn-secondary { background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.2); }
+        
+        /* App Page */
+        .app-page { display: none; }
+        .app-page.active { display: block; }
+        
+        /* Header */
+        .header {
+            background: rgba(10,22,40,0.95);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .header-logo { font-size: 24px; font-weight: 900; color: #0066FF; }
+        .header-actions { display: flex; gap: 10px; }
+        
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .icon-btn:hover { background: rgba(255,255,255,0.1); }
+        .icon-btn.primary { background: #0066FF; }
+        
+        /* Search */
+        .search-container { padding: 20px; }
+        .search-box {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 16px 50px 16px 20px;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.08);
+            border: 2px solid rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+        }
+        
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #0066FF;
+        }
+        
+        /* Products Grid */
+        .products-container { padding: 20px; }
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
+        }
+        
+        .product-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255,255,255,0.2);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(135deg, #1a2744, #0A1628);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+        
+        .product-info { padding: 12px; }
+        .product-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .product-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0066FF;
+        }
+        
+        .product-rating {
+            font-size: 12px;
+            color: #FFB800;
+            margin-top: 4px;
+        }
+        
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10,22,40,0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8F9BB3;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .nav-item i { font-size: 20px; margin-bottom: 4px; }
+        .nav-item.active { color: #0066FF; }
+        .nav-item:hover { color: #0066FF; }
+        
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body>
 
-<!-- Authentication Screen -->
-<div id="auth-container" style="display: flex;">
-    <div style="text-align: center; max-width: 400px; width: 100%; padding: 20px;">
+<!-- ============ AUTH PAGE ============ -->
+<div class="auth-page" id="authPage">
+    <div class="auth-card">
+        <div class="logo">🛍️ Forsale</div>
+        <p class="subtitle">The World's Smartest Marketplace<br>Powered by AI & Pi Network</p>
         
-        <!-- Logo -->
-        <div style="margin-bottom: 40px;">
-            <div style="font-size: 48px; font-weight: 900; color: #0066FF; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 10px;">
-                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #0066FF, #8B5CF6); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px;">🛍️</div>
-                Forsale
-            </div>
-            <p style="color: #8F9BB3; font-size: 18px;">
-                The World's Smartest Marketplace
-            </p>
-            <p style="color: #0066FF; font-size: 14px; margin-top: 5px;">
-                Powered by AI & Pi Network
-            </p>
-        </div>
+        <h2 style="text-align: center; margin-bottom: 24px;">Welcome Back</h2>
         
-        <!-- Login Card -->
-        <div style="background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 32px;">
-            <h2 style="margin-bottom: 24px; font-size: 30px; color: white;">Welcome Back</h2>
-            
-            <!-- Email Input -->
-            <div style="position: relative; margin-bottom: 16px;">
-                <input 
-                    type="email" 
-                    id="login-email" 
-                    placeholder="Email address"
-                    style="width: 100%; padding: 16px 48px 16px 16px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; font-size: 16px;">
-                <i class="fa-solid fa-envelope" style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: #0066FF;"></i>
-            </div>
-            
-            <!-- Password Input -->
-            <div style="position: relative; margin-bottom: 24px;">
-                <input 
-                    type="password" 
-                    id="login-password" 
-                    placeholder="Password"
-                    style="width: 100%; padding: 16px 48px 16px 16px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; font-size: 16px;">
-                <i class="fa-solid fa-lock" style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: #0066FF;"></i>
-            </div>
-            
-            <!-- Login Button -->
-            <button id="login-btn" style="width: 100%; padding: 14px; border-radius: 50px; border: none; background: #0066FF; color: white; font-weight: 700; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s;">
-                <span>Sign In</span>
-                <i class="fa-solid fa-arrow-right"></i>
-            </button>
-            
-            <!-- Divider -->
-            <div style="margin: 24px 0; display: flex; align-items: center; gap: 16px;">
-                <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
-                <span style="color: #8F9BB3; font-size: 14px;">OR</span>
-                <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
-            </div>
-            
-            <!-- Biometric Login -->
-            <div id="fingerprint-login-btn" style="cursor: pointer; margin-bottom: 16px; padding: 16px; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); transition: 0.3s;">
-                <i class="fa-solid fa-fingerprint" style="font-size: 40px; color: #0066FF; margin-bottom: 8px;"></i>
-                <p style="font-size: 14px; color: #0066FF; font-weight: 600;">
-                    Quick Login with Biometrics
-                </p>
-            </div>
-            
-            <!-- Pi Network Login -->
-            <button id="pi-login-btn" style="width: 100%; padding: 14px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; font-weight: 600; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <i class="fa-solid fa-network-wired"></i>
-                <span>Continue with Pi Network</span>
-            </button>
-            
-            <!-- Sign Up Link -->
-            <p style="margin-top: 24px; color: #8F9BB3; font-size: 14px;">
-                Don't have an account? 
-                <a href="#" onclick="showRegister()" style="color: #0066FF; font-weight: 600; text-decoration: none;">Sign Up</a>
-            </p>
-        </div>
+        <input type="email" id="email" placeholder="Email address">
+        <input type="password" id="password" placeholder="Password">
         
-        <!-- Language Selector -->
-        <div style="margin-top: 24px;">
-            <select id="language-selector" onchange="changeLanguage(this.value)" style="padding: 10px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50px; color: white; font-size: 14px; cursor: pointer;">
+        <button class="btn" onclick="login()">
+            <i class="fa-solid fa-arrow-right"></i> Sign In
+        </button>
+        
+        <div style="text-align: center; margin: 20px 0; color: #8F9BB3;">OR</div>
+        
+        <button class="btn btn-secondary" onclick="biometricLogin()">
+            <i class="fa-solid fa-fingerprint"></i> Biometric Login
+        </button>
+        
+        <button class="btn btn-secondary" onclick="piLogin()">
+            <i class="fa-solid fa-network-wired"></i> Continue with Pi Network
+        </button>
+        
+        <p style="text-align: center; margin-top: 20px; color: #8F9BB3; font-size: 14px;">
+            Don't have an account? <span style="color: #0066FF; cursor: pointer;">Sign Up</span>
+        </p>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <select id="langSelect" onchange="changeLang()" style="padding: 10px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; cursor: pointer;">
                 <option value="en">🇬🇧 English</option>
                 <option value="ar">🇸🇦 العربية</option>
                 <option value="es">🇪🇸 Español</option>
@@ -111,53 +267,178 @@
                 <option value="zh">🇨🇳 中文</option>
                 <option value="hi">🇮🇳 हिन्दी</option>
                 <option value="pt">🇧🇷 Português</option>
-                <option value="ru">🇷🇺 Русский</option>
-                <option value="ja">🇯🇵 日本語</option>
             </select>
         </div>
     </div>
 </div>
 
-<!-- App Container (Hidden by default) -->
-<div id="app-container" style="display: none;">
-    <p style="text-align: center; padding: 40px; color: white;">Loading app...</p>
+<!-- ============ APP PAGE ============ -->
+<div class="app-page" id="appPage">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-logo">🛍️ Forsale</div>
+        <div class="header-actions">
+            <div class="icon-btn primary"><i class="fa-solid fa-plus"></i></div>
+            <div class="icon-btn"><i class="fa-solid fa-bell"></i></div>
+            <div class="icon-btn"><i class="fa-solid fa-gear"></i></div>
+        </div>
+    </div>
+    
+    <!-- Search -->
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="Search with AI or describe your dream product...">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        </div>
+    </div>
+    
+    <!-- Products -->
+    <div class="products-container" style="padding-bottom: 80px;">
+        <h2 class="section-title">
+            <i class="fa-solid fa-fire"></i> Hot Deals
+        </h2>
+        
+        <div class="products-grid" id="productsGrid">
+            <!-- Products will be added here -->
+        </div>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </div>
+        <div class="nav-item">
+            <i class="fa-solid fa-robot"></i>
+            <span>AI Search</span>
+        </div>
+        <div class="nav-item">
+            <i class="fa-solid fa-box"></i>
+            <span>Orders</span>
+        </div>
+        <div class="nav-item">
+            <i class="fa-solid fa-wallet"></i>
+            <span>Wallet</span>
+        </div>
+    </div>
 </div>
 
-<!-- JavaScript - IMPORTANT! CHECK PATHS! -->
-<script src="script.js"></script>
-<script src="i18n.js"></script>
+<script>
+// Sample Products Data
+const products = [
+    { name: 'iPhone 15 Pro', price: '0.5 Pi', rating: '4.9', emoji: '📱' },
+    { name: 'MacBook Pro M3', price: '1.2 Pi', rating: '4.8', emoji: '💻' },
+    { name: 'Canon EOS R6', price: '0.8 Pi', rating: '4.7', emoji: '📷' },
+    { name: 'PlayStation 5', price: '0.3 Pi', rating: '5.0', emoji: '🎮' },
+    { name: 'AirPods Pro 2', price: '0.15 Pi', rating: '4.9', emoji: '🎧' },
+    { name: 'Galaxy S24', price: '0.4 Pi', rating: '4.6', emoji: '📱' },
+    { name: 'iPad Pro', price: '0.6 Pi', rating: '4.8', emoji: '📱' },
+    { name: 'Apple Watch', price: '0.25 Pi', rating: '4.7', emoji: '⌚' }
+];
 
-<style>
-/* Critical inline styles to ensure page works even if CSS doesn't load */
-body {
-    margin: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #0A1628 0%, #1a2744 100%);
-    min-height: 100vh;
-    color: white;
+// Login Functions
+function login() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    
+    if (email && password) {
+        showNotification('✅ Login successful!');
+        setTimeout(showApp, 1000);
+    } else {
+        showNotification('⚠️ Please enter email and password');
+    }
 }
 
-#auth-container {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+function biometricLogin() {
+    showNotification('🔐 Biometric login (mock)');
+    setTimeout(() => {
+        showNotification('✅ Login successful!');
+        setTimeout(showApp, 1000);
+    }, 1000);
 }
 
-input:focus, select:focus, button:focus {
-    outline: none;
+function piLogin() {
+    showNotification('🌐 Connecting to Pi Network...');
+    setTimeout(() => {
+        showNotification('✅ Pi Network login successful!');
+        setTimeout(showApp, 1000);
+    }, 1500);
 }
 
-button:hover {
-    opacity: 0.9;
-    transform: translateY(-2px);
+// Show App
+function showApp() {
+    document.getElementById('authPage').classList.add('hidden');
+    document.getElementById('appPage').classList.add('active');
+    renderProducts();
 }
 
-select option {
-    background: #0A1628;
-    color: white;
+// Render Products
+function renderProducts() {
+    const grid = document.getElementById('productsGrid');
+    grid.innerHTML = '';
+    
+    products.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+            <div class="product-image">${product.emoji}</div>
+            <div class="product-info">
+                <div class="product-name">${product.name}</div>
+                <div class="product-rating">⭐ ${product.rating}</div>
+                <div class="product-price">${product.price}</div>
+            </div>
+        `;
+        card.onclick = () => showNotification(`📦 ${product.name} - ${product.price}`);
+        grid.appendChild(card);
+    });
 }
-</style>
+
+// Notifications
+function showNotification(message) {
+    const notif = document.createElement('div');
+    notif.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(10,22,40,0.98);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.2);
+        font-weight: 600;
+        z-index: 9999;
+        animation: slideIn 0.3s ease;
+    `;
+    notif.textContent = message;
+    document.body.appendChild(notif);
+    
+    setTimeout(() => {
+        notif.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notif.remove(), 300);
+    }, 3000);
+}
+
+// Language Change
+function changeLang() {
+    const lang = document.getElementById('langSelect').value;
+    showNotification(`🌍 Language changed to: ${lang}`);
+}
+
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(400px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(400px); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+</script>
 
 </body>
 </html>
