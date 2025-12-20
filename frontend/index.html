@@ -1,444 +1,1820 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forsale - Global Marketplace</title>
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Forsale AI - سوق المستقبل</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0A1628 0%, #1a2744 100%);
-            color: white;
+        /* ========================================== */
+        /* 1. الثوابت والتصميم الأساسي (Glassmorphism) */
+        /* ========================================== */
+        :root {
+            --primary: #FFD700;
+            --accent: #00f2ff; 
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --radius: 14px;
+            --bg-dark: #0a1128;
+            --content-padding-h: 15px; 
+            --chat-user-bg: #4A90E2; /* لون رسائل المستخدم */
+            --chat-ai-bg: #1A2E44;
+            /* لون رسائل الذكاء الاصطناعي */
+            --success-color: #2ECC71;
+            /* لون النجاح */
+            --header-height: 65px;
+            /* ارتفاع الهيدر الأساسي */
+            --danger: #FF5252;
+            --pi-purple: #9453A9;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+
+        /* ROOT FIX - فرض الثبات */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%; max-width: 100vw; 
+            overflow-x: hidden !important; 
+            background: var(--bg-dark);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            color: var(--text-main);
             min-height: 100vh;
         }
-        
-        /* Auth Page */
-        .auth-page {
-            min-height: 100vh;
+
+        body {
+            background: radial-gradient(circle at top left, #1a2e44 0%, #000000 100%);
+            background-attachment: fixed;
+            padding-top: calc(var(--header-height) + 15px); /* قيمة مناسبة للهاتف */
+            padding-bottom: 70px;
+        }
+
+        .content-wrapper {
+            padding-left: var(--content-padding-h);
+            padding-right: var(--content-padding-h);
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+        }
+
+        /* ========================================== */
+        /* صفحة تسجيل الدخول */
+        /* ========================================== */
+        #auth-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #1a2e44 0%, #000 100%);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            z-index: 2000;
         }
-        
+
+        .auth-logo {
+            font-size: 35px;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
         .auth-card {
-            background: rgba(255,255,255,0.05);
+            background: var(--glass-bg);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 40px;
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 25px;
+            width: 100%;
             max-width: 400px;
-            width: 100%;
+            text-align: center;
         }
-        
-        .logo { font-size: 48px; font-weight: 900; color: #0066FF; text-align: center; margin-bottom: 10px; }
-        .subtitle { color: #8F9BB3; text-align: center; margin-bottom: 30px; }
-        
-        input {
+
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .input-group input {
             width: 100%;
-            padding: 16px;
-            margin-bottom: 16px;
+            padding: 12px 45px 12px 15px;
             border-radius: 50px;
-            border: 2px solid rgba(255,255,255,0.1);
+            border: 1px solid var(--glass-border);
             background: rgba(255,255,255,0.05);
             color: white;
-            font-size: 16px;
+            font-size: 14px;
         }
-        
-        input:focus { outline: none; border-color: #0066FF; }
-        
-        .btn {
+
+        .input-group i {
+            position: absolute;
+            right: 15px;
+            top: 14px;
+            color: var(--accent);
+        }
+
+        .main-btn {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             border-radius: 50px;
             border: none;
-            background: #0066FF;
-            color: white;
+            background: var(--primary);
+            color: black;
             font-weight: 700;
             font-size: 16px;
             cursor: pointer;
-            margin: 10px 0;
-            transition: 0.3s;
-        }
-        
-        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
-        .btn-secondary { background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.2); }
-        
-        /* App Page */
-        .app-page { display: none; }
-        .app-page.active { display: block; }
-        
-        /* Header */
-        .header {
-            background: rgba(10,22,40,0.95);
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .header-logo { font-size: 24px; font-weight: 900; color: #0066FF; }
-        .header-actions { display: flex; gap: 10px; }
-        
-        .icon-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white;
+            margin-top: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        
-        .icon-btn:hover { background: rgba(255,255,255,0.1); }
-        .icon-btn.primary { background: #0066FF; }
-        
-        /* Search */
-        .search-container { padding: 20px; }
-        .search-box {
-            position: relative;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 16px 50px 16px 20px;
-            border-radius: 50px;
-            background: rgba(255,255,255,0.08);
-            border: 2px solid rgba(255,255,255,0.1);
-            color: white;
-            font-size: 16px;
-        }
-        
-        .search-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #0066FF;
-        }
-        
-        /* Products Grid */
-        .products-container { padding: 20px; }
-        .section-title {
-            font-size: 24px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
             gap: 10px;
+            transition: all 0.3s ease;
         }
-        
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 16px;
+
+        .main-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,215,0,0.3);
         }
-        
-        .product-card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            overflow: hidden;
+
+        .pi-btn {
+            background: linear-gradient(90deg, var(--pi-purple), #612F74);
+            color: white;
+        }
+
+        .fingerprint-scan {
+            font-size: 40px;
+            color: var(--accent);
+            margin: 20px 0;
             cursor: pointer;
-            transition: 0.3s;
+            animation: pulse 2s infinite;
         }
-        
-        .product-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(255,255,255,0.2);
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
         }
-        
-        .product-image {
+
+        .auth-footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .auth-footer a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* ========================================== */
+        /* 2. الهيكل العام - (إصلاح تثبيت الهيدر) */
+        /* ========================================== */
+
+        .fixed-header-wrapper {
+            position: fixed;
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            z-index: 100;
+        }
+
+        .header {
+            padding: 15px 0;
+            margin-top: 0;
+            background: rgba(10, 17, 40, 0.95); 
+            border-bottom: 1px solid var(--glass-border);
             width: 100%;
-            height: 160px;
-            background: linear-gradient(135deg, #1a2744, #0A1628);
+        }
+        
+        .header .content-wrapper { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 22px; font-weight: 900; color: var(--primary); letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+        .logo .ai-badge {
+            /* تصميم شعار "AI" المميز للتطبيق */
+            font-size: 10px;
+            background: var(--accent);
+            color: var(--bg-dark);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+        
+        .icon-btn { background: var(--glass-bg); border: 1px solid var(--glass-border); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; transition: background 0.2s; }
+        .icon-btn.primary { background: var(--primary); color: black; border-color: var(--primary); }
+        /* NEW: Notification bell with a red dot */
+        .notification-icon-container { position: relative; }
+        .notification-dot {
+            position: absolute;
+            top: 5px; right: 5px;
+            width: 8px; height: 8px;
+            background: red;
+            border-radius: 50%;
+            border: 1px solid var(--bg-dark);
+            z-index: 5;
+        }
+
+        .search-box { margin: 15px 0; position: relative; width: 100%; }
+        /* Updated placeholder for AI Personal Shopper concept */
+        .search-box input { width: 100%; padding: 12px 40px 12px 15px; border-radius: 50px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); color: white; font-size: 14px; }
+        .search-icon { position: absolute; right: 15px; top: 13px; color: var(--text-muted); }
+
+        .cats-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; margin-bottom: 15px; width: 100%; }
+        .cats-scroll::-webkit-scrollbar { display: none; }
+        .cat-item { flex: 0 0 auto; padding: 10px 20px; border-radius: 30px; background: var(--glass-bg); border: 1px solid var(--glass-border); font-size: 13px; color: var(--text-muted); transition: 0.3s; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .cat-item.active { background: var(--primary); color: #000; font-weight: bold; border-color: var(--primary); }
+
+        /* ستايل لوحة الفلاتر الديناميكية (مستوى 2 و 3) */
+        .dynamic-filters { overflow: hidden; max-height: 0; transition: max-height 0.4s ease, opacity 0.4s ease; background: rgba(0,0,0,0.2); border-radius: var(--radius); margin-bottom: 0; opacity: 0; }
+        .dynamic-filters.open { 
+            margin-bottom: 20px;
+            opacity: 1; 
+            padding: 10px; 
+            border: 1px solid var(--glass-border); 
+            max-height: 400px; 
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .sub-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip { font-size: 12px; padding: 6px 12px; border-radius: 20px; background: rgba(255,255,255,0.08); color: #ddd; cursor: pointer; }
+        .chip.active { background: var(--accent); color: #000; }
+        
+        /* ستايل حقول الإدخال والقوائم المنسدلة (المستوى 3) */
+        .filter-group { 
+            margin-bottom: 12px;
+            width: 100%; 
+            display: flex; 
+            flex-direction: column;
+            gap: 5px;
+        }
+        .filter-group label { 
+            font-size: 13px;
+            color: var(--text-main); 
+            font-weight: bold;
+        }
+        .filter-group select, 
+        .filter-group input[type="text"],
+        .filter-group input[type="number"],
+        .filter-group textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            font-size: 14px;
+            appearance: none;
+        }
+        .filter-group select {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path fill="rgba(255,255,255,0.7)" d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 16px;
+        }
+        .filter-group select:focus, 
+        .filter-group input[type="text"]:focus,
+        .filter-group textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(0, 242, 255, 0.2);
+        }
+        
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; width: 100%; }
+        .product-card { position: relative; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; transition: 0.2s; }
+        .product-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0, 242, 255, 0.1); }
+        .p-img-box { width: 100%; height: 140px; background: #000; position: relative; }
+        .p-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .ai-tag { 
+            /* مؤشر تحليل AI على كرت المنتج */
+            position: absolute;
+            top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: var(--accent); font-size: 10px; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--accent);
+            display: flex; align-items: center; gap: 4px; 
+        }
+        .p-details { padding: 10px; }
+        .p-name { font-size: 13px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+        .p-price { color: var(--primary); font-weight: bold; font-size: 15px; }
+
+        /* ========================================== */
+        /* 3. ستايل النوافذ المنبثقة (Modals) */
+        /* ========================================== */
+        #product-detail-modal, #ai-upload-modal, #settingsModal, #checkoutModal, #ordersModal, #walletModal, #evidenceUploadModal, #notificationsModal, #sellerDashboardModal { 
+            /* تظليل ورفع النوافذ المنبثقة فوق المحتوى الرئيسي */
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--bg-dark); z-index: 200; overflow-y: auto; display: none; 
+            padding-bottom: 140px;
+        }
+        
+        /* Logy AI Chat Modal Fix */
+        #logyAiModal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--bg-dark); z-index: 600; overflow: hidden; 
+            display: none; 
+            flex-direction: column;
+        }
+
+        .detail-header { position: sticky; top: 0; background: rgba(10, 17, 40, 0.95); padding: 15px; z-index: 10; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); }
+        .detail-img { 
+            width: 100%;
+            height: 200px; 
+            object-fit: cover; 
+            margin-bottom: 15px; 
+        }
+        .detail-title { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
+        .detail-price { font-size: 28px; color: var(--primary); font-weight: 900; }
+        .ai-section-title { font-size: 16px; font-weight: bold; color: var(--accent); margin: 20px 0 10px; display: flex; align-items: center; gap: 8px; }
+        .ai-price-card { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .stat-box { text-align: center; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03); }
+        .stat-box .value { font-size: 20px; font-weight: bold; margin-bottom: 3px; }
+        .stat-box .label { font-size: 11px; color: var(--text-muted); }
+        .buy-fixed-bar { 
+            position: fixed;
+            bottom: 60px; 
+            width: 100%; background: rgba(10, 17, 40, 0.95); backdrop-filter: blur(10px); padding: 10px 0; z-index: 20; border-top: 1px solid var(--glass-border);
+        }
+        .buy-btn { width: 100%; padding: 15px; border: none; border-radius: 50px; background: var(--primary); color: black; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .buy-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ستايل مؤشر السعر التاريخي (Mockup) */
+        .price-chart-mock { 
+            height: 80px;
+            width: 100%; 
+            margin-top: 10px; 
+            background: repeating-linear-gradient(to top, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 1px, transparent 1px, transparent 20px); 
+            position: relative; 
+            border-radius: 8px;
+        }
+        .chart-line { 
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 100%; 
+            background: linear-gradient(to right, #00f2ff, #2ECC71);
+            mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2' d='M0,80 Q25,20 50,70 T100,30'/%3E%3C/svg%3E"); 
+            mask-size: 100% 100%;
+        }
+
+        /* ستايل لوجستيات الشحن (مستعاد) */
+        .ai-logistics-card { padding: 15px; }
+        .step { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+        .step-icon { width: 25px; height: 25px; border-radius: 50%; background: var(--accent); color: black; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .step-text { font-size: 13px; }
+
+        /* NEW: Detail Tabs */
+        .detail-tabs-container {
+            padding: 15px;
+            margin-top: 20px; 
+            margin-bottom: 20px;
+        }
+        .detail-tabs-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px; 
+            scrollbar-width: none; 
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .detail-tabs-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        .detail-tab-item {
+            flex: 0 0 auto;
+            padding: 10px 18px;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid transparent;
+            font-size: 13px;
+            color: var(--text-muted);
+            transition: 0.3s;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 48px;
+            gap: 8px;
+            font-weight: 500;
         }
-        
-        .product-info { padding: 12px; }
-        .product-name {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .detail-tab-item.active {
+            background: var(--primary);
+            color: #000;
+            font-weight: bold;
+            border-color: var(--primary);
         }
-        
-        .product-price {
-            font-size: 18px;
-            font-weight: 700;
-            color: #0066FF;
+        .detail-tab-item:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--text-main);
         }
-        
-        .product-rating {
-            font-size: 12px;
-            color: #FFB800;
-            margin-top: 4px;
+        .detail-tab-content {
+            padding-top: 10px;
         }
-        
-        /* Bottom Nav */
-        .bottom-nav {
+
+        /* ستايل خطوات نظام Escrow الآمن */
+        .escrow-step { display: flex; align-items: center; margin-bottom: 15px; }
+        .escrow-step-icon {
+            width: 30px;
+            height: 30px; border-radius: 50%; background: var(--glass-bg);
+            border: 1px solid var(--glass-border); display: flex; align-items: center;
+            justify-content: center; font-size: 14px; color: var(--text-muted);
+            margin-left: 10px; transition: all 0.5s;
+        }
+        .escrow-step.active .escrow-step-icon {
+            /* التلوين بالأخضر عند التفعيل */
+            background: var(--success-color);
+            color: black; border-color: var(--success-color);
+        }
+        .escrow-step-text { font-size: 14px; font-weight: 500; }
+        /* End of Escrow Steps */
+
+
+        /* ========================================== */
+        /* 4. شريط التنقل السفلي */
+        /* ========================================== */
+        .footer-nav {
             position: fixed;
             bottom: 0;
             left: 0;
-            right: 0;
-            background: rgba(10,22,40,0.95);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding: 10px 0;
+            width: 100%;
+            height: 60px;
+            /* استخدام خلفية شفافة ومزج الألوان */
+            background: rgba(10, 17, 40, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--glass-border); z-index: 500;
             display: flex;
             justify-content: space-around;
+            align-items: center;
         }
-        
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: #8F9BB3;
-            font-size: 12px;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 11px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: color 0.2s;
+            padding: 5px 0;
+            min-width: 60px;
+        }
+        .nav-item i {
+            font-size: 18px;
+            margin-bottom: 3px;
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-item:hover {
+            color: var(--text-main);
+        }
+
+        /* ========================================== */
+        /* 5. ستايل Logy AI Chat */
+        /* ========================================== */
+        #logyAiModal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--bg-dark); z-index: 600; overflow: hidden; 
+            display: none; 
+            flex-direction: column;
+        }
+        .logy-chat-header {
+            padding: 15px;
+            background: rgba(10, 17, 40, 0.95); 
+            z-index: 10; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid var(--glass-border); 
+            color: white;
+        }
+        .logy-chat-header .logo { font-size: 18px; color: var(--accent); }
+
+        .logy-chat-area {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .msg-user {
+            background: var(--chat-user-bg);
+            color: white;
+            align-self: flex-start; 
+            border-bottom-right-radius: 2px;
+        }
+
+        .msg-ai {
+            background: var(--chat-ai-bg);
+            color: white;
+            align-self: flex-end; 
+            border-bottom-left-radius: 2px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .logy-input-bar {
+            padding: 10px 15px;
+            background: rgba(10, 17, 40, 0.95);
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .logy-input-bar input {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 14px;
+        }
+
+        .logy-send-btn {
+            background: var(--primary);
+            color: black;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* Settings Modal Specific Styles */
+        #settingsModal .content-wrapper, #notificationsModal .content-wrapper {
+            padding-top: 20px;
+        }
+        .settings-group {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .settings-group h4 {
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .settings-group button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+        .settings-group button.primary {
+            background: var(--primary);
+            color: var(--bg-dark);
+        }
+        .settings-group button.accent {
+            background: var(--accent);
+            color: var(--bg-dark);
+        }
+        .settings-group p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* NEW: Notification Item Style */
+        .notification-item {
+            border-bottom: 1px solid var(--glass-border);
+            padding: 10px 0;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        .notification-icon {
+            min-width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .notification-item.unread .notification-icon {
+            background: var(--primary);
+        }
+        .notification-content {
+            flex-grow: 1;
+        }
+        .notification-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+        .notification-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        .notification-time {
+            font-size: 10px;
+            color: #555;
+            text-align: left;
         }
         
-        .nav-item i { font-size: 20px; margin-bottom: 4px; }
-        .nav-item.active { color: #0066FF; }
-        .nav-item:hover { color: #0066FF; }
+        /* إضافة التطبيق الرئيسي */
+        #app-container {
+            display: none;
+        }
         
-        .hidden { display: none !important; }
+        /* NEW: Seller Dashboard Modal Style */
+        #sellerDashboardModal { 
+            /* نفس ستايل النوافذ المنبثقة الأخرى */
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--bg-dark); z-index: 200; overflow-y: auto; display: none; 
+            padding-bottom: 70px; /* لتجنب تداخل شريط التنقل */
+        }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .kpi-card {
+            padding: 15px;
+            border-radius: var(--radius);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            text-align: center;
+        }
+        .kpi-card .value {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        .kpi-card .label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .dashboard-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+        }
+        .dashboard-list-item:hover {
+            background: rgba(255,255,255,0.02);
+        }
+        .list-item-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .list-item-title {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .list-item-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
     </style>
 </head>
 <body>
 
-<!-- ============ AUTH PAGE ============ -->
-<div class="auth-page" id="authPage">
+<div id="auth-container">
+    <div class="auth-logo">
+        <span style="background:var(--accent);color:black;font-size:14px;padding:2px 8px;border-radius:6px">AI</span> 
+        Forsale
+    </div>
+    <p style="color:var(--text-muted);margin-bottom:30px;text-align:center">منصة المستقبل الذكية - مدعومة بـ Pi Network</p>
+
     <div class="auth-card">
-        <div class="logo">🛍️ Forsale</div>
-        <p class="subtitle">The World's Smartest Marketplace<br>Powered by AI & Pi Network</p>
+        <h2 style="margin-bottom:20px">تسجيل الدخول الآمن</h2>
         
-        <h2 style="text-align: center; margin-bottom: 24px;">Welcome Back</h2>
+        <div class="input-group">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" placeholder="البريد الإلكتروني" id="login-email">
+        </div>
         
-        <input type="email" id="email" placeholder="Email address">
-        <input type="password" id="password" placeholder="Password">
-        
-        <button class="btn" onclick="login()">
-            <i class="fa-solid fa-arrow-right"></i> Sign In
+        <div class="input-group">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" placeholder="كلمة المرور" id="login-password">
+        </div>
+
+        <button class="main-btn" id="login-btn">
+            دخول آمن <i class="fa-solid fa-arrow-left"></i>
         </button>
-        
-        <div style="text-align: center; margin: 20px 0; color: #8F9BB3;">OR</div>
-        
-        <button class="btn btn-secondary" onclick="biometricLogin()">
-            <i class="fa-solid fa-fingerprint"></i> Biometric Login
+
+        <div style="margin-top:20px; cursor:pointer;" id="fingerprint-login-btn">
+            <i class="fa-solid fa-fingerprint fingerprint-scan"></i>
+            <p style="font-size:14px; color:var(--accent); font-weight:bold;">أو استخدم بصمة Pi Network</p>
+        </div>
+
+        <button class="main-btn pi-btn" id="pi-login-btn" style="margin-top:10px;">
+            <i class="fa-solid fa-network-wired"></i> تسجيل الدخول عبر Pi Browser
         </button>
-        
-        <button class="btn btn-secondary" onclick="piLogin()">
-            <i class="fa-solid fa-network-wired"></i> Continue with Pi Network
-        </button>
-        
-        <p style="text-align: center; margin-top: 20px; color: #8F9BB3; font-size: 14px;">
-            Don't have an account? <span style="color: #0066FF; cursor: pointer;">Sign Up</span>
-        </p>
-        
-        <div style="text-align: center; margin-top: 20px;">
-            <select id="langSelect" onchange="changeLang()" style="padding: 10px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; cursor: pointer;">
-                <option value="en">🇬🇧 English</option>
-                <option value="ar">🇸🇦 العربية</option>
-                <option value="es">🇪🇸 Español</option>
-                <option value="fr">🇫🇷 Français</option>
-                <option value="de">🇩🇪 Deutsch</option>
-                <option value="zh">🇨🇳 中文</option>
-                <option value="hi">🇮🇳 हिन्दी</option>
-                <option value="pt">🇧🇷 Português</option>
-            </select>
+
+        <div class="auth-footer">
+            <p>ليس لديك حساب؟ <a href="#" onclick="showRegister()">سجل الآن</a></p>
         </div>
     </div>
 </div>
 
-<!-- ============ APP PAGE ============ -->
-<div class="app-page" id="appPage">
-    <!-- Header -->
-    <div class="header">
-        <div class="header-logo">🛍️ Forsale</div>
-        <div class="header-actions">
-            <div class="icon-btn primary"><i class="fa-solid fa-plus"></i></div>
-            <div class="icon-btn"><i class="fa-solid fa-bell"></i></div>
-            <div class="icon-btn"><i class="fa-solid fa-gear"></i></div>
+<div id="app-container">
+    <div class="fixed-header-wrapper">
+        <div class="header" id="main-header">
+            <div class="content-wrapper">
+                <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-store"></i> Forsale</div>
+                <div style="display:flex; gap:10px;">
+                    <div class="icon-btn primary" onclick="openAiUploadModal()"><i class="fa-solid fa-plus"></i></div>
+                    <div class="notification-icon-container">
+                        <div class="notification-dot" id="notification-dot"></div>
+                        <div class="icon-btn" onclick="openNotificationsModal()"><i class="fa-solid fa-bell"></i></div>
+                    </div>
+                    <div class="icon-btn" onclick="openSettingsModal()"><i class="fa-solid fa-gear"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="content-wrapper">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" placeholder="ابحث بذكاء اصطناعي أو صف منتج أحلامك...">
+            </div>
+            
+            <div class="cats-scroll" id="level1-scroll"></div>
+
+            <div class="dynamic-filters glass-panel" id="filter-panel">
+                <div class="sub-chips" id="level2-chips"> </div>
+                <div id="level3-area"> </div>
+            </div>
+
+            <h2 style="font-size: 20px; color: var(--text-main); margin: 0 0 15px;">اقتراحات Logy AI</h2>
+            
+            <div class="products-grid" id="products-grid"> </div>
+        </div>
+    </div>
+
+    <div id="product-detail-modal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-eye"></i> تفاصيل المنتج</div>
+            <div class="icon-btn" onclick="closeProductDetailModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <img id="detail-img" class="detail-img" src="" alt="صورة المنتج">
+            <div class="detail-title" id="detail-title"></div>
+            <div class="detail-price" id="detail-price"></div>
+
+            <h3 class="ai-section-title"><i class="fa-solid fa-microchip"></i> تحليل Logy AI للسعر</h3>
+            <div class="glass-panel ai-price-card">
+                <div class="stat-box" id="ai-score-box">
+                    <div class="value" id="ai-score">0.0</div>
+                    <div class="label">نقطة قوة العرض (10 هي الأفضل)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="value" id="ai-market-price">0 Pi</div>
+                    <div class="label">متوسط السعر السوقي (AI)</div>
+                </div>
+            </div>
+            <div class="price-chart-mock"><div class="chart-line"></div></div>
+            <p id="ai-summary" style="font-size: 13px; color: var(--text-muted); margin-top: 10px; padding: 0 15px;"></p>
+
+            <h3 class="ai-section-title"><i class="fa-solid fa-truck-fast"></i> لوجستيات الشحن (AI Secured)</h3>
+            <div class="glass-panel ai-logistics-card">
+                <div class="step">
+                    <div class="step-icon"><i class="fa-solid fa-calendar-alt"></i></div>
+                    <div class="step-text">زمن التوصيل المقدر: <span id="shipping-eta" style="font-weight: bold; color:var(--accent);">3-5 أيام</span></div>
+                </div>
+                <div class="step">
+                    <div class="step-icon"><i class="fa-solid fa-shield-alt"></i></div>
+                    <div class="step-text">إدارة المشاكل: <span id="shipping-problem" style="color:var(--text-main);">مراقبة شحن مدارة بالذكاء الاصطناعي</span></div>
+                </div>
+                <div class="step">
+                    <div class="step-icon"><i class="fa-solid fa-box"></i></div>
+                    <div class="step-text">الناقل: <span id="shipping-carrier" style="font-weight: bold; color:var(--primary);">Logy AI Express</span></div>
+                </div>
+            </div>
+            
+            <div class="detail-tabs-container glass-panel">
+                <div class="detail-tabs-scroll">
+                    <div class="detail-tab-item active" data-tab="description" onclick="showDetailTab('description', this)">
+                        <i class="fa-solid fa-file-alt"></i> الوصف والتفاصيل 
+                    </div>
+                    <div class="detail-tab-item" data-tab="specs" onclick="showDetailTab('specs', this)">
+                        <i class="fa-solid fa-cogs"></i> المواصفات الفنية 
+                    </div>
+                    <div class="detail-tab-item" data-tab="reviews" onclick="showDetailTab('reviews', this)">
+                        <i class="fa-solid fa-comments"></i> آراء المشترين 
+                    </div>
+                </div>
+                <div class="detail-tab-content" id="detail-description">
+                    <p id="detail-desc" style="line-height: 1.8; color: var(--text-main); font-size: 14px;"></p>
+                </div>
+                <div class="detail-tab-content" id="detail-specs" style="display:none;">
+                    <ul id="specs-list" style="list-style: none; padding: 0; margin: 0;"></ul>
+                </div>
+                <div class="detail-tab-content" id="detail-reviews" style="display:none;">
+                    <p style="color:var(--text-muted);">نظام المراجعات قريباً. Logy AI يحلل المشترين لضمان المصداقية.</p>
+                </div>
+            </div>
+
+            <h3 class="ai-section-title"><i class="fa-solid fa-lock"></i> نظام الضمان والمدفوعات الآمنة (Escrow)</h3>
+            <div class="glass-panel" style="padding: 15px;">
+                <div class="escrow-step active">
+                    <div class="escrow-step-icon"><i class="fa-solid fa-wallet"></i></div>
+                    <div class="escrow-step-text"><strong>1. الدفع والاحتجاز:</strong> يتم حجز (Escrow) قيمة المنتج في محفظة مؤمنة بالذكاء الاصطناعي.</div>
+                </div>
+                <div class="escrow-step">
+                    <div class="escrow-step-icon"><i class="fa-solid fa-box"></i></div>
+                    <div class="escrow-step-text"><strong>2. الشحن والتتبع:</strong> البائع يشحن المنتج، ويراقب Logy AI كل مرحلة.</div>
+                </div>
+                <div class="escrow-step">
+                    <div class="escrow-step-icon"><i class="fa-solid fa-check"></i></div>
+                    <div class="escrow-step-text"><strong>3. التأكيد والتحرير:</strong> عند تأكيد الاستلام، يتم تحرير دفعة Pi للبائع.</div>
+                </div>
+            </div>
+        </div>
+        <div class="buy-fixed-bar">
+            <div class="content-wrapper">
+                <button class="buy-btn" id="buy-btn" onclick="openCheckoutModal()"><i class="fa-solid fa-shopping-cart"></i> شراء المنتج الآن</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="ai-upload-modal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-microchip"></i> إدراج منتج جديد</div>
+            <div class="icon-btn" onclick="closeAiUploadModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 20px; color: var(--accent); margin: 15px 0;">أطلق منتجك إلى العالم بواسطة Logy AI</h2>
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-image"></i> تحميل الصور</h4>
+                <p>قم بتحميل 3-5 صور واضحة لمنتجك. Logy AI سيقوم بتحليل الجودة، والمواصفات، والحالة.</p>
+                <input type="file" id="product-images" accept="image/*" multiple style="display: none;">
+                <button class="primary" onclick="document.getElementById('product-images').click()" style="background: var(--primary); color: black;">
+                    <i class="fa-solid fa-cloud-upload-alt"></i> اختر ملفات الصور
+                </button>
+                <p id="image-count-label" style="margin-top: 10px; font-size: 12px; color: var(--accent);">لم يتم اختيار أي ملفات.</p>
+            </div>
+            
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-keyboard"></i> معلومات أساسية</h4>
+                <div class="filter-group">
+                    <label for="manual-desc">وصف مختصر للمنتج (بالكلمات):</label>
+                    <textarea id="manual-desc" rows="3" placeholder="مثال: آيفون 15 برو مستعمل، لون أبيض، سعة 256 جيجا" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:var(--text-main); font-size:14px;"></textarea>
+                </div>
+                <div class="filter-group" style="margin-top: 15px;">
+                    <label>السعر الذي تقترحه (اختياري):</label>
+                    <input type="number" id="manual-price" placeholder="Pi" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:var(--text-main); font-size:14px;">
+                </div>
+            </div>
+            
+            <button class="buy-btn" onclick="startAiAnalysis()" id="start-analysis-btn" style="margin-top: 20px;" disabled>
+                <i class="fa-solid fa-microchip"></i> تحليل وإدراج المنتج الآن بواسطة AI
+            </button>
+        </div>
+    </div>
+
+    <div id="settingsModal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-gear"></i> الإعدادات</div>
+            <div class="icon-btn" onclick="closeSettingsModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">إعدادات الحساب والتطبيق</h2>
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-user-circle"></i> الحساب العام</h4>
+                <p>إدارة ملفك الشخصي وإعدادات الأمان.</p>
+                <button class="primary" onclick="alert('جاري التوجه لصفحة إدارة الملف الشخصي')">تعديل الملف الشخصي</button>
+                <button class="accent" onclick="openSellerDashboardModal()" style="margin-top: 15px;"><i class="fa-solid fa-chart-line"></i> لوحة تحكم البائع</button>
+            </div>
+
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-lock"></i> الأمان والخصوصية</h4>
+                <p>إعدادات المصادقة الثنائية وتفضيلات البيانات.</p>
+                <button class="accent" onclick="alert('تم تفعيل المصادقة الثنائية بواسطة Logy AI.')">تفعيل المصادقة الثنائية</button>
+            </div>
+
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-network-wired"></i> تكامل Pi Network</h4>
+                <p>مراجعة حالة التوثيق (KYC) وحالة الانتقال للشبكة الرئيسية.</p>
+                <button class="primary" onclick="simulateMainnetTransition()">مراجعة حالة Mainnet</button>
+            </div>
+            
+            <button class="buy-btn" style="background:var(--danger); margin-top: 30px;" onclick="alert('تم تسجيل الخروج بنجاح. سنفتقدك!')">
+                <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
+            </button>
         </div>
     </div>
     
-    <!-- Search -->
-    <div class="search-container">
-        <div class="search-box">
-            <input type="text" class="search-input" placeholder="Search with AI or describe your dream product...">
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+    <div id="checkoutModal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-credit-card"></i> تأكيد الدفع</div>
+            <div class="icon-btn" onclick="closeCheckoutModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">ملخص عملية الشراء</h2>
+            
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-box"></i> المنتج</h4>
+                <p id="checkout-product-name" style="font-weight: bold; font-size: 15px; margin-bottom: 5px;">iPhone 15 Pro (Titanium)</p>
+                <p>السعر: <span id="checkout-product-price" style="font-weight: bold; color:var(--primary);">105,000 Pi</span></p>
+            </div>
+            
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-map-location-dot"></i> عنوان الشحن</h4>
+                <p>الاسم: <span style="font-weight: bold;">خالد علي</span></p>
+                <p>العنوان: الرياض، شارع الأمير محمد بن سلمان، فيلا رقم 5</p>
+                <button class="accent" style="margin-top: 15px;">تغيير العنوان</button>
+            </div>
+            
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-shield-alt"></i> حماية المشتري (Logy AI Escrow)</h4>
+                <p style="color:var(--success-color); font-weight: bold;">أمنة: سيتم حجز (Escrow) المبلغ حتى تستلم المنتج وتؤكد مطابقته للمواصفات.</p>
+            </div>
+
+            <div class="buy-fixed-bar">
+                <div class="content-wrapper">
+                    <button class="buy-btn" style="background:var(--success-color); color:black;" onclick="checkout()"><i class="fa-solid fa-wallet"></i> تأكيد ودفع 105,000 Pi</button>
+                </div>
+            </div>
         </div>
     </div>
     
-    <!-- Products -->
-    <div class="products-container" style="padding-bottom: 80px;">
-        <h2 class="section-title">
-            <i class="fa-solid fa-fire"></i> Hot Deals
-        </h2>
-        
-        <div class="products-grid" id="productsGrid">
-            <!-- Products will be added here -->
+    <div id="ordersModal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-cart-shopping"></i> Logy AI Orders</div>
+            <div class="icon-btn" onclick="closeOrdersModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">الطلبات المدارة بالذكاء الاصطناعي</h2>
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-check-circle" style="color:var(--success-color);"></i> طلب #LOGY901 (iPhone 15 Pro)</h4>
+                <p>الحالة: <span style="font-weight: bold; color:var(--success-color);">تم الاستلام وتحرير Pi</span></p>
+                <p style="font-size: 12px; color: var(--text-muted);">الشحن: Logy AI Express، تم التوصيل في زمن قياسي.</p>
+            </div>
+            <div class="settings-group" style="border-color: red;">
+                <h4><i class="fa-solid fa-gavel" style="color:red;"></i> طلب #LOGY902 (Vintage Watch)</h4>
+                <p>الحالة: <span style="font-weight: bold; color:red;">نزاع قيد التحكيم الآلي</span></p>
+                <p style="font-size: 13px; color: var(--text-main); margin-top: 10px;"> قرار Logy AI: الذكاء الاصطناعي يراجع الآن أدلة المشتري (صور الضرر) وسجلات تتبع الشحن. </p>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;"> النتيجة المتوقعة: Logy AI يميل إلى... </p>
+                <button class="buy-btn" style="background:red; margin-top: 15px;" onclick="openEvidenceUploadModal()">رفع أدلة جديدة (بصفتك المشتري)</button>
+            </div>
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-truck-ramp-box" style="color:var(--primary);"></i> طلب #LOGY903 (MacBook Air)</h4>
+                <p>الحالة: <span style="font-weight: bold; color:var(--primary);">قيد الشحن - Logy AI Express</span></p>
+                <p style="font-size: 12px; color: var(--text-muted);">تاريخ التوصيل المتوقع: 2025-12-05</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="walletModal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-wallet"></i> Pi Wallet</div>
+            <div class="icon-btn" onclick="closeWalletModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0 10px;">رصيد Pi الحالي</h2>
+            <div class="glass-panel" style="padding: 25px; text-align: center; border-color: var(--pi-purple);">
+                <div style="font-size: 14px; color: var(--text-muted);">الرصيد الكلي</div>
+                <div style="font-size: 40px; font-weight: 900; color: var(--pi-purple); margin-top: 5px;">
+                    120,500 Pi
+                </div>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">(مدار بواسطة Logy AI)</p>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; margin-top: 20px;">
+                <button class="buy-btn" style="background: var(--success-color); flex: 1;" onclick="deposit()"><i class="fa-solid fa-money-bill-transfer"></i> إيداع Pi</button>
+                <button class="buy-btn" style="background: var(--primary); flex: 1;" onclick="withdraw()"><i class="fa-solid fa-hand-holding-dollar"></i> سحب Pi</button>
+            </div>
+            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0 10px;">سجل المعاملات (AI Secured)</h2>
+            <div id="transactions-history">
+                <div class="settings-group" style="border-left: 4px solid var(--success-color);">
+                    <h4><i class="fa-solid fa-arrow-down" style="color:var(--success-color);"></i> إيداع Pi (من المحفظة الخارجية)</h4>
+                    <p style="font-size: 13px; color: var(--text-main);">المبلغ: <span style="font-weight: bold; color:var(--success-color);">+50,000 Pi</span></p>
+                    <p style="font-size: 12px; color: var(--text-muted);">التاريخ: 2025-11-20 | الحالة: مكتملة</p>
+                </div>
+                <div class="settings-group" style="border-left: 4px solid var(--primary);">
+                    <h4><i class="fa-solid fa-arrow-up" style="color:var(--primary);"></i> شراء: آيفون 15 برو (#P2)</h4>
+                    <p style="font-size: 13px; color: var(--text-main);">المبلغ: <span style="font-weight: bold; color:var(--primary);">-105,000 Pi</span></p>
+                    <p style="font-size: 12px; color: var(--text-muted);">التاريخ: 2025-11-21 | الحالة: <span style="color:var(--success-color);">محرر للبائع</span></p>
+                </div>
+            </div>
         </div>
     </div>
     
-    <!-- Bottom Navigation -->
-    <div class="bottom-nav">
-        <div class="nav-item active">
+    <div id="evidenceUploadModal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-gavel"></i> رفع أدلة للنزاع #LOGY902</div>
+            <div class="icon-btn" onclick="closeEvidenceUploadModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 20px; color: red; margin: 15px 0;">أرسل أدلتك لـ Logy AI للتحكيم</h2>
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-file-upload"></i> تحميل الملفات (صور، فيديو، مستندات)</h4>
+                <p>يرجى تحميل صور واضحة توضح الضرر أو الاختلاف عن الوصف. Logy AI سيتولى تحليل الأدلة.</p>
+                <input type="file" id="evidence-files" accept="image/*, application/pdf, video/*" multiple style="display: none;">
+                <button class="primary" style="background: var(--accent); color: black;" onclick="document.getElementById('evidence-files').click()">
+                    <i class="fa-solid fa-cloud-upload-alt"></i> اختر ملفات الأدلة
+                </button>
+                <p id="file-count-label" style="margin-top: 10px; font-size: 12px; color: var(--accent);">لم يتم اختيار أي ملفات.</p>
+            </div>
+            
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-keyboard"></i> وصف المشكلة</h4>
+                <div class="filter-group">
+                    <label for="evidence-description">وصف مفصل للمشكلة:</label>
+                    <textarea id="evidence-description" rows="5" placeholder="مثال: الساعة وصلت بخدش عميق في الزجاج، ولم يتم ذكره في الوصف." style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:var(--text-main); font-size:14px;"></textarea>
+                </div>
+            </div>
+            
+            <button class="buy-btn" onclick="submitEvidence()" id="submit-evidence-btn" style="background:var(--danger); margin-top: 20px;" disabled>
+                <i class="fa-solid fa-paper-plane"></i> إرسال الأدلة للتحكيم الآلي
+            </button>
+        </div>
+    </div>
+
+    <div id="notificationsModal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-bell"></i> إشعارات Logy AI</div>
+            <div class="icon-btn" onclick="closeNotificationsModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">أحدث التنبيهات المدارة بالذكاء الاصطناعي</h2>
+            <div class="glass-panel" style="padding: 10px;">
+                <div class="notification-item unread">
+                    <div class="notification-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                    <div class="notification-content">
+                        <div class="notification-title">تم تحرير الأرباح!</div>
+                        <div class="notification-text">تم تحرير مبلغ 105,000 Pi من عملية بيع iPhone 15 Pro. يمكنك سحبها الآن.</div>
+                        <div class="notification-time">منذ 5 دقائق</div>
+                    </div>
+                </div>
+                <div class="notification-item unread">
+                    <div class="notification-icon" style="background:var(--danger);"><i class="fa-solid fa-gavel"></i></div>
+                    <div class="notification-content">
+                        <div class="notification-title">نزاع جديد قيد المراجعة</div>
+                        <div class="notification-text">المشتري (Logy902) فتح نزاع على ساعة اليد الكلاسيكية. Logy AI بدأ التحكيم.</div>
+                        <div class="notification-time">منذ ساعة</div>
+                    </div>
+                </div>
+                <div class="notification-item">
+                    <div class="notification-icon" style="background:var(--primary);"><i class="fa-solid fa-bolt"></i></div>
+                    <div class="notification-content">
+                        <div class="notification-title">تحديث على سعر منتجك</div>
+                        <div class="notification-text">Logy AI يوصي بتخفيض سعر الفيلا في الرياض بنسبة 3% لزيادة احتمالية البيع الفوري.</div>
+                        <div class="notification-time">منذ يوم</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="sellerDashboardModal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-chart-line"></i> لوحة تحكم البائع</div>
+            <div class="icon-btn" onclick="closeSellerDashboardModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 22px; color: var(--primary); margin: 15px 0;">ملخص الأداء (Logy AI)</h2>
+            
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="value" id="total-sales">245,000 Pi</div>
+                    <div class="label">إجمالي المبيعات</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="value" id="active-listings">12</div>
+                    <div class="label">منتجات نشطة</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="value" id="pending-orders">3</div>
+                    <div class="label">طلبات قيد الشحن</div>
+                </div>
+                <div class="kpi-card" style="border-color: var(--success-color);">
+                    <div class="value" id="seller-score">9.5</div>
+                    <div class="label">تقييم البائع (AI)</div>
+                </div>
+            </div>
+            
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-list-check"></i> إدارة المنتجات</h4>
+                <p style="margin-bottom: 10px;">إدارة قائمة منتجاتك، تعديل الأسعار، ومراجعة تحليل Logy AI لكل منتج.</p>
+                <div class="dashboard-list">
+                    <div class="dashboard-list-item" onclick="viewListingDetails('P1')">
+                        <div class="list-item-info">
+                            <div class="list-item-title">iPhone 15 Pro (Titanium)</div>
+                            <div class="list-item-meta">السعر: 105,000 Pi | AI Score: 9.2</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-left" style="color: var(--text-muted);"></i>
+                    </div>
+                    <div class="dashboard-list-item" onclick="viewListingDetails('P4')">
+                        <div class="list-item-info">
+                            <div class="list-item-title">ساعة يد كلاسيكية (نزاع)</div>
+                            <div class="list-item-meta">السعر: 15,000 Pi | الحالة: نزاع قيد المراجعة</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-left" style="color: var(--danger);"></i>
+                    </div>
+                </div>
+                <button class="main-btn" onclick="openAiUploadModal()" style="background: var(--accent); color: black; margin-top: 15px;">
+                    <i class="fa-solid fa-plus"></i> إدراج منتج جديد بواسطة AI
+                </button>
+            </div>
+
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-box-open"></i> الطلبات والشحن</h4>
+                <p style="margin-bottom: 10px;">تتبع طلباتك، توليد بوليصات شحن Logy AI، وتحديث حالة التوصيل.</p>
+                <div class="dashboard-list">
+                    <div class="dashboard-list-item" onclick="viewOrderShipment('O789')">
+                        <div class="list-item-info">
+                            <div class="list-item-title">طلب #LOGY789 (MacBook Pro)</div>
+                            <div class="list-item-meta">الحالة: <span style="color:var(--primary); font-weight: bold;">بانتظار الشحن</span> | المشتري: أحمد</div>
+                        </div>
+                        <i class="fa-solid fa-truck-ramp-box" style="color: var(--primary);"></i>
+                    </div>
+                    <div class="dashboard-list-item" onclick="viewOrderShipment('O900')">
+                        <div class="list-item-info">
+                            <div class="list-item-title">طلب #LOGY900 (عطر فرنسي)</div>
+                            <div class="list-item-meta">الحالة: <span style="color:var(--success-color); font-weight: bold;">تم التوصيل</span> | الأرباح مُحررة</div>
+                        </div>
+                        <i class="fa-solid fa-check" style="color: var(--success-color);"></i>
+                    </div>
+                </div>
+                <button class="main-btn" onclick="alert('جاري محاكاة توليد بوليصة شحن Logy AI...')" style="margin-top: 15px;">
+                    <i class="fa-solid fa-truck-fast"></i> توليد بوليصة شحن
+                </button>
+            </div>
+
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-sack-dollar"></i> الأرباح والسحب</h4>
+                <p style="margin-bottom: 10px;">إجمالي الأرصدة المتاحة للسحب.</p>
+                <div class="kpi-card" style="margin-bottom: 15px;">
+                    <div class="value" style="color: var(--success-color);" id="available-earnings">112,000 Pi</div>
+                    <div class="label">أرباح متاحة للسحب الفوري</div>
+                </div>
+                <button class="main-btn" onclick="withdraw()" style="background: var(--success-color); color: black;">
+                    <i class="fa-solid fa-hand-holding-dollar"></i> سحب الأرباح الآن
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="logyAiModal">
+        <div class="logy-chat-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-robot"></i> Logy AI Chat</div>
+            <div class="icon-btn" onclick="closeLogyAiModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="logy-chat-area" id="logy-chat-area">
+            </div>
+        <div class="logy-input-bar">
+            <input type="text" id="logy-input" placeholder="اطلب من Logy AI مساعدتك في أي شيء..." autofocus>
+            <div class="logy-send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></div>
+        </div>
+    </div>
+
+
+    <div class="footer-nav">
+        <div class="nav-item active" onclick="showApp('home')">
             <i class="fa-solid fa-house"></i>
-            <span>Home</span>
+            <span>الرئيسية</span>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" onclick="openLogyAiModal()">
             <i class="fa-solid fa-robot"></i>
-            <span>AI Search</span>
+            <span>Logy AI</span>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" onclick="openOrdersModal()">
             <i class="fa-solid fa-box"></i>
-            <span>Orders</span>
+            <span>الطلبات</span>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" onclick="openWalletModal()">
             <i class="fa-solid fa-wallet"></i>
-            <span>Wallet</span>
+            <span>المحفظة</span>
         </div>
     </div>
 </div>
 
 <script>
-// Sample Products Data
-const products = [
-    { name: 'iPhone 15 Pro', price: '0.5 Pi', rating: '4.9', emoji: '📱' },
-    { name: 'MacBook Pro M3', price: '1.2 Pi', rating: '4.8', emoji: '💻' },
-    { name: 'Canon EOS R6', price: '0.8 Pi', rating: '4.7', emoji: '📷' },
-    { name: 'PlayStation 5', price: '0.3 Pi', rating: '5.0', emoji: '🎮' },
-    { name: 'AirPods Pro 2', price: '0.15 Pi', rating: '4.9', emoji: '🎧' },
-    { name: 'Galaxy S24', price: '0.4 Pi', rating: '4.6', emoji: '📱' },
-    { name: 'iPad Pro', price: '0.6 Pi', rating: '4.8', emoji: '📱' },
-    { name: 'Apple Watch', price: '0.25 Pi', rating: '4.7', emoji: '⌚' }
-];
+    // ============================================
+    // بيانات محاكاة محلية
+    // ============================================
+    let currentUser = null;
+    const users = JSON.parse(localStorage.getItem('forsale_users')) || [];
+    let activeCategory = 'all';
+    let activeSub = null;
+    let unreadNotifications = 2; // محاكاة للإشعارات
+    let logyMsgs = [
+        { s: 'ai', t: 'مرحباً بك! أنا Logy AI، مساعدك الشخصي في Forsale. كيف يمكنني خدمتك اليوم؟ يمكنك أن تطلب مني البحث، أو تحليل منتج، أو مراجعة طلباتك.' }
+    ];
 
-// Login Functions
-function login() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    
-    if (email && password) {
-        showNotification('✅ Login successful!');
-        setTimeout(showApp, 1000);
-    } else {
-        showNotification('⚠️ Please enter email and password');
+    // ============================================
+    // وظائف تسجيل الدخول
+    // ============================================
+    function checkLoginStatus() {
+        currentUser = JSON.parse(localStorage.getItem('forsale_current_user'));
+        if (currentUser) {
+            showApp();
+        } else {
+            // يتم تعيين display: flex هنا كحالة افتراضية
+            document.getElementById('auth-container').style.display = 'flex'; 
+        }
     }
-}
 
-function biometricLogin() {
-    showNotification('🔐 Biometric login (mock)');
-    setTimeout(() => {
-        showNotification('✅ Login successful!');
-        setTimeout(showApp, 1000);
-    }, 1000);
-}
+    /**
+     * @description وظيفة إظهار التطبيق الرئيسي وإغلاق جميع النوافذ المنبثقة.
+     * 🚨 Fix: تم إضافة closeAllModals() لضمان عمل شريط التنقل السفلي.
+     */
+    function showApp() {
+        closeAllModals(); // ⬅️ الإضافة اللازمة لحل مشكلة التنقل
+        document.getElementById('auth-container').style.display = 'none';
+        document.getElementById('app-container').style.display = 'block';
+        initializeApp();
+    }
 
-function piLogin() {
-    showNotification('🌐 Connecting to Pi Network...');
-    setTimeout(() => {
-        showNotification('✅ Pi Network login successful!');
-        setTimeout(showApp, 1000);
-    }, 1500);
-}
+    function setupLogin() {
+        const loginBtn = document.getElementById('login-btn');
+        const fingerprintBtn = document.getElementById('fingerprint-login-btn');
+        const piLoginBtn = document.getElementById('pi-login-btn');
 
-// Show App
-function showApp() {
-    document.getElementById('authPage').classList.add('hidden');
-    document.getElementById('appPage').classList.add('active');
-    renderProducts();
-}
+        const handleLogin = () => {
+            // محاكاة تأثير التحميل
+            loginBtn.innerHTML = 'جاري الدخول... <i class="fa-solid fa-spinner fa-spin"></i>';
+            loginBtn.disabled = true;
 
-// Render Products
-function renderProducts() {
-    const grid = document.getElementById('productsGrid');
-    grid.innerHTML = '';
-    
-    products.forEach(product => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.innerHTML = `
-            <div class="product-image">${product.emoji}</div>
-            <div class="product-info">
-                <div class="product-name">${product.name}</div>
-                <div class="product-rating">⭐ ${product.rating}</div>
-                <div class="product-price">${product.price}</div>
+            // محاكاة الدخول
+            setTimeout(() => {
+                const email = document.getElementById('login-email').value || 'user@example.com';
+                const password = document.getElementById('login-password').value || 'password';
+
+                // البحث عن المستخدم في قاعدة البيانات المحلية
+                const user = users.find(u => u.email === email && u.password === password);
+
+                if (user || (email && password)) {
+                    // حفظ حالة تسجيل الدخول
+                    if (!user) {
+                        // إنشاء مستخدم جديد إذا لم يكن موجوداً
+                        const newUser = { id: Date.now(), email: email, password: password, joinDate: new Date().toISOString() };
+                        users.push(newUser);
+                        localStorage.setItem('forsale_users', JSON.stringify(users));
+                        localStorage.setItem('forsale_current_user', JSON.stringify(newUser));
+                    } else {
+                        localStorage.setItem('forsale_current_user', JSON.stringify(user));
+                    }
+                    showApp();
+                } else {
+                    alert('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+                    loginBtn.innerHTML = 'دخول آمن <i class="fa-solid fa-arrow-left"></i>';
+                    loginBtn.disabled = false;
+                }
+            }, 1500);
+        }
+
+        loginBtn.addEventListener('click', handleLogin);
+        fingerprintBtn.addEventListener('click', handleLogin);
+        piLoginBtn.addEventListener('click', handleLogin);
+    }
+
+    function showRegister() {
+        alert('🚀 نظام التسجيل قريباً!\n\nيمكنك استخدام أي بيانات للدخول التجريبي');
+    }
+
+    // ============================================
+    // البيانات الهيكلية الكاملة للفئات والمنتجات
+    // ============================================
+    const CATEGORIES = [
+        { id: 'all', name: 'الكل', icon: 'fa-layer-group', subs: [] },
+        { id: 'tech', name: 'إلكترونيات', icon: 'fa-laptop-code', subs: [
+            { id: 'mobile', name: 'هواتف وأجهزة لوحية', filters: ['الحالة: (جديد, مستعمل)', 'الماركة: (آبل, سامسونج, هواوي)', 'سعة التخزين', 'اللون', 'حالة البطارية'] },
+            { id: 'laptops', name: 'حواسيب محمولة', filters: ['الماركة', 'المعالج', 'حجم الشاشة', 'الذاكرة العشوائية (RAM)'] },
+            { id: 'accs', name: 'إكسسوارات وقطع', filters: ['النوع: (سماعة, شاحن, ساعة ذكية)', 'الماركة', 'الحالة'] },
+        ] },
+        { id: 'real', name: 'عقارات', icon: 'fa-building', subs: [
+            { id: 'apartments', name: 'شقق للإيجار/البيع', filters: ['النوع: (شقة, استوديو, دوبلكس)', 'الموقع', 'المساحة', 'عدد الغرف', 'حالة العقار: (جديد, مستعمل)'] },
+            { id: 'villas', name: 'فيلات ومنازل', filters: ['الموقع', 'المساحة', 'عدد الغرف', 'المرافق: (مسبح, حديقة, موقف)'] },
+            { id: 'land', name: 'أراضي', filters: ['النوع: (سكنية, تجارية, زراعية)', 'الموقع', 'المساحة'] },
+        ] },
+        { id: 'fashion', name: 'الأزياء والموضة', icon: 'fa-shirt', subs: [
+            { id: 'clothes', name: 'ملابس', filters: ['الجنس: (رجالي, نسائي, أطفال)', 'النوع: (علوي, سفلي, خارجي)', 'المقاس', 'الماركة', 'اللون', 'الحالة'] },
+            { id: 'shoes_bags', name: 'أحذية وحقائب', filters: ['النوع: (رياضية, رسمية, حقيبة يد)', 'الماركة', 'المقاس', 'المادة المصنوعة منها'] },
+            { id: 'jewel_watches', name: 'مجوهرات وساعات', filters: ['النوع: (ساعة يد, خاتم, عقد)', 'الماركة', 'نوع المعدن: (ذهب, فضة, ألماس)', 'الحالة'] },
+            { id: 'cosmetics', name: 'مستحضرات التجميل والعطور', filters: ['النوع: (عطور, مكياج, عناية بالبشرة)', 'الماركة', 'حالة العبوة: (جديد, أخرى)'] }
+        ] },
+        { id: 'home', name: 'المنزل والمعيشة', icon: 'fa-couch', subs: [
+            { id: 'furniture', name: 'أثاث وديكور', filters: ['النوع', 'الحالة', 'الماركة', 'اللون'] },
+            { id: 'kitchen', name: 'أجهزة المطبخ', filters: ['النوع', 'الماركة', 'الحالة', 'الكهرباء (220V, 110V)'] },
+        ] }
+    ];
+
+    const PRODUCTS = [
+        { id: 'p1', name: 'iPhone 15 Pro (Titanium)', price: 105000, cat: 'tech', details: 'جهاز آيفون 15 برو مستعمل لمدة شهر واحد، بحالة ممتازة (100% بدون خدوش)، اللون تيتانيوم طبيعي، سعة 256 جيجا بايت. مرفق بالصندوق وجميع الإكسسوارات الأصلية. تم فحصه من قبل Logy AI.', img: 'https://placehold.co/600x400/00f2ff/0a1128?text=iPhone+15+Pro', ai_analysis: { score: 9.2, market_price: 110000, summary: 'عرض ممتاز وسعر تنافسي مقارنة بحالة الجهاز والمواصفات. فرصة شراء سريعة. يوصي به Logy AI بشدة.', price_state_color: '#00f2ff' }, shipping_ai: { eta: '3-5 أيام عمل', problem_handling: 'إدارة المشاكل: مراقبة شحن مدارة بالذكاء الاصطناعي على مدار الساعة.', carrier: 'Logy AI Express' }, specs: { 'الماركة': 'أبل', 'الموديل': 'آيفون 15 برو', 'سعة التخزين': '256 جيجا بايت', 'اللون': 'تيتانيوم طبيعي', 'حالة البطارية': '98%', 'الكاميرا': 'ثلاثية العدسات (48MP رئيسية)', 'المعالج': 'A17 Bionic', 'نظام التشغيل': 'iOS الأحدث' } },
+        { id: 'p2', name: 'MacBook Pro 2024 (M3 Max)', price: 155000, cat: 'tech', details: 'لابتوب احترافي جديد، لم يستخدم إلا بضع ساعات. معالج M3 Max، ذاكرة 32GB، سعة 1TB SSD. مثالي للمصممين والمطورين. ضمان سنة متبقية.', img: 'https://placehold.co/600x400/0a1128/FFD700?text=MacBook+Pro', ai_analysis: { score: 8.8, market_price: 155000, summary: 'السعر يتوافق تماماً مع القيمة السوقية والمواصفات الحديثة. Logy AI ينصح به للمحترفين.', price_state_color: '#FFD700' }, shipping_ai: { eta: '5-7 أيام عمل', problem_handling: 'إدارة المشاكل: مراقبة شحن مدارة بالذكاء الاصطناعي على مدار الساعة.', carrier: 'Logy AI Express' }, specs: { 'الماركة': 'أبل', 'الموديل': 'ماك بوك برو', 'المعالج': 'M3 Max', 'الذاكرة': '32GB', 'التخزين': '1TB SSD', 'الشاشة': '16 بوصة Liquid Retina XDR', 'اللون': 'فضاء أسود', 'الحالة': 'جديد' } },
+        { id: 'p3', name: 'فيلا مودرن بالرياض', price: 1500000, cat: 'real', details: 'فيلا فاخرة بتصميم عصري، مساحة 500 متر مربع، 6 غرف نوم، ومسبح خاص. تقع في حي راقٍ بالرياض، وتشطيبات سوبر لوكس مع حديقة واسعة وموقف سيارات يتسع لثلاث سيارات. فرصة استثمارية وسكنية لا تعوض.', img: 'https://placehold.co/800x600/1a1a1a/2ECC71?text=Villa+Riyadh', ai_analysis: { score: 9.9, market_price: 1800000, summary: 'فرصة استثمارية نادرة! السعر أقل بكثير من القيمة السوقية للموقع والتشطيب. Logy AI يوصي بالتحرك السريع.', price_state_color: '#00f2ff' }, shipping_ai: { eta: 'تحويل ملكية خلال 14 يوم', problem_handling: 'إدارة المشاكل: Logy AI يراجع مستندات الملكية والتحويل.', carrier: 'Logy AI Legal' }, specs: { 'الموقع': 'شمال الرياض', 'المساحة': '500 متر مربع', 'عدد الغرف': '6', 'الحالة': 'جديد', 'المرافق': 'مسبح، حديقة، موقف سيارات', 'وثائق': 'سند ملكية جاهز' } },
+        { id: 'p4', name: 'ساعة يد كلاسيكية (نزاع)', price: 15000, cat: 'fashion', details: 'ساعة يد كلاسيكية نادرة ماركة سويسرية، تعود لعام 1970. تعمل بحالة ممتازة. (هذا المنتج حالياً في مرحلة نزاع مع المشتري).', img: 'https://placehold.co/400x400/4A90E2/ffffff?text=Vintage+Watch', ai_analysis: { score: 7.0, market_price: 18000, summary: 'سعر مقبول، ولكن هناك خطر بيع بطيء بسبب التخصص. تم فتح نزاع عليها.', price_state_color: '#FF5252' }, shipping_ai: { eta: 'قيد التحكيم', problem_handling: 'إدارة المشاكل: Logy AI يقوم بمراجعة أدلة البائع والمشتري.', carrier: 'Logy AI Arbitration' }, specs: { 'الماركة': 'سويسرية كلاسيكية', 'الموديل': '1970 Vintage', 'نوع المعدن': 'فولاذ مقاوم للصدأ', 'الحالة': 'مستعمل (نزاع)', 'الحركة': 'ميكانيكية يدوية', 'المقاومة للماء': 'لا' } }
+    ];
+
+    // ============================================
+    // 1. وظائف العرض والرسم (Rendering)
+    // ============================================
+    function renderCategories() {
+        const catContainer = document.getElementById('level1-scroll');
+        catContainer.innerHTML = CATEGORIES.map((c, index) => `
+            <div class="cat-item ${index === 0 ? 'active' : ''}" onclick="selectCategory('${c.id}', this)">
+                <i class="fa-solid ${c.icon}"></i> ${c.name}
             </div>
-        `;
-        card.onclick = () => showNotification(`📦 ${product.name} - ${product.price}`);
-        grid.appendChild(card);
-    });
-}
+        `).join('');
+    }
 
-// Notifications
-function showNotification(message) {
-    const notif = document.createElement('div');
-    notif.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: rgba(10,22,40,0.98);
-        color: white;
-        padding: 16px 24px;
-        border-radius: 12px;
-        border: 1px solid rgba(255,255,255,0.2);
-        font-weight: 600;
-        z-index: 9999;
-        animation: slideIn 0.3s ease;
-    `;
-    notif.textContent = message;
-    document.body.appendChild(notif);
+    function renderProducts(catId = 'all', subId = null) {
+        let filteredProducts = PRODUCTS;
+        if (catId !== 'all') {
+            const subCategory = CATEGORIES.find(c => c.id === catId)?.subs.find(s => s.id === subId);
+            // في حالة تطبيق مرشحات حقيقية، سيتم تصفية المنتجات بناءً على catId و subCategory
+            // حالياً، نكتفي بعرض الكل كمحاكاة
+        }
+
+        const grid = document.getElementById('products-grid');
+        if (filteredProducts.length === 0) {
+            grid.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding: 50px 0;">لم يتم العثور على منتجات في هذا التصنيف حالياً. جرب فلتر آخر.</p>';
+            return;
+        }
+
+        grid.innerHTML = filteredProducts.map(p => `
+            <div class="product-card glass-panel" onclick="openProductDetail('${p.id}')">
+                <div class="p-img-box">
+                    <img src="${p.img}" alt="${p.name}">
+                    <div class="ai-tag" style="border-color:${p.ai_analysis.price_state_color}; color:${p.ai_analysis.price_state_color};">
+                        <i class="fa-solid fa-brain"></i> AI Score ${p.ai_analysis.score.toFixed(1)}
+                    </div>
+                </div>
+                <div class="p-details">
+                    <div class="p-name">${p.name}</div>
+                    <div class="p-price">${p.price.toLocaleString()} Pi</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function updateNotificationDot() {
+        const dot = document.getElementById('notification-dot');
+        if (dot) {
+            dot.style.display = unreadNotifications > 0 ? 'block' : 'none';
+        }
+    }
+
+    // **2. وظائف اختيار التصنيف والفلاتر الديناميكية (مصححة)**
+    function selectCategory(id, el) {
+        document.querySelectorAll('#level1-scroll .cat-item').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        activeCategory = id;
+        activeSub = null; // إعادة تعيين الفرعي
+        
+        const catData = CATEGORIES.find(c => c.id === id);
+        const panel = document.getElementById('filter-panel');
+        const level2Chips = document.getElementById('level2-chips');
+        const level3Area = document.getElementById('level3-area');
+
+        level2Chips.innerHTML = '';
+        level3Area.innerHTML = '';
+        
+        if (catData.subs && catData.subs.length > 0) {
+            // Render Level 2 chips
+            level2Chips.innerHTML = catData.subs.map(s => `
+                <div class="chip" data-sub-id="${s.id}" data-cat-id="${id}" onclick="selectSub(this)">${s.name}</div>
+            `).join('');
+            panel.classList.add('open');
+            panel.style.maxHeight = "400px";
+            panel.style.opacity = "1";
+        } else {
+            panel.classList.remove('open');
+            panel.style.maxHeight = "0";
+            panel.style.opacity = "0";
+        }
+        
+        renderProducts(activeCategory, activeSub);
+    }
+
+    /* منطق توليد حقول إدخال المرشحات (المستوى 3) ديناميكياً */
+    function selectSub(el) {
+        document.querySelectorAll('#level2-chips .chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        activeSub = el.getAttribute('data-sub-id');
+
+        const catId = el.getAttribute('data-cat-id');
+        const catData = CATEGORIES.find(c => c.id === catId);
+        const subData = catData.subs.find(s => s.id === activeSub);
+        const level3Area = document.getElementById('level3-area');
+
+        // توليد حقول الفلاتر (مثل dropdowns أو حقول نصية) بناءً على filters
+        if (subData.filters && subData.filters.length > 0) {
+            level3Area.innerHTML = '<h5 style="font-size: 14px; margin: 15px 0 10px;">مرشحات Logy AI المخصصة:</h5>';
+            subData.filters.forEach((filter, index) => {
+                level3Area.innerHTML += `
+                    <div class="filter-group">
+                        <label for="filter-${index}">${filter.split(':')[0]}:</label>
+                        <input type="text" id="filter-${index}" placeholder="${filter.split(':')[1] ? filter.split(':')[1].trim() : 'أدخل قيمة'}">
+                    </div>
+                `;
+            });
+            level3Area.innerHTML += `<button class="main-btn" onclick="applyFilters()" style="background: var(--accent); color: black; margin-top: 15px;">تطبيق مرشحات AI</button>`;
+        } else {
+            level3Area.innerHTML = '';
+        }
+
+        renderProducts(activeCategory, activeSub);
+    }
+
+    function applyFilters() {
+        // محاكاة تطبيق الفلاتر
+        document.getElementById('products-grid').innerHTML = 
+            '<div style="text-align:center; padding:50px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i><p style="margin-top:10px;">جاري تحليل وتصفية آلاف المنتجات بواسطة Logy AI...</p></div>';
+
+        setTimeout(() => {
+            document.getElementById('products-grid').innerHTML = '';
+            // Clear simulation
+            renderProducts(); // Render original products as a fallback example
+            alert(`تم تطبيق المرشحات بنجاح! \n\nالتصنيف الرئيسي: ${activeCategory}\nالتصنيف الفرعي: ${activeSub}\n\nعرضت نتائج بحث مخصصة بالذكاء الاصطناعي.`);
+        }, 2000); // 2 ثانية محاكاة
+    }
+
+    // **3. وظائف النوافذ المنبثقة (Modals)**
+    function closeAllModals() {
+        const modals = document.querySelectorAll('#product-detail-modal, #ai-upload-modal, #settingsModal, #checkoutModal, #ordersModal, #walletModal, #evidenceUploadModal, #notificationsModal, #sellerDashboardModal, #logyAiModal');
+        modals.forEach(modal => modal.style.display = 'none');
+        document.body.style.overflow = '';
+    }
     
-    setTimeout(() => {
-        notif.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => notif.remove(), 300);
-    }, 3000);
-}
+    // وظائف تفاصيل المنتج (#product-detail-modal)
+    function openProductDetail(id) {
+        closeAllModals(); // NEW: إغلاق أي نافذة مفتوحة قبل عرض التفاصيل
+        const product = PRODUCTS.find(p => p.id === id);
+        if (!product) return;
 
-// Language Change
-function changeLang() {
-    const lang = document.getElementById('langSelect').value;
-    showNotification(`🌍 Language changed to: ${lang}`);
-}
+        document.getElementById('detail-title').textContent = product.name;
+        document.getElementById('detail-price').textContent = `${product.price.toLocaleString()} Pi`;
+        document.getElementById('detail-img').src = product.img;
+        document.getElementById('detail-desc').textContent = product.details;
+        document.getElementById('ai-score').textContent = product.ai_analysis.score.toFixed(1);
+        document.getElementById('ai-market-price').textContent = `${product.ai_analysis.market_price.toLocaleString()} Pi`;
+        document.getElementById('ai-summary').textContent = product.ai_analysis.summary;
+        
+        document.getElementById('ai-score-box').style.borderColor = product.ai_analysis.price_state_color;
+        document.getElementById('ai-score').style.color = product.ai_analysis.price_state_color;
 
-// Add CSS animations
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from { transform: translateX(400px); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
+        document.getElementById('shipping-eta').textContent = product.shipping_ai.eta;
+        document.getElementById('shipping-problem').textContent = product.shipping_ai.problem_handling;
+        document.getElementById('shipping-carrier').textContent = product.shipping_ai.carrier;
+        
+        // رسم المواصفات الفنية
+        const specsList = document.getElementById('specs-list');
+        specsList.innerHTML = Object.entries(product.specs).map(([key, value]) => `
+            <li style="display:flex; justify-content:space-between; padding: 5px 0; border-bottom: 1px dashed rgba(255,255,255,0.05);">
+                <span style="color:var(--text-muted);">${key}</span>
+                <span style="font-weight: bold;">${value}</span>
+            </li>
+        `).join('');
+
+        // إعادة ضبط علامات التبويب إلى الوصف
+        showDetailTab('description', document.querySelector('.detail-tab-item[data-tab="description"]'));
+
+        document.getElementById('product-detail-modal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
     }
-    @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(400px); opacity: 0; }
+
+    function closeProductDetailModal() {
+        document.getElementById('product-detail-modal').style.display = 'none';
+        document.body.style.overflow = '';
     }
-`;
-document.head.appendChild(style);
+    
+    function showDetailTab(tabId, el) {
+        // إخفاء جميع المحتويات
+        document.querySelectorAll('.detail-tab-content').forEach(content => content.style.display = 'none');
+        // إزالة حالة النشاط من جميع الأزرار
+        document.querySelectorAll('.detail-tab-item').forEach(item => item.classList.remove('active'));
+        
+        // إظهار المحتوى المطلوب وتفعيل الزر
+        document.getElementById(`detail-${tabId}`).style.display = 'block';
+        el.classList.add('active');
+    }
+
+    // وظائف رفع منتج جديد (#ai-upload-modal)
+    function checkAiUploadForm() {
+        const desc = document.getElementById('manual-desc').value.trim();
+        const filesCount = document.getElementById('product-images').files.length;
+        const btn = document.getElementById('start-analysis-btn');
+        const fileLabel = document.getElementById('image-count-label');
+        
+        fileLabel.textContent = filesCount > 0 ? 
+            `تم اختيار ${filesCount} ملف(ات).` : 'لم يتم اختيار أي ملفات.';
+
+        // تفعيل الزر إذا كان هناك وصف (أطول من 10 أحرف) وصور تم اختيارها
+        if (desc.length > 10 && filesCount > 0) {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        } else {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+        }
+    }
+
+    window.openAiUploadModal = () => {
+        closeAllModals(); // NEW: إغلاق أي نافذة مفتوحة
+        document.getElementById('ai-upload-modal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        
+        // ربط الدالة بأحداث الإدخال والتغيير
+        document.getElementById('manual-desc').oninput = checkAiUploadForm;
+        document.getElementById('manual-price').oninput = checkAiUploadForm;
+        document.getElementById('product-images').onchange = checkAiUploadForm;
+        
+        // التحقق المبدئي لضبط حالة الزر (سيجعله معطلاً إذا لم يتم إدخال شيء)
+        checkAiUploadForm();
+    };
+
+    window.closeAiUploadModal = () => {
+        document.getElementById('ai-upload-modal').style.display = 'none';
+        document.body.style.overflow = '';
+    };
+
+    window.startAiAnalysis = () => {
+        document.getElementById('start-analysis-btn').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري تحليل المنتج وإدراجه بواسطة Logy AI...';
+        document.getElementById('start-analysis-btn').disabled = true;
+
+        setTimeout(() => {
+            document.getElementById('start-analysis-btn').innerHTML = '<i class="fa-solid fa-check"></i> تم الإدراج بنجاح!';
+            const desc = document.getElementById('manual-desc').value || 'وصف لم يتم إدخاله';
+            const price = document.getElementById('manual-price').value || 'سعر مقترح بواسطة AI';
+
+            alert(`تهانينا! تم إدراج منتجك بنجاح. \n\nLogy AI قام بتحليل صورك وإدخالاتك (${desc})، وتم توليد عنوان ووصف احترافيين. \n\nالسعر المعتمد: ${price} Pi.\n\n Logy AI سيتولى التسويق والترويج لمنتجك عالمياً.`);
+
+            // إعادة الزر إلى حالته الأصلية
+            setTimeout(() => {
+                document.getElementById('start-analysis-btn').innerHTML = '<i class="fa-solid fa-microchip"></i> تحليل وإدراج المنتج الآن بواسطة AI';
+                document.getElementById('start-analysis-btn').disabled = false;
+                closeAiUploadModal();
+            }, 1000);
+        }, 3000); // 3 ثواني محاكاة تحليل AI
+    };
+
+    // وظائف نافذة الإعدادات (#settingsModal)
+    window.openSettingsModal = () => {
+        closeAllModals();
+        document.getElementById('settingsModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    };
+    window.closeSettingsModal = () => {
+        document.getElementById('settingsModal').style.display = 'none';
+        document.body.style.overflow = '';
+    };
+    window.simulateMainnetTransition = () => {
+        alert('جاري محاكاة الانتقال إلى شبكة Pi Network الرئيسية (Mainnet)... \n\nفي الواقع، سيتم هذا الانتقال تلقائياً وبسلاسة بمجرد فتح الشبكة للعالم الخارجي، مما يضمن استمرارية خدمات Forsale AI.');
+    }
+    
+    // وظائف نافذة الدفع (#checkoutModal)
+    window.openCheckoutModal = () => {
+        closeAllModals();
+        // محاكاة إعداد بيانات المنتج للدفع (يجب أن تكون ديناميكية في تطبيق حقيقي)
+        const product = PRODUCTS.find(p => p.id === 'p1'); // يفترض المنتج الأول للشراء التجريبي
+        document.getElementById('checkout-product-name').textContent = product.name;
+        document.getElementById('checkout-product-price').textContent = `${product.price.toLocaleString()} Pi`;
+
+        document.getElementById('checkoutModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    };
+    window.closeCheckoutModal = () => {
+        document.getElementById('checkoutModal').style.display = 'none';
+        document.body.style.overflow = '';
+    };
+
+    function checkout() {
+        alert('جاري التوجه إلى محفظة Pi Wallet للتفويض بالدفع الآمن (Escrow). سيتم حجز 105,000 Pi حتى تأكيد الاستلام.');
+        closeCheckoutModal();
+        openOrdersModal(); // محاكاة الانتقال إلى صفحة الطلبات بعد الدفع
+    }
+
+    // وظائف نافذة الطلبات (#ordersModal)
+    window.openOrdersModal = () => {
+        closeAllModals();
+        document.getElementById('ordersModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    };
+    window.closeOrdersModal = () => {
+        document.getElementById('ordersModal').style.display = 'none';
+        document.body.style.overflow = '';
+    };
+
+    // وظائف نافذة رفع دليل جديد للنزاع (#evidenceUploadModal)
+    function checkEvidenceForm() {
+        const desc = document.getElementById('evidence-description').value.trim();
+        const filesCount = document.getElementById('evidence-files').files.length;
+        const btn = document.getElementById('submit-evidence-btn');
+        const fileLabel = document.getElementById('file-count-label');
+        
+        fileLabel.textContent = filesCount > 0 ? 
+            `تم اختيار ${filesCount} ملف(ات).` : 'لم يتم اختيار أي ملفات.';
+
+        // تفعيل الزر إذا كان هناك وصف (أطول من 10 أحرف) أو ملفات تم اختيارها
+        if (desc.length > 10 || filesCount > 0) {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        } else {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+        }
+    }
+
+    window.openEvidenceUploadModal = () => {
+        closeAllModals(); // NEW: إغلاق أي نافذة مفتوحة
+        document.getElementById('evidenceUploadModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        
+        // ربط الدوال بأحداث الإدخال والتغيير
+        document.getElementById('evidence-description').oninput = checkEvidenceForm;
+        document.getElementById('evidence-files').onchange = checkEvidenceForm;
+        
+        // تنظيف النموذج قبل الفتح
+        document.getElementById('evidence-description').value = '';
+        document.getElementById('evidence-files').value = '';
+        checkEvidenceForm(); // التحقق المبدئي (سيجعله معطلاً)
+    };
+
+    window.closeEvidenceUploadModal = () => {
+        document.getElementById('evidenceUploadModal').style.display = 'none';
+        document.body.style.overflow = '';
+    };
+
+    function submitEvidence() {
+        alert('تم إرسال أدلتك بنجاح. Logy AI سيبدأ مراجعة شاملة للأدلة خلال 24 ساعة.');
+        closeEvidenceUploadModal();
+    }
+
+    // وظائف نافذة الإشعارات (#notificationsModal)
+    window.openNotificationsModal = () => {
+        closeAllModals();
+        unreadNotifications = 0; // محاكاة قراءة الإشعارات
+        updateNotificationDot();
+        document.getElementById('notificationsModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    };
+    window.closeNotificationsModal = () => {
+        document.getElementById('notificationsModal').style.display = 'none';
+        document.body.style.overflow = '';
+    };
+
+    // وظائف الدردشة Logy AI Chat (#logyAiModal)
+    window.openLogyAiModal = () => {
+        closeAllModals();
+        document.getElementById('logyAiModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        renderChat();
+    };
+    window.closeLogyAiModal = () => {
+        document.getElementById('logyAiModal').style.display = 'none';
+        document.body.style.overflow = '';
+    };
+
+    function renderChat() {
+        const chatArea = document.getElementById('logy-chat-area');
+        chatArea.innerHTML = logyMsgs.map(msg => `
+            <div class="message-bubble msg-${msg.s}">${msg.t}</div>
+        `).join('');
+        // التمرير إلى الأسفل
+        chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('logy-input');
+        const text = input.value.trim();
+        if (text === '') return;
+
+        logyMsgs.push({ s: 'user', t: text });
+        input.value = '';
+        renderChat();
+        
+        // محاكاة استجابة الذكاء الاصطناعي
+        setTimeout(() => {
+            const t_lower = text.toLowerCase();
+            let aiResponse = 'أعتذر، لا أفهم سؤالك. يمكنني مساعدتك في البحث عن منتجات أو معلومات حول نظام Forsale AI.';
+
+            if (t_lower.includes('بحث') || t_lower.includes('منتج')) {
+                aiResponse = 'للبحث، استخدم شريط البحث الرئيسي. يمكنك وصف المنتج الذي تريده بالتفصيل (مثل: "ساعة يد فاخرة ذهبية مستعملة") وسأجد لك أفضل التواصيات!';
+            } else if (t_lower.includes('بيع') || t_lower.includes('إدراج')) {
+                aiResponse = 'ترغب في بيع منتجك بسرعة! قم بتحميل صورة المنتج من خلال أيقونة "+" في الأعلى، وسأقترح عليك أفضل سعر، وكتابة وصف جذاب لضمان بيع سريع وفعال.';
+            } else if (t_lower.includes('عالمي') || t_lower.includes('عملاء')) {
+                aiResponse = 'Forsale AI هو سوق عالمي بالكامل! الذكاء الاصطناعي لدينا مسؤول عن استهداف العملاء في جميع أنحاء العالم، وتكييف العروض، وإدارة اللوجستيات الدولية لضمان وصول منتجاتك لأكبر قاعدة مشتركين ممكنة.';
+            } else if (!isNaN(parseInt(text))) {
+                aiResponse = `تم العثور على الطلب رقم ${text}: حالته هو "في مرحلة الشحن". تم فحص المنتج بواسطة Logy AI للتأكد من الجودة. التوصيل المتوقع: 2025-11-28.`;
+            }
+
+            logyMsgs.push({ s: 'ai', t: aiResponse });
+            renderChat();
+        }, 1500); // 1.5 ثانية لمحاكاة معالجة AI
+    }
+    
+    // وظائف نافذة المحفظة (#walletModal)
+    window.openWalletModal = () => {
+        closeAllModals();
+        // NEW: إغلاق أي نافذة مفتوحة
+        document.getElementById('walletModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    };
+    window.closeWalletModal = () => {
+        document.getElementById('walletModal').style.display = 'none';
+        document.body.style.overflow = '';
+    };
+
+    function deposit() {
+        alert('جاري التوجه إلى Pi Wallet لإجراء الإيداع. المعاملات مؤمنة بالكامل ومدمجة مع Pi Network.');
+    }
+
+    function withdraw() {
+        alert('جاري التوجه إلى Pi Wallet لإجراء السحب. جميع عمليات السحب تخضع للمراجعة الأمنية الآلية Logy AI.');
+    }
+
+    /* ============================================ */
+    /* وظائف لوحة تحكم البائع (#sellerDashboardModal) */
+    /* ============================================ */
+    window.openSellerDashboardModal = () => {
+        closeAllModals(); // دالة موجودة في الكود الأساسي
+        document.getElementById('sellerDashboardModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    };
+    window.closeSellerDashboardModal = () => {
+        document.getElementById('sellerDashboardModal').style.display = 'none';
+        document.body.style.overflow = '';
+    };
+
+    function viewListingDetails(productId) {
+        alert(`جاري عرض تفاصيل المنتج: ${productId}\n(هنا يتم فتح صفحة تفاصيل المنتج مع خيارات التعديل للبائع).`);
+    }
+
+    function viewOrderShipment(orderId) {
+        alert(`جاري عرض تفاصيل الطلب: ${orderId}\n(هنا يتم فتح صفحة تتبع الطلب وخيارات الشحن).`);
+    }
+
+    // تهيئة التطبيق الرئيسي
+    function initializeApp() {
+        renderCategories();
+        renderProducts();
+        selectCategory('all', document.querySelector('.cat-item')); // Select 'الكل' initially
+        updateNotificationDot();
+        // إظهار النقطة الحمراء في البداية
+    }
+
+    // تهيئة الصفحة عند التحميل
+    document.addEventListener('DOMContentLoaded', () => {
+        setupLogin();
+        // 🚨 تم تعطيل التحقق التلقائي هنا لضمان ظهور صفحة الدخول في كل مرة
+        // checkLoginStatus(); 
+        
+        // **إصلاح زر Enter في الدردشة (Logy AI Chat)**
+        const logyInput = document.getElementById('logy-input');
+        if (logyInput) {
+            logyInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        }
+    });
 </script>
-
 </body>
 </html>
