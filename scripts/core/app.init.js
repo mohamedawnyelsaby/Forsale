@@ -15,6 +15,7 @@ import { seedProducts } from "../modules/products/products.seed.js";
 import { HomeScreen } from "../ui/screens/home.screen.js";
 import { ProductsScreen } from "../ui/screens/products.screen.js";
 import { ProfileScreen } from "../ui/screens/profile.screen.js";
+import { CartScreen } from "../ui/screens/cart.screen.js";
 
 // UI
 import { MainTabs } from "../ui/tabs/main.tabs.js";
@@ -40,6 +41,7 @@ export function initApp() {
   // 5️⃣ Routes
   Router.register("/home", HomeScreen);
   Router.register("/products", ProductsScreen);
+  Router.register("/cart", CartScreen);
   Router.register("/profile", ProfileScreen);
 
   // 6️⃣ Start application
