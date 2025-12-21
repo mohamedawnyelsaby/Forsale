@@ -1,15 +1,24 @@
 // PATH: scripts/core/app.init.js
 
-import { UIState } from "./state.store.js";
-import { UIRouter } from "./router.ui.js";
-import { Tabs } from "../ui/tabs.ui.js";
-import { ProductsUI } from "../ui/products.ui.js";
+import { Router } from "./router.js";
 
-export const App = {
-    start() {
-        UIState.init();
-        UIRouter.init();
-        Tabs.init();
-        ProductsUI.init("home-screen");
-    }
-};
+import { HomeScreen } from "../ui/screens/home.screen.js";
+import { ProductsScreen } from "../ui/screens/products.screen.js";
+import { ProfileScreen } from "../ui/screens/profile.screen.js";
+
+import { MainTabs } from "../ui/tabs/main.tabs.js";
+
+export function initApp() {
+  const root = document.getElementById("root");
+  const app = document.createElement("div");
+  app.id = "app";
+
+  root.appendChild(app);
+  root.appendChild(MainTabs());
+
+  Router.register("/home", HomeScreen);
+  Router.register("/products", ProductsScreen);
+  Router.register("/profile", ProfileScreen);
+
+  Router.start("/home");
+}
