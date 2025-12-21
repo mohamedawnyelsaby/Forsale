@@ -628,6 +628,27 @@ window.closeSettingsModal = () => {
     document.body.style.overflow = '';
 };
 
+window.logout = () => {
+    if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+        // Clear saved session
+        localStorage.removeItem('forsale_current_user');
+        currentUser = null;
+        
+        // Close all modals
+        closeAllModals();
+        
+        // Show login page
+        document.getElementById("app-container").style.display = "none";
+        document.getElementById("auth-container").style.display = "flex";
+        
+        // Clear form fields
+        document.getElementById('login-email').value = '';
+        document.getElementById('login-password').value = '';
+        
+        console.log("👋 Logged out successfully");
+    }
+};
+
 window.openOrdersModal = () => {
     closeAllModals();
     document.getElementById('ordersModal').style.display = 'block';
@@ -739,28 +760,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 Forsale AI loaded");
     console.log("📱 Pi App: blackstyle");
     
-    // Initialize app first
-    initializeApp();
+    // Check if user is already logged in (from localStorage)
+    const savedUser = localStorage.getItem('forsale_current_user');
     
-    if (isPiBrowser()) {
-        console.log("✅ Running in Pi Browser");
+    if (savedUser) {
+        // User was logged in before - go directly to app
+        console.log("✅ Found saved user session");
+        currentUser = JSON.parse(savedUser);
         
         document.getElementById("auth-container").style.display = "none";
         document.getElementById("app-container").style.display = "block";
+        initializeApp();
         
-        try {
-            await authenticateUser();
-        } catch (error) {
-            console.log("⚠️ Auto-auth failed, will prompt when needed");
+        // Try to authenticate with Pi if in Pi Browser
+        if (isPiBrowser()) {
+            try {
+                await authenticateUser();
+            } catch (error) {
+                console.log("⚠️ Pi auth failed, continuing with saved session");
+            }
         }
-        
     } else {
-        console.log("⚠️ Not in Pi Browser - Demo mode");
-        console.log("🔗 Open: minepi.com/blackstyle");
-        
-        // Show app in demo mode
-        document.getElementById("auth-container").style.display = "none";
-        document.getElementById("app-container").style.display = "block";
+        // No saved session - show login page
+        console.log("🔐 No saved session - showing login page");
+        document.getElementById("auth-container").style.display = "flex";
+        document.getElementById("app-container").style.display = "none";
     }
     
     // Setup Enter key for chat
@@ -778,35 +802,91 @@ document.addEventListener('DOMContentLoaded', async () => {
  * LOGIN HANDLERS
  ************************/
 document.getElementById('login-btn')?.addEventListener('click', async () => {
-    if (isPiBrowser()) {
+    const email = document.getElementById('login-email')?.value || '';
+    const password = document.getElementById('login-password')?.value || '';
+    
+    if (!email || !password) {
+        alert("⚠️ يرجى إدخال البريد الإلكتروني وكلمة المرور");
+        return;
+    }
+    
+    // Simulate login
+    const btn = document.getElementById('login-btn');
+    btn.innerHTML = 'جاري الدخول... <i class="fa-solid fa-spinner fa-spin"></i>';
+    btn.disabled = true;
+    
+    setTimeout(async () => {
+        // Create or get user
+        const user = { 
+            email: email, 
+            username: email.split('@')[0],
+            joinDate: new Date().toISOString() 
+        };
+        
+        // Save to localStorage
+        localStorage.setItem('forsale_current_user', JSON.stringify(user));
+        currentUser = user;
+        
+        // If in Pi Browser, also authenticate with Pi
+        if (isPiBrowser()) {
+            try {
+                await authenticateUser();
+            } catch (error) {
+                console.log("⚠️ Pi auth optional, continuing with email login");
+            }
+        }
+        
+        // Show app
+        document.getElementById("auth-container").style.display = "none";
+        document.getElementById("app-container").style.display = "block";
+        initializeApp();
+        
+        btn.innerHTML = 'دخول آمن <i class="fa-solid fa-arrow-left"></i>';
+        btn.disabled = false;
+    }, 1500);
+});
+
+document.getElementById('pi-login-btn')?.addEventListener('click', async () => {
+    if (!isPiBrowser()) {
+        alert("⚠️ يجب فتح التطبيق من Pi Browser\n\nافتح: minepi.com/blackstyle");
+        return;
+    }
+    
+    const btn = document.getElementById('pi-login-btn');
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري تسجيل الدخول...';
+    btn.disabled = true;
+    
+    try {
         const user = await authenticateUser();
         if (user) {
+            // Save to localStorage
+            localStorage.setItem('forsale_current_user', JSON.stringify(user));
+            
             document.getElementById("auth-container").style.display = "none";
             document.getElementById("app-container").style.display = "block";
             initializeApp();
         }
-    } else {
-        alert("⚠️ يجب فتح التطبيق من Pi Browser\n\nافتح: minepi.com/blackstyle");
-    }
-});
-
-document.getElementById('pi-login-btn')?.addEventListener('click', () => {
-    if (!isPiBrowser()) {
-        window.location.href = "https://minepi.com/blackstyle";
-    } else {
-        authenticateUser();
+    } catch (error) {
+        alert("❌ فشل تسجيل الدخول عبر Pi Network");
+    } finally {
+        btn.innerHTML = '<i class="fa-solid fa-network-wired"></i> تسجيل الدخول عبر Pi Browser';
+        btn.disabled = false;
     }
 });
 
 document.getElementById('fingerprint-login-btn')?.addEventListener('click', async () => {
-    if (isPiBrowser()) {
-        const user = await authenticateUser();
-        if (user) {
-            document.getElementById("auth-container").style.display = "none";
-            document.getElementById("app-container").style.display = "block";
-            initializeApp();
-        }
-    } else {
-        alert("⚠️ يجب فتح التطبيق من Pi Browser");
+    if (!isPiBrowser()) {
+        alert("⚠️ يجب فتح التطبيق من Pi Browser\n\nافتح: minepi.com/blackstyle");
+        return;
+    }
+    
+    const user = await authenticateUser();
+    if (user) {
+        // Save to localStorage
+        localStorage.setItem('forsale_current_user', JSON.stringify(user));
+        
+        document.getElementById("auth-container").style.display = "none";
+        document.getElementById("app-container").style.display = "block";
+        initializeApp();
     }
 });
