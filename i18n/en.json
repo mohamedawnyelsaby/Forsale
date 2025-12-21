@@ -1,13 +1,18 @@
-// PATH: i18n/en.json
 {
   "app.title": "Forsale",
+
   "auth.login": "Login",
   "auth.logout": "Logout",
   "auth.welcome": "Welcome back",
+
   "nav.home": "Home",
   "nav.search": "Search",
   "nav.profile": "Profile",
   "nav.settings": "Settings",
+
   "action.confirm": "Confirm",
-  "action.cancel": "Cancel"
+  "action.cancel": "Cancel",
+  "action.add_to_cart": "Add to cart",
+
+  "product.sample.title": "Sample Product"
 }
