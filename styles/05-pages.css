@@ -1,0 +1,15 @@
+/* PATH: styles/05-pages.css */
+
+#auth-container {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at center, #1a2e44 0%, #000 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+#app-container {
+    display: none;
+}
