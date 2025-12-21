@@ -638,12 +638,15 @@ window.logout = () => {
         closeAllModals();
         
         // Show login page
+        document.body.classList.remove('logged-in');
         document.getElementById("app-container").style.display = "none";
         document.getElementById("auth-container").style.display = "flex";
         
         // Clear form fields
-        document.getElementById('login-email').value = '';
-        document.getElementById('login-password').value = '';
+        const emailInput = document.getElementById('login-email');
+        const passwordInput = document.getElementById('login-password');
+        if (emailInput) emailInput.value = '';
+        if (passwordInput) passwordInput.value = '';
         
         console.log("👋 Logged out successfully");
     }
@@ -768,6 +771,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log("✅ Found saved user session");
         currentUser = JSON.parse(savedUser);
         
+        // Show app, hide login
+        document.body.classList.add('logged-in');
         document.getElementById("auth-container").style.display = "none";
         document.getElementById("app-container").style.display = "block";
         initializeApp();
@@ -783,6 +788,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
         // No saved session - show login page
         console.log("🔐 No saved session - showing login page");
+        document.body.classList.remove('logged-in');
         document.getElementById("auth-container").style.display = "flex";
         document.getElementById("app-container").style.display = "none";
     }
@@ -837,6 +843,7 @@ document.getElementById('login-btn')?.addEventListener('click', async () => {
         }
         
         // Show app
+        document.body.classList.add('logged-in');
         document.getElementById("auth-container").style.display = "none";
         document.getElementById("app-container").style.display = "block";
         initializeApp();
@@ -862,6 +869,7 @@ document.getElementById('pi-login-btn')?.addEventListener('click', async () => {
             // Save to localStorage
             localStorage.setItem('forsale_current_user', JSON.stringify(user));
             
+            document.body.classList.add('logged-in');
             document.getElementById("auth-container").style.display = "none";
             document.getElementById("app-container").style.display = "block";
             initializeApp();
@@ -885,6 +893,7 @@ document.getElementById('fingerprint-login-btn')?.addEventListener('click', asyn
         // Save to localStorage
         localStorage.setItem('forsale_current_user', JSON.stringify(user));
         
+        document.body.classList.add('logged-in');
         document.getElementById("auth-container").style.display = "none";
         document.getElementById("app-container").style.display = "block";
         initializeApp();
