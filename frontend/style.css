@@ -44,6 +44,17 @@ body {
     padding-bottom: 70px;
 }
 
+/* منع عرض التطبيق حتى يتم التحقق من حالة تسجيل الدخول */
+body:not(.auth-checked) #app-container {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+body:not(.auth-checked) #auth-container {
+    display: flex !important;
+    visibility: visible !important;
+}
+
 .content-wrapper {
     padding-left: var(--content-padding-h);
     padding-right: var(--content-padding-h);
