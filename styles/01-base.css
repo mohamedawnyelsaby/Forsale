@@ -1,0 +1,26 @@
+/* PATH: styles/01-base.css */
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    min-height: 100vh;
+    background: var(--bg-dark);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    color: var(--text-main);
+}
+
+body {
+    background: radial-gradient(circle at top left, #1a2e44 0%, #000000 100%);
+    background-attachment: fixed;
+    padding-top: calc(var(--header-height) + 15px);
+    padding-bottom: 70px;
+}
