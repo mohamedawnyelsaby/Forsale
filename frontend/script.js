@@ -1,12 +1,18 @@
 /************************
  * FORSALE AI - COMPLETE SCRIPT
  * Original functionality + Pi Network Integration
+ * VERSION: 2.1 - Fixed Login & Pi Authentication
+ * BUILD DATE: December 21, 2025
  ************************/
 
 /************************
  * GLOBAL CONFIG
  ************************/
 const API_BASE = "https://forsale-production.up.railway.app";
+const APP_VERSION = "2.1";
+const BUILD_DATE = "2025-12-21";
+
+console.log(`🚀 Forsale AI v${APP_VERSION} - Build: ${BUILD_DATE}`);
 
 let currentUser = null;
 let activeCategory = 'all';
@@ -637,8 +643,13 @@ window.logout = () => {
         // Close all modals
         closeAllModals();
         
-        // Show login page
+        // Update all classes
         document.body.classList.remove('logged-in');
+        document.body.classList.add('auth-checked');
+        document.documentElement.classList.remove('show-app');
+        document.documentElement.classList.add('show-login');
+        
+        // Show login page
         document.getElementById("app-container").style.display = "none";
         document.getElementById("auth-container").style.display = "flex";
         
@@ -763,6 +774,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 Forsale AI loaded");
     console.log("📱 Pi App: blackstyle");
     
+    // IMPORTANT: Mark that we've checked auth status
+    // This prevents flash of wrong page
+    
     // Check if user is already logged in (from localStorage)
     const savedUser = localStorage.getItem('forsale_current_user');
     
@@ -773,6 +787,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Show app, hide login
         document.body.classList.add('logged-in');
+        document.body.classList.add('auth-checked');
         document.getElementById("auth-container").style.display = "none";
         document.getElementById("app-container").style.display = "block";
         initializeApp();
@@ -789,6 +804,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // No saved session - show login page
         console.log("🔐 No saved session - showing login page");
         document.body.classList.remove('logged-in');
+        document.body.classList.add('auth-checked');
         document.getElementById("auth-container").style.display = "flex";
         document.getElementById("app-container").style.display = "none";
     }
@@ -841,6 +857,12 @@ document.getElementById('login-btn')?.addEventListener('click', async () => {
         
         // Show app
         document.body.classList.add('logged-in');
+        document.body.classList.add('auth-checked');
+        document.documentElement.classList.remove('show-login');
+        document.documentElement.classList.add('show-app');
+        document.body.classList.add('auth-checked');
+        document.documentElement.classList.remove('show-login');
+        document.documentElement.classList.add('show-app');
         document.getElementById("auth-container").style.display = "none";
         document.getElementById("app-container").style.display = "block";
         initializeApp();
@@ -871,6 +893,9 @@ document.getElementById('pi-login-btn')?.addEventListener('click', async () => {
             localStorage.setItem('forsale_current_user', JSON.stringify(user));
             
             document.body.classList.add('logged-in');
+            document.body.classList.add('auth-checked');
+            document.documentElement.classList.remove('show-login');
+            document.documentElement.classList.add('show-app');
             document.getElementById("auth-container").style.display = "none";
             document.getElementById("app-container").style.display = "block";
             initializeApp();
