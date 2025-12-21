@@ -1,0 +1,17 @@
+/* PATH: styles/04-modals.css */
+
+#product-detail-modal,
+#ai-upload-modal,
+#settingsModal,
+#checkoutModal,
+#ordersModal,
+#walletModal,
+#notificationsModal,
+#sellerDashboardModal {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-dark);
+    z-index: 200;
+    display: none;
+    overflow-y: auto;
+}
