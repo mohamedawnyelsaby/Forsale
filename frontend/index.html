@@ -7,6 +7,36 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     
+    <!-- Prevent flash of wrong page -->
+    <script>
+        // This runs BEFORE the page renders
+        (function() {
+            const savedUser = localStorage.getItem('forsale_current_user');
+            if (!savedUser) {
+                // No saved session - ensure login page shows
+                document.documentElement.classList.add('show-login');
+            } else {
+                // Has saved session - ensure app shows
+                document.documentElement.classList.add('show-app');
+            }
+        })();
+    </script>
+    <style>
+        /* Critical CSS to prevent flash */
+        html.show-login #app-container {
+            display: none !important;
+        }
+        html.show-login #auth-container {
+            display: flex !important;
+        }
+        html.show-app #auth-container {
+            display: none !important;
+        }
+        html.show-app #app-container {
+            display: block !important;
+        }
+    </style>
+    
     <!-- Pi Network SDK -->
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script>
