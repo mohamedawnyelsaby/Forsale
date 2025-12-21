@@ -5,12 +5,15 @@ import {
   selectCartTotal,
   isCartEmpty
 } from "../../modules/cart/cart.selectors.js";
+
 import {
   addToCart,
   removeFromCart,
   clearCart
 } from "../../modules/cart/cart.actions.js";
+
 import { subscribeCart } from "../../modules/cart/cart.store.js";
+import { startCheckout } from "../../modules/checkout/checkout.controller.js";
 
 export function CartScreen(container) {
   container.innerHTML = `
@@ -38,11 +41,13 @@ export function CartScreen(container) {
             (i) => `
           <li class="cart-item">
             <span>${i.title}</span>
+
             <div class="qty">
               <button data-action="dec" data-id="${i.id}">-</button>
               <span>${i.qty}</span>
               <button data-action="inc" data-id="${i.id}">+</button>
             </div>
+
             <strong>${i.price * i.qty} PI</strong>
           </li>
         `
@@ -54,16 +59,19 @@ export function CartScreen(container) {
         <strong>Total: ${total} PI</strong>
       </div>
 
-      <button id="checkout-btn">Checkout</button>
+      <button id="checkout-btn">Checkout with Pi</button>
       <button id="clear-cart">Clear Cart</button>
     `;
   }
 
+  // Initial render
   render();
 
+  // Reactive updates
   const unsubscribe = subscribeCart(render);
 
-  content.addEventListener("click", (e) => {
+  // UI actions
+  content.addEventListener("click", async (e) => {
     const btn = e.target;
     const id = btn.dataset.id;
 
@@ -81,10 +89,24 @@ export function CartScreen(container) {
     }
 
     if (btn.id === "checkout-btn") {
-      alert("Checkout flow will start here (Pi integration next)");
+      btn.disabled = true;
+      btn.textContent = "Processing...";
+
+      try {
+        await startCheckout();
+        alert("Payment successful");
+        clearCart();
+      } catch (err) {
+        console.error(err);
+        alert("Payment failed or cancelled");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Checkout with Pi";
+      }
     }
   });
 
+  // Cleanup
   container.addEventListener(
     "screen:destroy",
     () => unsubscribe(),
