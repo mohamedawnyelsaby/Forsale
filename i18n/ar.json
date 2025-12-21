@@ -1,13 +1,18 @@
-// PATH: i18n/ar.json
 {
   "app.title": "Forsale",
+
   "auth.login": "تسجيل الدخول",
   "auth.logout": "تسجيل الخروج",
   "auth.welcome": "مرحبًا بعودتك",
+
   "nav.home": "الرئيسية",
   "nav.search": "بحث",
   "nav.profile": "الملف الشخصي",
   "nav.settings": "الإعدادات",
+
   "action.confirm": "تأكيد",
-  "action.cancel": "إلغاء"
+  "action.cancel": "إلغاء",
+  "action.add_to_cart": "أضف إلى السلة",
+
+  "product.sample.title": "منتج تجريبي"
 }
