@@ -14,15 +14,15 @@ export function ProductsScreen(container) {
 
   const view = container.querySelector("#products-view");
 
-  // Initial render
+  // 1️⃣ Initial render
   renderProductsList(view);
 
-  // Reactive updates
+  // 2️⃣ Reactive updates (ProductsStore → UI)
   const unsubscribe = Store.subscribe(() => {
     renderProductsList(view);
   });
 
-  // Handle click (details)
+  // 3️⃣ Handle product click → details
   view.addEventListener("click", (e) => {
     const card = e.target.closest(".product-card");
     if (!card) return;
@@ -31,6 +31,10 @@ export function ProductsScreen(container) {
     renderProductDetails(view, productId);
   });
 
-  // Cleanup (future-safe)
-  container.addEventListener("screen:destroy", unsubscribe, { once: true });
+  // 4️⃣ Cleanup (future routing-safe)
+  container.addEventListener(
+    "screen:destroy",
+    () => unsubscribe(),
+    { once: true }
+  );
 }
