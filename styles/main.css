@@ -1,0 +1,9 @@
+/* PATH: styles/main.css */
+
+@import "./00-variables.css";
+@import "./01-base.css";
+@import "./02-layout.css";
+@import "./03-components.css";
+@import "./04-modals.css";
+@import "./05-pages.css";
+@import "./06-animations.css";
