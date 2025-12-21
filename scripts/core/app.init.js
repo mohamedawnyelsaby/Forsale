@@ -5,6 +5,9 @@ import { Router } from "./router.js";
 // State
 import { bootstrapState } from "./state/bootstrap.js";
 
+// Cart (restore persisted cart)
+import { restoreCart } from "../modules/cart/cart.persistence.js";
+
 // Products seed (temporary, API-ready)
 import { seedProducts } from "../modules/products/products.seed.js";
 
@@ -20,10 +23,13 @@ export function initApp() {
   // 1️⃣ Restore persisted global state
   bootstrapState();
 
-  // 2️⃣ Seed initial products (will be removed when API is connected)
+  // 2️⃣ Restore cart from LocalStorage
+  restoreCart();
+
+  // 3️⃣ Seed initial products (will be removed when API is connected)
   seedProducts();
 
-  // 3️⃣ App root
+  // 4️⃣ App root
   const root = document.getElementById("root");
   const app = document.createElement("div");
   app.id = "app";
@@ -31,11 +37,11 @@ export function initApp() {
   root.appendChild(app);
   root.appendChild(MainTabs());
 
-  // 4️⃣ Routes
+  // 5️⃣ Routes
   Router.register("/home", HomeScreen);
   Router.register("/products", ProductsScreen);
   Router.register("/profile", ProfileScreen);
 
-  // 5️⃣ Start application
+  // 6️⃣ Start application
   Router.start("/home");
 }
