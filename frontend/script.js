@@ -808,13 +808,10 @@ document.addEventListener('DOMContentLoaded', async () => {
  * LOGIN HANDLERS
  ************************/
 document.getElementById('login-btn')?.addEventListener('click', async () => {
-    const email = document.getElementById('login-email')?.value || '';
-    const password = document.getElementById('login-password')?.value || '';
-    
-    if (!email || !password) {
-        alert("⚠️ يرجى إدخال البريد الإلكتروني وكلمة المرور");
-        return;
-    }
+    const emailInput = document.getElementById('login-email');
+    const passwordInput = document.getElementById('login-password');
+    const email = emailInput?.value.trim() || 'demo@forsale.com';
+    const password = passwordInput?.value.trim() || 'demo123';
     
     // Simulate login
     const btn = document.getElementById('login-btn');
@@ -855,7 +852,11 @@ document.getElementById('login-btn')?.addEventListener('click', async () => {
 
 document.getElementById('pi-login-btn')?.addEventListener('click', async () => {
     if (!isPiBrowser()) {
-        alert("⚠️ يجب فتح التطبيق من Pi Browser\n\nافتح: minepi.com/blackstyle");
+        // Not in Pi Browser - show alert with instructions
+        const confirmOpen = confirm("⚠️ يجب فتح التطبيق من Pi Browser\n\nهل تريد معرفة كيفية فتح التطبيق في Pi Browser؟");
+        if (confirmOpen) {
+            alert("📱 خطوات فتح التطبيق في Pi Browser:\n\n1. افتح تطبيق Pi Network على هاتفك\n2. اضغط على أيقونة المتصفح (Browser) في الأسفل\n3. ابحث عن: blackstyle\n4. أو افتح: minepi.com/blackstyle\n\n✨ بدلاً من ذلك، يمكنك الدخول الآن بزر 'دخول آمن' للتجربة!");
+        }
         return;
     }
     
@@ -884,18 +885,36 @@ document.getElementById('pi-login-btn')?.addEventListener('click', async () => {
 
 document.getElementById('fingerprint-login-btn')?.addEventListener('click', async () => {
     if (!isPiBrowser()) {
-        alert("⚠️ يجب فتح التطبيق من Pi Browser\n\nافتح: minepi.com/blackstyle");
+        // Not in Pi Browser - show helpful message
+        const confirmOpen = confirm("⚠️ ميزة البصمة متاحة فقط في Pi Browser\n\nهل تريد معرفة كيفية فتح التطبيق في Pi Browser؟");
+        if (confirmOpen) {
+            alert("📱 خطوات فتح التطبيق في Pi Browser:\n\n1. افتح تطبيق Pi Network على هاتفك\n2. اضغط على أيقونة المتصفح (Browser) في الأسفل\n3. ابحث عن: blackstyle\n4. أو افتح: minepi.com/blackstyle\n\n✨ بدلاً من ذلك، يمكنك الدخول الآن بزر 'دخول آمن' للتجربة!");
+        }
         return;
     }
     
-    const user = await authenticateUser();
-    if (user) {
-        // Save to localStorage
-        localStorage.setItem('forsale_current_user', JSON.stringify(user));
-        
-        document.body.classList.add('logged-in');
-        document.getElementById("auth-container").style.display = "none";
-        document.getElementById("app-container").style.display = "block";
-        initializeApp();
+    // Show loading state on fingerprint icon
+    const fingerprintIcon = document.querySelector('.fingerprint-scan');
+    if (fingerprintIcon) {
+        fingerprintIcon.style.opacity = '0.5';
+    }
+    
+    try {
+        const user = await authenticateUser();
+        if (user) {
+            // Save to localStorage
+            localStorage.setItem('forsale_current_user', JSON.stringify(user));
+            
+            document.body.classList.add('logged-in');
+            document.getElementById("auth-container").style.display = "none";
+            document.getElementById("app-container").style.display = "block";
+            initializeApp();
+        }
+    } catch (error) {
+        alert("❌ فشل المصادقة عبر Pi Network");
+    } finally {
+        if (fingerprintIcon) {
+            fingerprintIcon.style.opacity = '1';
+        }
     }
 });
