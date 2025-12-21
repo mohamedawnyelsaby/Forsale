@@ -1,0 +1,19 @@
+/* PATH: styles/00-variables.css */
+
+:root {
+    --primary: #FFD700;
+    --accent: #00f2ff;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text-main: #ffffff;
+    --text-muted: #a0a0a0;
+    --radius: 14px;
+    --bg-dark: #0a1128;
+    --content-padding-h: 15px;
+    --chat-user-bg: #4A90E2;
+    --chat-ai-bg: #1A2E44;
+    --success-color: #2ECC71;
+    --danger: #FF5252;
+    --pi-purple: #9453A9;
+    --header-height: 65px;
+}
