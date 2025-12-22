@@ -1,5 +1,5 @@
 // ============================================
-// 📄 FILENAME: validate.ts
+// 📄 FILENAME: validate.ts (FIXED)
 // 📍 PATH: backend/src/middleware/validate.ts
 // ============================================
 
@@ -8,7 +8,7 @@ import { AnyZodObject, ZodError } from 'zod';
 import { AppError } from '../utils/AppError';
 
 export const validate = (schema: AnyZodObject) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       await schema.parseAsync({
         body: req.body,
