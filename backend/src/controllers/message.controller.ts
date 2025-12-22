@@ -1,9 +1,9 @@
 // ============================================
-// 📄 FILENAME: message.controller.ts
+// 📄 FILENAME: message.controller.ts (FIXED)
 // 📍 PATH: backend/src/controllers/message.controller.ts
 // ============================================
 
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { MessageService } from '../services/message.service';
 import { AuthRequest } from '../middleware/auth';
 import { AppError } from '../utils/AppError';
@@ -11,7 +11,7 @@ import { AppError } from '../utils/AppError';
 const messageService = new MessageService();
 
 export class MessageController {
-  async getConversations(req: AuthRequest, res: Response, next: NextFunction) {
+  async getConversations(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.user) {
         throw new AppError('Authentication required', 401);
@@ -28,7 +28,7 @@ export class MessageController {
     }
   }
   
-  async getConversationWith(req: AuthRequest, res: Response, next: NextFunction) {
+  async getConversationWith(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.user) {
         throw new AppError('Authentication required', 401);
@@ -49,7 +49,7 @@ export class MessageController {
     }
   }
   
-  async sendMessage(req: AuthRequest, res: Response, next: NextFunction) {
+  async sendMessage(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.user) {
         throw new AppError('Authentication required', 401);
@@ -70,7 +70,7 @@ export class MessageController {
     }
   }
   
-  async markAsRead(req: AuthRequest, res: Response, next: NextFunction) {
+  async markAsRead(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.user) {
         throw new AppError('Authentication required', 401);
