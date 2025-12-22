@@ -1,5 +1,5 @@
 // ============================================
-// 📄 FILENAME: product.service.ts
+// 📄 FILENAME: product.service.ts (FIXED)
 // 📍 PATH: backend/src/services/product.service.ts
 // ============================================
 
@@ -10,7 +10,7 @@ import { AIService } from './ai.service';
 const aiService = new AIService();
 
 export class ProductService {
-  async getAll(options: { page: number; limit: number }) {
+  async getAll(options: { page: number; limit: number }): Promise<any> {
     const skip = (options.page - 1) * options.limit;
     
     const [products, total] = await Promise.all([
@@ -51,7 +51,7 @@ export class ProductService {
     };
   }
   
-  async getById(id: number) {
+  async getById(id: number): Promise<any> {
     const product = await prisma.product.findUnique({
       where: { id },
       include: {
@@ -64,7 +64,7 @@ export class ProductService {
         },
         reviews: {
           include: {
-            user: {
+            reviewer: {
               select: {
                 id: true,
                 name: true
@@ -82,7 +82,6 @@ export class ProductService {
       throw new AppError('Product not found', 404);
     }
     
-    // Track view
     await prisma.productView.create({
       data: {
         product_id: id,
@@ -100,7 +99,7 @@ export class ProductService {
     maxPrice?: number;
     page: number;
     limit: number;
-  }) {
+  }): Promise<any> {
     const skip = (params.page - 1) * params.limit;
     
     const where: any = {
@@ -159,7 +158,7 @@ export class ProductService {
     };
   }
   
-  async getByCategory(category: string, options: { page: number; limit: number }) {
+  async getByCategory(category: string, options: { page: number; limit: number }): Promise<any> {
     const skip = (options.page - 1) * options.limit;
     
     const [products, total] = await Promise.all([
@@ -198,8 +197,7 @@ export class ProductService {
     };
   }
   
-  async create(data: any) {
-    // Get AI analysis if images provided
+  async create(data: any): Promise<any> {
     let aiMeta = null;
     if (data.images && data.images.length > 0) {
       aiMeta = await aiService.analyzeProduct({
@@ -208,10 +206,16 @@ export class ProductService {
       });
     }
     
+    const slug = data.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '') + '-' + Date.now();
+    
     const product = await prisma.product.create({
       data: {
         seller_id: data.seller_id,
         title: data.title,
+        slug,
         description: data.description,
         price_pi: data.price_pi,
         category: data.category,
@@ -232,8 +236,7 @@ export class ProductService {
     return product;
   }
   
-  async update(id: number, userId: number, data: any) {
-    // Check ownership
+  async update(id: number, userId: number, data: any): Promise<any> {
     const product = await prisma.product.findUnique({
       where: { id }
     });
@@ -246,7 +249,6 @@ export class ProductService {
       throw new AppError('Not authorized to update this product', 403);
     }
     
-    // Update
     const updated = await prisma.product.update({
       where: { id },
       data: {
@@ -262,7 +264,7 @@ export class ProductService {
     return updated;
   }
   
-  async delete(id: number, userId: number) {
+  async delete(id: number, userId: number): Promise<void> {
     const product = await prisma.product.findUnique({
       where: { id }
     });
@@ -280,7 +282,7 @@ export class ProductService {
     });
   }
   
-  async getSellerProducts(sellerId: number) {
+  async getSellerProducts(sellerId: number): Promise<any[]> {
     return await prisma.product.findMany({
       where: {
         seller_id: sellerId
