@@ -1,5 +1,5 @@
 // ============================================
-// 📄 FILENAME: upload.service.ts
+// 📄 FILENAME: upload.service.ts (FIXED)
 // 📍 PATH: backend/src/services/upload.service.ts
 // ============================================
 
@@ -8,6 +8,7 @@ import { Upload } from '@aws-sdk/lib-storage';
 import { v4 as uuidv4 } from 'uuid';
 import { config } from '../config/env';
 import { logger } from '../utils/logger';
+import { AppError } from '../utils/AppError';
 
 export class UploadService {
   private s3Client: S3Client;
@@ -53,7 +54,7 @@ export class UploadService {
       
     } catch (error) {
       logger.error('❌ Image upload failed:', error);
-      throw new Error('Failed to upload image');
+      throw new AppError('Failed to upload image', 500);
     }
   }
   
@@ -67,7 +68,7 @@ export class UploadService {
       
     } catch (error) {
       logger.error('❌ Multiple upload failed:', error);
-      throw new Error('Failed to upload images');
+      throw new AppError('Failed to upload images', 500);
     }
   }
   
@@ -75,7 +76,7 @@ export class UploadService {
     try {
       const urlParts = url.split(`/${config.S3_BUCKET}/`);
       if (urlParts.length < 2) {
-        throw new Error('Invalid image URL');
+        throw new AppError('Invalid image URL', 400);
       }
       
       const key = urlParts[1].split('?')[0];
@@ -91,7 +92,7 @@ export class UploadService {
       
     } catch (error) {
       logger.error('❌ Image deletion failed:', error);
-      throw new Error('Failed to delete image');
+      throw new AppError('Failed to delete image', 500);
     }
   }
   
@@ -122,7 +123,7 @@ export class UploadService {
       
     } catch (error) {
       logger.error('❌ Avatar upload failed:', error);
-      throw new Error('Failed to upload avatar');
+      throw new AppError('Failed to upload avatar', 500);
     }
   }
   
@@ -138,11 +139,11 @@ export class UploadService {
     const maxSize = 10 * 1024 * 1024;
     
     if (!allowedMimes.includes(file.mimetype)) {
-      throw new Error('Invalid file type');
+      throw new AppError('Invalid file type', 400);
     }
     
     if (file.size > maxSize) {
-      throw new Error('File too large');
+      throw new AppError('File too large', 400);
     }
     
     return true;
