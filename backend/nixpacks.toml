@@ -7,15 +7,15 @@ nixPkgs = ["nodejs-20_x", "openssl"]
 
 [phases.install]
 cmds = [
-  "npm ci --include=dev",
-  "npx prisma generate"
+  "npm ci --include=dev"
 ]
 
 [phases.build]
 cmds = [
-  "npm run build",
-  "npx prisma generate"
+  "cp -r prisma ./node_modules/.prisma/ || true",
+  "npx prisma generate",
+  "npm run build"
 ]
 
 [start]
-cmd = "node dist/index.js"
+cmd = "npx prisma generate && node dist/index.js"
