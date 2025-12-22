@@ -1,5 +1,5 @@
 // ============================================
-// 📄 FILENAME: message.service.ts
+// 📄 FILENAME: message.service.ts (FIXED)
 // 📍 PATH: backend/src/services/message.service.ts
 // ============================================
 
@@ -7,36 +7,69 @@ import { prisma } from '../config/database';
 import { AppError } from '../utils/AppError';
 
 export class MessageService {
-  async getUserConversations(userId: number) {
-    // Get unique users the current user has chatted with
-    const conversations = await prisma.$queryRaw`
-      SELECT DISTINCT ON (other_user_id)
-        other_user_id,
-        u.name as other_user_name,
-        u.email as other_user_email,
-        m.content as last_message,
-        m.created_at as last_message_at,
-        m.read,
-        COUNT(*) FILTER (WHERE m.receiver_id = ${userId} AND m.read = false) as unread_count
-      FROM (
-        SELECT 
-          CASE 
-            WHEN sender_id = ${userId} THEN receiver_id 
-            ELSE sender_id 
-          END as other_user_id,
-          id, content, created_at, read, receiver_id
-        FROM messages
-        WHERE sender_id = ${userId} OR receiver_id = ${userId}
-      ) m
-      JOIN users u ON u.id = m.other_user_id
-      GROUP BY other_user_id, u.name, u.email, m.content, m.created_at, m.read, m.id
-      ORDER BY other_user_id, m.created_at DESC
-    `;
-    
-    return conversations;
+  async getUserConversations(userId: number): Promise<any[]> {
+    const sentMessages = await prisma.message.groupBy({
+      by: ['receiver_id'],
+      where: { sender_id: userId },
+      _max: { created_at: true }
+    });
+
+    const receivedMessages = await prisma.message.groupBy({
+      by: ['sender_id'],
+      where: { receiver_id: userId },
+      _max: { created_at: true }
+    });
+
+    const userIds = new Set<number>();
+    sentMessages.forEach(m => userIds.add(m.receiver_id));
+    receivedMessages.forEach(m => userIds.add(m.sender_id));
+
+    const conversations = await Promise.all(
+      Array.from(userIds).map(async (otherUserId) => {
+        const lastMessage = await prisma.message.findFirst({
+          where: {
+            OR: [
+              { sender_id: userId, receiver_id: otherUserId },
+              { sender_id: otherUserId, receiver_id: userId }
+            ]
+          },
+          orderBy: { created_at: 'desc' },
+          include: {
+            sender: {
+              select: { id: true, name: true, email: true }
+            }
+          }
+        });
+
+        const unreadCount = await prisma.message.count({
+          where: {
+            sender_id: otherUserId,
+            receiver_id: userId,
+            read: false
+          }
+        });
+
+        const otherUser = await prisma.user.findUnique({
+          where: { id: otherUserId },
+          select: { id: true, name: true, email: true }
+        });
+
+        return {
+          otherUser,
+          lastMessage,
+          unreadCount
+        };
+      })
+    );
+
+    return conversations.sort((a, b) => {
+      const aTime = a.lastMessage?.created_at?.getTime() || 0;
+      const bTime = b.lastMessage?.created_at?.getTime() || 0;
+      return bTime - aTime;
+    });
   }
   
-  async getConversation(userId: number, otherUserId: number) {
+  async getConversation(userId: number, otherUserId: number): Promise<any[]> {
     const messages = await prisma.message.findMany({
       where: {
         OR: [
@@ -57,7 +90,6 @@ export class MessageService {
       }
     });
     
-    // Mark messages as read
     await prisma.message.updateMany({
       where: {
         sender_id: otherUserId,
@@ -76,9 +108,16 @@ export class MessageService {
     sender_id: number;
     receiver_id: number;
     content: string;
-  }) {
+  }): Promise<any> {
+    const conversationId = [data.sender_id, data.receiver_id]
+      .sort()
+      .join('-');
+
     const message = await prisma.message.create({
-      data,
+      data: {
+        ...data,
+        conversation_id: conversationId
+      },
       include: {
         sender: {
           select: {
@@ -92,7 +131,7 @@ export class MessageService {
     return message;
   }
   
-  async markAsRead(messageId: number, userId: number) {
+  async markAsRead(messageId: number, userId: number): Promise<void> {
     const message = await prisma.message.findUnique({
       where: { id: messageId }
     });
