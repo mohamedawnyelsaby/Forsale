@@ -1,5 +1,5 @@
 // ============================================
-// 📄 FILENAME: errorHandler.ts
+// 📄 FILENAME: errorHandler.ts (FIXED)
 // 📍 PATH: backend/src/middleware/errorHandler.ts
 // ============================================
 
@@ -12,23 +12,25 @@ export const errorHandler = (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): void => {
   logger.error('Error:', err);
   
   if (err instanceof AppError) {
-    return res.status(err.statusCode).json({
+    res.status(err.statusCode).json({
       success: false,
       message: err.message,
       errors: err.errors
     });
+    return;
   }
   
   // Prisma errors
   if (err.name === 'PrismaClientKnownRequestError') {
-    return res.status(400).json({
+    res.status(400).json({
       success: false,
       message: 'Database operation failed'
     });
+    return;
   }
   
   // Default error
