@@ -8,18 +8,12 @@ import { ProductService } from '../services/product.service';
 import { AuthRequest } from '../middleware/auth';
 import { AppError } from '../utils/AppError';
 import { prisma } from '../config/database';
-import { AIService } from '../services/ai.service';
 
 const productService = new ProductService();
-const aiService = new AIService();
 
 export class ProductController {
   
-  // ============================================
-  // GET ALL PRODUCTS (Fixed)
-  // ============================================
-  
-  async getAll(req: Request, res: Response, next: NextFunction) {
+  async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
@@ -35,11 +29,7 @@ export class ProductController {
     }
   }
   
-  // ============================================
-  // ENHANCED SEARCH (Fixed with Prisma)
-  // ============================================
-  
-  async search(req: Request, res: Response, next: NextFunction) {
+  async search(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const {
         q,
@@ -54,12 +44,10 @@ export class ProductController {
         limit = 20
       } = req.query;
       
-      // Build where clause
       const where: any = {
         stock: { gt: 0 }
       };
       
-      // Text search
       if (q) {
         where.OR = [
           { title: { contains: q as string, mode: 'insensitive' } },
@@ -67,12 +55,10 @@ export class ProductController {
         ];
       }
       
-      // Category filter
       if (category && category !== 'all') {
         where.category = category;
       }
       
-      // Price range
       if (minPrice !== undefined || maxPrice !== undefined) {
         where.price_pi = {};
         if (minPrice !== undefined) {
@@ -83,7 +69,6 @@ export class ProductController {
         }
       }
       
-      // Determine sort order
       let orderBy: any = { created_at: 'desc' };
       
       switch (sortBy) {
@@ -98,10 +83,8 @@ export class ProductController {
           break;
       }
       
-      // Calculate pagination
       const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
       
-      // Execute query
       const [products, total] = await Promise.all([
         prisma.product.findMany({
           where,
@@ -140,11 +123,7 @@ export class ProductController {
     }
   }
   
-  // ============================================
-  // GET BY ID
-  // ============================================
-  
-  async getById(req: Request, res: Response, next: NextFunction) {
+  async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const product = await productService.getById(parseInt(req.params.id));
       
@@ -157,11 +136,7 @@ export class ProductController {
     }
   }
   
-  // ============================================
-  // GET BY CATEGORY
-  // ============================================
-  
-  async getByCategory(req: Request, res: Response, next: NextFunction) {
+  async getByCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { category } = req.params;
       const page = parseInt(req.query.page as string) || 1;
@@ -178,11 +153,7 @@ export class ProductController {
     }
   }
   
-  // ============================================
-  // CREATE PRODUCT
-  // ============================================
-  
-  async create(req: AuthRequest, res: Response, next: NextFunction) {
+  async create(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.user) {
         throw new AppError('Authentication required', 401);
@@ -202,11 +173,7 @@ export class ProductController {
     }
   }
   
-  // ============================================
-  // UPDATE PRODUCT
-  // ============================================
-  
-  async update(req: AuthRequest, res: Response, next: NextFunction) {
+  async update(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.user) {
         throw new AppError('Authentication required', 401);
@@ -227,11 +194,7 @@ export class ProductController {
     }
   }
   
-  // ============================================
-  // DELETE PRODUCT
-  // ============================================
-  
-  async delete(req: AuthRequest, res: Response, next: NextFunction) {
+  async delete(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.user) {
         throw new AppError('Authentication required', 401);
@@ -248,11 +211,7 @@ export class ProductController {
     }
   }
   
-  // ============================================
-  // GET MY PRODUCTS
-  // ============================================
-  
-  async getMyProducts(req: AuthRequest, res: Response, next: NextFunction) {
+  async getMyProducts(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.user) {
         throw new AppError('Authentication required', 401);
