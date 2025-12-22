@@ -1,22 +1,18 @@
 // ============================================
-// 📄 FILENAME: index.ts (FIXED - Using Prisma)
+// 📄 FILENAME: index.ts (FIXED - PRODUCTION READY)
 // 📍 PATH: backend/src/index.ts
 // ============================================
 
-import express, { Application, Request, Response, NextFunction } from 'express';
+import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 
-// Load environment variables
 dotenv.config();
 
-// Import Prisma
 import { prisma, connectDB, disconnectDB } from './config/database';
-
-// Import routes
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import productRoutes from './routes/product.routes';
@@ -25,8 +21,6 @@ import piRoutes from './routes/pi.routes';
 import uploadRoutes from './routes/upload.routes';
 import reviewRoutes from './routes/review.routes';
 import messageRoutes from './routes/message.routes';
-
-// Import error handler
 import { errorHandler } from './middleware/errorHandler';
 import { logger } from './utils/logger';
 
@@ -46,13 +40,11 @@ class Server {
   }
 
   private initializeMiddlewares(): void {
-    // Security
     this.app.use(helmet({
       contentSecurityPolicy: false,
       crossOriginEmbedderPolicy: false
     }));
 
-    // CORS
     this.app.use(cors({
       origin: process.env.CORS_ORIGIN || '*',
       credentials: true,
@@ -60,14 +52,10 @@ class Server {
       allowedHeaders: ['Content-Type', 'Authorization']
     }));
 
-    // Compression
     this.app.use(compression());
-
-    // Body parsers
     this.app.use(express.json({ limit: '10mb' }));
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-    // Rate limiting
     const limiter = rateLimit({
       windowMs: 15 * 60 * 1000,
       max: 100,
@@ -81,7 +69,6 @@ class Server {
   }
 
   private initializeRoutes(): void {
-    // Health check
     this.app.get('/health', (req: Request, res: Response) => {
       res.status(200).json({
         success: true,
@@ -100,7 +87,6 @@ class Server {
       });
     });
 
-    // Root
     this.app.get('/', (req: Request, res: Response) => {
       res.status(200).json({
         success: true,
@@ -111,7 +97,6 @@ class Server {
       });
     });
 
-    // API routes
     this.app.use('/api/auth', authRoutes);
     this.app.use('/api/users', userRoutes);
     this.app.use('/api/products', productRoutes);
@@ -121,7 +106,6 @@ class Server {
     this.app.use('/api/reviews', reviewRoutes);
     this.app.use('/api/messages', messageRoutes);
 
-    // 404
     this.app.use('*', (req: Request, res: Response) => {
       res.status(404).json({
         success: false,
