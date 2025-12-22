@@ -1,5 +1,5 @@
 // ============================================
-// 📄 FILENAME: ai.service.ts
+// 📄 FILENAME: ai.service.ts (FIXED)
 // 📍 PATH: backend/src/services/ai.service.ts
 // ============================================
 
@@ -8,18 +8,27 @@ import { config } from '../config/env';
 import { logger } from '../utils/logger';
 
 export class AIService {
+  private readonly aiServiceUrl: string;
+  private readonly aiServiceKey: string;
+
+  constructor() {
+    this.aiServiceUrl = config.AI_SERVICE_URL || 'https://api.example.com';
+    this.aiServiceKey = config.AI_SERVICE_KEY || 'mock-key';
+  }
+
   async analyzeProduct(data: {
     description?: string;
     images?: string[];
-  }) {
+  }): Promise<any> {
     try {
       const response = await axios.post(
-        `${config.AI_SERVICE_URL}/analyze`,
+        `${this.aiServiceUrl}/analyze`,
         data,
         {
           headers: {
-            'X-API-Key': config.AI_SERVICE_KEY
-          }
+            'X-API-Key': this.aiServiceKey
+          },
+          timeout: 10000
         }
       );
       
@@ -30,15 +39,16 @@ export class AIService {
     }
   }
   
-  async getPriceRecommendation(productData: any) {
+  async getPriceRecommendation(productData: any): Promise<any> {
     try {
       const response = await axios.post(
-        `${config.AI_SERVICE_URL}/price-recommendation`,
+        `${this.aiServiceUrl}/price-recommendation`,
         productData,
         {
           headers: {
-            'X-API-Key': config.AI_SERVICE_KEY
-          }
+            'X-API-Key': this.aiServiceKey
+          },
+          timeout: 10000
         }
       );
       
@@ -49,15 +59,16 @@ export class AIService {
     }
   }
   
-  async detectFraud(orderData: any) {
+  async detectFraud(orderData: any): Promise<any> {
     try {
       const response = await axios.post(
-        `${config.AI_SERVICE_URL}/fraud-detection`,
+        `${this.aiServiceUrl}/fraud-detection`,
         orderData,
         {
           headers: {
-            'X-API-Key': config.AI_SERVICE_KEY
-          }
+            'X-API-Key': this.aiServiceKey
+          },
+          timeout: 10000
         }
       );
       
@@ -68,15 +79,16 @@ export class AIService {
     }
   }
   
-  async analyzeDispute(data: any) {
+  async analyzeDispute(data: any): Promise<any> {
     try {
       const response = await axios.post(
-        `${config.AI_SERVICE_URL}/dispute-analysis`,
+        `${this.aiServiceUrl}/dispute-analysis`,
         data,
         {
           headers: {
-            'X-API-Key': config.AI_SERVICE_KEY
-          }
+            'X-API-Key': this.aiServiceKey
+          },
+          timeout: 10000
         }
       );
       
