@@ -1,28 +1,21 @@
 // ============================================
-// 📄 FILENAME: schema.prisma (OPTIMIZED FOR TERMUX ARM64)
+// 📄 FILENAME: schema.prisma (FIXED FOR TERMUX)
 // 📍 PATH: backend/prisma/schema.prisma
-// 🔧 FEATURES: Multi-platform support + ARM64 + Performance optimization
 // ============================================
 
 generator client {
   provider        = "prisma-client-js"
-  // ✅ دعم متعدد المنصات: Native + Linux ARM64 + Debian x86
-  binaryTargets   = ["native", "linux-arm64-openssl-1.1.x", "linux-arm64-openssl-3.0.x", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
-  // ✅ استخدام Binary Engine للأداء الأفضل على ARM
+  binaryTargets   = ["native", "linux-arm64-openssl-1.1.x", "linux-arm64-openssl-3.0.x"]
   engineType      = "binary"
-  // ✅ تفعيل Preview Features للميزات المتقدمة
-  previewFeatures = ["fullTextSearch", "fullTextIndex", "metrics", "tracing"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  // ✅ تحسين اتصال قاعدة البيانات
-  relationMode = "prisma"
 }
 
 // ============================================
-// 👤 USER MODEL - Enhanced
+// 👤 USER MODEL
 // ============================================
 model User {
   id              Int       @id @default(autoincrement())
@@ -31,12 +24,10 @@ model User {
   name            String?
   role            String    @default("user")
   email_verified  Boolean   @default(false)
-  phone           String?   @unique
+  phone           String?
   avatar_url      String?
   bio             String?
-  location        Json?     // {city, country, coordinates}
-  preferences     Json?     // User settings and preferences
-  pi_wallet       String?   @unique
+  pi_wallet       String?
   balance_pi      Float     @default(0)
   rating_avg      Float     @default(0)
   total_sales     Int       @default(0)
@@ -47,7 +38,6 @@ model User {
   created_at      DateTime  @default(now())
   updated_at      DateTime  @updatedAt
   
-  // Relations
   products          Product[]
   orders_as_buyer   Order[]            @relation("BuyerOrders")
   orders_as_seller  Order[]            @relation("SellerOrders")
@@ -59,169 +49,109 @@ model User {
   notifications     Notification[]
   saved_products    SavedProduct[]
   search_history    SearchHistory[]
-  reports_made      Report[]           @relation("ReportsMade")
-  reports_received  Report[]           @relation("ReportsReceived")
   wallet_history    WalletTransaction[]
   
   @@index([email])
-  @@index([pi_wallet])
   @@index([role])
-  @@index([is_active])
-  @@index([rating_avg])
   @@map("users")
 }
 
-// ============================================
-// 🔐 REFRESH TOKEN MODEL
-// ============================================
 model RefreshToken {
   id         Int      @id @default(autoincrement())
   user_id    Int
-  token      String   @unique @db.VarChar(500)
+  token      String   @unique
   device_id  String?
-  ip_address String?
-  user_agent String?
   expires_at DateTime
   revoked    Boolean  @default(false)
-  revoked_at DateTime?
   created_at DateTime @default(now())
   
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
   
   @@index([user_id])
-  @@index([expires_at])
-  @@index([revoked])
   @@map("refresh_tokens")
 }
 
-// ============================================
-// 🛍️ PRODUCT MODEL - Enhanced with AI
-// ============================================
 model Product {
   id              Int      @id @default(autoincrement())
   seller_id       Int
-  title           String   @db.VarChar(200)
+  title           String
   slug            String   @unique
-  description     String?  @db.Text
+  description     String?
   price_pi        Float
   original_price  Float?
   discount        Int      @default(0)
   category        String
   subcategory     String?
   brand           String?
-  condition       String   @default("new") // new, used, refurbished
+  condition       String   @default("new")
   images          Json     @default("[]")
   video_url       String?
   stock           Int      @default(1)
   min_order       Int      @default(1)
-  max_order       Int?
-  weight          Float?   // in kg
-  dimensions      Json?    // {length, width, height}
-  shipping_from   String?
-  tags            String[] @default([])
-  specifications  Json?
+  tags            Json     @default("[]")
   
-  // AI Features
-  ai_meta         Json?    // AI-generated metadata
-  ai_tags         String[] @default([])
-  ai_category     String?
-  ai_description  String?  @db.Text
+  ai_meta         Json?
   ai_quality_score Float?
   
-  // Status & Performance
-  status          String   @default("active") // active, pending, rejected, sold, archived
+  status          String   @default("active")
   is_featured     Boolean  @default(false)
-  is_promoted     Boolean  @default(false)
   view_count      Int      @default(0)
-  like_count      Int      @default(0)
   save_count      Int      @default(0)
   sold_count      Int      @default(0)
   rating_avg      Float    @default(0)
-  review_count    Int      @default(0)
   
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
-  featured_until  DateTime?
   
-  // Relations
   seller     User              @relation(fields: [seller_id], references: [id], onDelete: Cascade)
   orders     Order[]
   reviews    Review[]
   views      ProductView[]
   saved_by   SavedProduct[]
-  reports    Report[]
   variants   ProductVariant[]
   
   @@index([seller_id])
-  @@index([category, subcategory])
+  @@index([category])
   @@index([price_pi])
   @@index([status])
-  @@index([is_featured])
-  @@index([rating_avg])
-  @@index([created_at])
-  @@index([slug])
-  @@fulltext([title, description])
   @@map("products")
 }
 
-// ============================================
-// 🎨 PRODUCT VARIANT MODEL (New)
-// ============================================
 model ProductVariant {
   id         Int      @id @default(autoincrement())
   product_id Int
-  name       String   // e.g., "Color", "Size"
-  value      String   // e.g., "Red", "Large"
+  name       String
+  value      String
   price_diff Float    @default(0)
   stock      Int      @default(0)
-  sku        String?  @unique
-  image_url  String?
+  sku        String?
   created_at DateTime @default(now())
   
   product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
   
-  @@unique([product_id, name, value])
   @@index([product_id])
   @@map("product_variants")
 }
 
-// ============================================
-// 📦 ORDER MODEL - Enhanced
-// ============================================
 model Order {
   id              Int      @id @default(autoincrement())
   order_number    String   @unique
   buyer_id        Int
   seller_id       Int
   product_id      Int
-  variant_id      Int?
   quantity        Int      @default(1)
-  price_per_unit  Float
   amount_pi       Float
-  shipping_cost   Float    @default(0)
-  tax_amount      Float    @default(0)
   total_amount    Float
   
-  // Payment Info
   status          String   @default("CREATED")
-  payment_id      String?  @unique
-  txid            String?  @unique
-  payment_method  String?  // pi_payment, escrow
+  payment_id      String?
+  txid            String?
   payment_status  String   @default("PENDING")
-  paid_at         DateTime?
   
-  // Shipping Info
-  shipping_address Json?
-  shipping_method  String?
-  tracking_number  String?
-  
-  // Timestamps
   created_at      DateTime  @default(now())
   updated_at      DateTime  @updatedAt
   completed_at    DateTime?
-  cancelled_at    DateTime?
   
-  // Relations
   buyer       User              @relation("BuyerOrders", fields: [buyer_id], references: [id])
   seller      User              @relation("SellerOrders", fields: [seller_id], references: [id])
   product     Product           @relation(fields: [product_id], references: [id])
@@ -232,30 +162,21 @@ model Order {
   @@index([seller_id])
   @@index([product_id])
   @@index([status])
-  @@index([payment_status])
-  @@index([created_at])
   @@map("orders")
 }
 
-// ============================================
-// ⭐ REVIEW MODEL - Enhanced
-// ============================================
 model Review {
   id          Int      @id @default(autoincrement())
   reviewer_id Int
-  reviewee_id Int      // Seller being reviewed
+  reviewee_id Int
   product_id  Int
-  order_id    Int?
-  rating      Int      // 1-5
-  comment     String?  @db.Text
+  rating      Int
+  comment     String?
   images      Json?    @default("[]")
   helpful_count Int    @default(0)
   verified_purchase Boolean @default(false)
-  ai_sentiment String? // positive, neutral, negative
-  ai_summary   String?
-  is_visible   Boolean @default(true)
+  ai_sentiment String?
   created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
   
   reviewer User    @relation("ReviewsGiven", fields: [reviewer_id], references: [id], onDelete: Cascade)
   reviewee User    @relation("ReviewsReceived", fields: [reviewee_id], references: [id], onDelete: Cascade)
@@ -263,66 +184,41 @@ model Review {
   
   @@unique([reviewer_id, product_id])
   @@index([product_id])
-  @@index([reviewee_id])
-  @@index([rating])
-  @@index([created_at])
   @@map("reviews")
 }
 
-// ============================================
-// ⚖️ DISPUTE MODEL - AI-Enhanced
-// ============================================
 model Dispute {
   id              Int      @id @default(autoincrement())
   dispute_number  String   @unique
   order_id        Int      @unique
-  initiator_id    Int      // Who started the dispute
   reason          String
-  description     String?  @db.Text
+  description     String?
   evidence        Json     @default("[]")
   
-  // AI Analysis
   ai_analysis     Json?
   ai_decision     Json?
-  ai_confidence   Float?
   
-  // Status
   status          String   @default("OPEN")
-  priority        String   @default("MEDIUM")
-  resolution      String?  @db.Text
-  resolved_by     String?  // system, admin, agreement
-  refund_amount   Float?
+  resolution      String?
   
   created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
   resolved_at     DateTime?
   
   order Order @relation(fields: [order_id], references: [id])
   
   @@index([status])
-  @@index([priority])
-  @@index([created_at])
   @@map("disputes")
 }
 
-// ============================================
-// 💬 MESSAGE MODEL - Real-time Chat
-// ============================================
 model Message {
   id              Int      @id @default(autoincrement())
   conversation_id String
   sender_id       Int
   receiver_id     Int
-  content         String   @db.Text
-  message_type    String   @default("text") // text, image, file, product
-  attachments     Json?    @default("[]")
-  product_ref     Int?
+  content         String
+  message_type    String   @default("text")
   read            Boolean  @default(false)
-  read_at         DateTime?
-  deleted_by_sender   Boolean @default(false)
-  deleted_by_receiver Boolean @default(false)
   created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
   
   sender   User @relation("SentMessages", fields: [sender_id], references: [id], onDelete: Cascade)
   receiver User @relation("ReceivedMessages", fields: [receiver_id], references: [id], onDelete: Cascade)
@@ -330,189 +226,99 @@ model Message {
   @@index([conversation_id])
   @@index([sender_id])
   @@index([receiver_id])
-  @@index([read])
-  @@index([created_at])
   @@map("messages")
 }
 
-// ============================================
-// 🔔 NOTIFICATION MODEL - Enhanced
-// ============================================
 model Notification {
   id          Int      @id @default(autoincrement())
   user_id     Int
-  type        String   // order, message, review, dispute, system
-  category    String   // info, warning, success, error
+  type        String
   title       String
-  message     String   @db.Text
-  icon        String?
-  image_url   String?
-  action_url  String?
-  action_text String?
+  message     String
   data        Json?
   read        Boolean  @default(false)
-  read_at     DateTime?
-  priority    String   @default("normal") // low, normal, high, urgent
-  expires_at  DateTime?
+  priority    String   @default("normal")
   created_at  DateTime @default(now())
   
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
   
   @@index([user_id, read])
-  @@index([type])
-  @@index([priority])
-  @@index([created_at])
   @@map("notifications")
 }
 
-// ============================================
-// 👁️ PRODUCT VIEW MODEL - Analytics
-// ============================================
 model ProductView {
   id           Int      @id @default(autoincrement())
   product_id   Int
   user_id      Int?
-  session_id   String?
   ip_address   String?
   user_agent   String?
-  referrer     String?
-  country      String?
-  city         String?
-  device_type  String?  // mobile, tablet, desktop
-  view_duration Int?    // seconds
   viewed_at    DateTime @default(now())
   
   product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
   
   @@index([product_id])
-  @@index([user_id])
-  @@index([viewed_at])
   @@map("product_views")
 }
 
-// ============================================
-// 💾 SAVED PRODUCT MODEL
-// ============================================
 model SavedProduct {
   id          Int      @id @default(autoincrement())
   user_id     Int
   product_id  Int
-  collection  String?  @default("default")
-  notes       String?
   saved_at    DateTime @default(now())
   
   user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
   product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
   
   @@unique([user_id, product_id])
-  @@index([user_id])
-  @@index([collection])
   @@map("saved_products")
 }
 
-// ============================================
-// 🔍 SEARCH HISTORY MODEL - AI-Enhanced
-// ============================================
 model SearchHistory {
   id              Int      @id @default(autoincrement())
   user_id         Int
   query           String
   filters         Json?
   results_count   Int      @default(0)
-  clicked_products Json?   @default("[]")
-  ai_suggestions  String[] @default([])
-  session_id      String?
   created_at      DateTime @default(now())
   
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
   
   @@index([user_id])
-  @@index([query])
-  @@index([created_at])
   @@map("search_history")
 }
 
-// ============================================
-// 📮 SHIPPING TRACKING MODEL
-// ============================================
 model ShippingTracking {
   id                  Int      @id @default(autoincrement())
   order_id            Int      @unique
   carrier             String
-  tracking_code       String   @unique
-  tracking_url        String?
+  tracking_code       String
   status              String   @default("PENDING")
-  current_location    String?
   estimated_delivery  DateTime?
   delivered_at        DateTime?
-  signature_required  Boolean  @default(false)
-  signature_name      String?
   events              Json     @default("[]")
-  notes               String?
   created_at          DateTime @default(now())
   updated_at          DateTime @updatedAt
   
   order Order @relation(fields: [order_id], references: [id])
   
-  @@index([tracking_code])
-  @@index([status])
   @@map("shipping_tracking")
 }
 
-// ============================================
-// 🚨 REPORT MODEL (New) - Content Moderation
-// ============================================
-model Report {
-  id            Int      @id @default(autoincrement())
-  reporter_id   Int
-  reported_id   Int      // User or Product ID
-  report_type   String   // user, product, review, message
-  entity_id     Int      // ID of the reported entity
-  reason        String
-  description   String?  @db.Text
-  evidence      Json?    @default("[]")
-  status        String   @default("PENDING")
-  ai_analysis   Json?
-  admin_notes   String?
-  resolved_by   Int?
-  resolved_at   DateTime?
-  created_at    DateTime @default(now())
-  
-  reporter User @relation("ReportsMade", fields: [reporter_id], references: [id], onDelete: Cascade)
-  reported User @relation("ReportsReceived", fields: [reported_id], references: [id], onDelete: Cascade)
-  product  Product? @relation(fields: [entity_id], references: [id], onDelete: Cascade)
-  
-  @@index([reporter_id])
-  @@index([reported_id])
-  @@index([status])
-  @@index([report_type])
-  @@map("reports")
-}
-
-// ============================================
-// 💰 WALLET TRANSACTION MODEL (New)
-// ============================================
 model WalletTransaction {
   id              Int      @id @default(autoincrement())
   user_id         Int
   transaction_id  String   @unique
-  type            String   // deposit, withdrawal, payment, refund, fee
+  type            String
   amount          Float
   balance_before  Float
   balance_after   Float
   status          String   @default("PENDING")
   description     String?
-  reference_type  String?  // order, dispute, etc.
-  reference_id    Int?
-  metadata        Json?
   created_at      DateTime @default(now())
-  completed_at    DateTime?
   
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
   
   @@index([user_id])
   @@index([type])
-  @@index([status])
-  @@index([created_at])
   @@map("wallet_transactions")
 }
