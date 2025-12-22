@@ -1,9 +1,10 @@
+cat > tsconfig.json << 'EOF'
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ESNext",
+    "module": "commonjs",
     "lib": ["ES2022"],
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
@@ -17,8 +18,6 @@
     "allowJs": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"],
-  "ts-node": {
-    "esm": true
-  }
+  "exclude": ["node_modules", "dist"]
 }
+EOF
