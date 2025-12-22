@@ -1,6 +1,3 @@
-rm src/config/env.ts
-
-cat > src/config/env.ts << 'ENDOFFILE'
 import dotenv from 'dotenv';
 import { z } from 'zod';
 
@@ -38,4 +35,3 @@ export const PI_APP_SECRET = config.PI_APP_SECRET;
 export const PI_APP_ID = config.PI_APP_ID;
 export const PI_CALLBACK_BASE = config.PI_CALLBACK_BASE;
 export const FRONTEND_URL = config.FRONTEND_URL;
-ENDOFFILE
