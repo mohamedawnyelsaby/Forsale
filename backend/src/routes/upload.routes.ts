@@ -1,9 +1,9 @@
 // ============================================
-// 📄 FILENAME: upload.routes.ts
+// 📄 FILENAME: upload.routes.ts (FIXED)
 // 📍 PATH: backend/src/routes/upload.routes.ts
 // ============================================
 
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import { UploadController } from '../controllers/upload.controller';
 import { authenticate } from '../middleware/auth';
@@ -17,7 +17,7 @@ const upload = multer({
     fileSize: 10 * 1024 * 1024,
     files: 10
   },
-  fileFilter: (req, file, cb) => {
+  fileFilter: (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
     const allowedMimes = [
       'image/jpeg',
       'image/png',
@@ -38,27 +38,35 @@ router.post(
   '/image',
   authenticate,
   upload.single('image'),
-  uploadController.uploadImage
+  (req: Request, res: Response, next: NextFunction) => {
+    uploadController.uploadImage(req, res, next);
+  }
 );
 
 router.post(
   '/images',
   authenticate,
   upload.array('images', 10),
-  uploadController.uploadMultipleImages
+  (req: Request, res: Response, next: NextFunction) => {
+    uploadController.uploadMultipleImages(req, res, next);
+  }
 );
 
 router.post(
   '/avatar',
   authenticate,
   upload.single('avatar'),
-  uploadController.uploadAvatar
+  (req: Request, res: Response, next: NextFunction) => {
+    uploadController.uploadAvatar(req, res, next);
+  }
 );
 
 router.delete(
   '/image',
   authenticate,
-  uploadController.deleteImage
+  (req: Request, res: Response, next: NextFunction) => {
+    uploadController.deleteImage(req, res, next);
+  }
 );
 
 export default router;
