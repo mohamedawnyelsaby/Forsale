@@ -1,6 +1,3 @@
-// ============================================
-// ⚙️ RAILWAY.JSON - DEPLOYMENT CONFIG
-// ============================================
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
