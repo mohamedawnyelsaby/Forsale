@@ -1,5 +1,5 @@
 // ============================================
-// 📄 FILENAME: order.service.ts
+// 📄 FILENAME: order.service.ts (FIXED)
 // 📍 PATH: backend/src/services/order.service.ts
 // ============================================
 
@@ -16,8 +16,7 @@ export class OrderService {
     buyer_id: number;
     product_id: number;
     quantity: number;
-  }) {
-    // Get product
+  }): Promise<any> {
     const product = await prisma.product.findUnique({
       where: { id: data.product_id }
     });
@@ -30,27 +29,28 @@ export class OrderService {
       throw new AppError('Insufficient stock', 400);
     }
     
-    // Calculate total
     const amount_pi = product.price_pi * data.quantity;
     
-    // Create payment with Pi Network
     const payment = await piService.createPayment({
       amount: amount_pi,
       memo: `Order for ${product.title}`,
       metadata: {
-        product_id: product.id,
-        buyer_id: data.buyer_id
+        productId: String(product.id),
+        userId: String(data.buyer_id),
+        expectedAmount: amount_pi,
+        timestamp: Date.now()
       }
     });
     
-    // Create order
     const order = await prisma.order.create({
       data: {
         buyer_id: data.buyer_id,
+        seller_id: product.seller_id,
         product_id: data.product_id,
         quantity: data.quantity,
         amount_pi,
-        status: 'PENDING_PAYMENT',
+        total_amount: amount_pi,
+        status: 'CREATED',
         payment_id: payment.identifier
       },
       include: {
@@ -71,12 +71,12 @@ export class OrderService {
     };
   }
   
-  async getUserOrders(userId: number) {
+  async getUserOrders(userId: number): Promise<any[]> {
     return await prisma.order.findMany({
       where: {
         OR: [
           { buyer_id: userId },
-          { product: { seller_id: userId } }
+          { seller_id: userId }
         ]
       },
       include: {
@@ -103,7 +103,7 @@ export class OrderService {
     });
   }
   
-  async getById(id: number, userId: number) {
+  async getById(id: number, userId: number): Promise<any> {
     const order = await prisma.order.findUnique({
       where: { id },
       include: {
@@ -120,19 +120,17 @@ export class OrderService {
       throw new AppError('Order not found', 404);
     }
     
-    // Check access
-    if (order.buyer_id !== userId && order.product.seller_id !== userId) {
+    if (order.buyer_id !== userId && order.seller_id !== userId) {
       throw new AppError('Not authorized to view this order', 403);
     }
     
     return order;
   }
   
-  async updateStatus(id: number, userId: number, status: string) {
+  async updateStatus(id: number, userId: number, status: string): Promise<any> {
     const order = await this.getById(id, userId);
     
-    // Only seller can update shipping status
-    if (order.product.seller_id !== userId) {
+    if (order.seller_id !== userId) {
       throw new AppError('Only seller can update order status', 403);
     }
     
@@ -144,16 +142,16 @@ export class OrderService {
     return updated;
   }
   
-  async confirmDelivery(id: number, userId: number) {
+  async confirmDelivery(id: number, userId: number): Promise<any> {
     const order = await this.getById(id, userId);
     
-    // Only buyer can confirm delivery
     if (order.buyer_id !== userId) {
       throw new AppError('Only buyer can confirm delivery', 403);
     }
     
-    // Complete payment (release escrow)
-    await piService.completePayment(order.payment_id!, order.txid!);
+    if (order.payment_id && order.txid) {
+      await piService.completePayment(order.payment_id, order.txid);
+    }
     
     const updated = await prisma.order.update({
       where: { id },
@@ -165,28 +163,26 @@ export class OrderService {
     return updated;
   }
   
-  async createDispute(id: number, userId: number, data: any) {
+  async createDispute(id: number, userId: number, data: any): Promise<any> {
     const order = await this.getById(id, userId);
     
-    // Create dispute
+    const disputeNumber = `DIS${Date.now()}${Math.floor(Math.random() * 1000)}`;
+    
     const dispute = await prisma.dispute.create({
       data: {
+        dispute_number: disputeNumber,
         order_id: id,
-        buyer_id: order.buyer_id,
-        seller_id: order.product.seller_id,
         reason: data.reason,
         description: data.description,
-        evidence: data.evidence || {}
+        evidence: data.evidence || []
       }
     });
     
-    // Update order status
     await prisma.order.update({
       where: { id },
       data: { status: 'DISPUTED' }
     });
     
-    // AI arbitration
     const aiDecision = await aiService.analyzeDispute({
       order,
       dispute,
