@@ -1,5 +1,5 @@
 // ============================================
-// 📄 FILENAME: review.service.ts
+// 📄 FILENAME: review.service.ts (FIXED)
 // 📍 PATH: backend/src/services/review.service.ts
 // ============================================
 
@@ -7,11 +7,11 @@ import { prisma } from '../config/database';
 import { AppError } from '../utils/AppError';
 
 export class ReviewService {
-  async getProductReviews(productId: number) {
+  async getProductReviews(productId: number): Promise<any> {
     const reviews = await prisma.review.findMany({
       where: { product_id: productId },
       include: {
-        user: {
+        reviewer: {
           select: {
             id: true,
             name: true
@@ -23,7 +23,6 @@ export class ReviewService {
       }
     });
     
-    // Calculate average rating
     const avgRating = reviews.length > 0
       ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
       : 0;
@@ -42,14 +41,19 @@ export class ReviewService {
     product_id: number;
     rating: number;
     comment?: string;
-  }) {
-    // Check if user already reviewed this product
-    const existing = await prisma.review.findUnique({
+  }): Promise<any> {
+    const product = await prisma.product.findUnique({
+      where: { id: data.product_id }
+    });
+
+    if (!product) {
+      throw new AppError('Product not found', 404);
+    }
+
+    const existing = await prisma.review.findFirst({
       where: {
-        user_id_product_id: {
-          user_id: data.user_id,
-          product_id: data.product_id
-        }
+        reviewer_id: data.user_id,
+        product_id: data.product_id
       }
     });
     
@@ -57,7 +61,6 @@ export class ReviewService {
       throw new AppError('You have already reviewed this product', 400);
     }
     
-    // Check if user bought the product
     const order = await prisma.order.findFirst({
       where: {
         buyer_id: data.user_id,
@@ -71,9 +74,15 @@ export class ReviewService {
     }
     
     const review = await prisma.review.create({
-      data,
+      data: {
+        reviewer_id: data.user_id,
+        reviewee_id: product.seller_id,
+        product_id: data.product_id,
+        rating: data.rating,
+        comment: data.comment
+      },
       include: {
-        user: {
+        reviewer: {
           select: {
             id: true,
             name: true
@@ -85,7 +94,7 @@ export class ReviewService {
     return review;
   }
   
-  async delete(id: number, userId: number) {
+  async delete(id: number, userId: number): Promise<void> {
     const review = await prisma.review.findUnique({
       where: { id }
     });
@@ -94,7 +103,7 @@ export class ReviewService {
       throw new AppError('Review not found', 404);
     }
     
-    if (review.user_id !== userId) {
+    if (review.reviewer_id !== userId) {
       throw new AppError('Not authorized to delete this review', 403);
     }
     
