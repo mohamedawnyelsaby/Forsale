@@ -1,5 +1,5 @@
 // ============================================
-// 📄 FILENAME: auth.ts
+// 📄 FILENAME: auth.ts (FIXED)
 // 📍 PATH: backend/src/middleware/auth.ts
 // ============================================
 
@@ -20,7 +20,7 @@ export const authenticate = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const token = req.headers.authorization?.replace('Bearer ', '');
     
@@ -37,7 +37,7 @@ export const authenticate = async (
 };
 
 export const authorize = (...roles: string[]) => {
-  return (req: AuthRequest, res: Response, next: NextFunction) => {
+  return (req: AuthRequest, res: Response, next: NextFunction): void => {
     if (!req.user || !roles.includes(req.user.role)) {
       return next(new AppError('Insufficient permissions', 403));
     }
