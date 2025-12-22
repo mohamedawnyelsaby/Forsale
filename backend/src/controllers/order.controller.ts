@@ -1,9 +1,9 @@
 // ============================================
-// 📄 FILENAME: order.controller.ts
+// 📄 FILENAME: order.controller.ts (FIXED)
 // 📍 PATH: backend/src/controllers/order.controller.ts
 // ============================================
 
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { OrderService } from '../services/order.service';
 import { AuthRequest } from '../middleware/auth';
 import { AppError } from '../utils/AppError';
@@ -11,7 +11,7 @@ import { AppError } from '../utils/AppError';
 const orderService = new OrderService();
 
 export class OrderController {
-  async create(req: AuthRequest, res: Response, next: NextFunction) {
+  async create(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.user) {
         throw new AppError('Authentication required', 401);
@@ -32,7 +32,7 @@ export class OrderController {
     }
   }
   
-  async getMyOrders(req: AuthRequest, res: Response, next: NextFunction) {
+  async getMyOrders(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.user) {
         throw new AppError('Authentication required', 401);
@@ -49,7 +49,7 @@ export class OrderController {
     }
   }
   
-  async getById(req: AuthRequest, res: Response, next: NextFunction) {
+  async getById(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.user) {
         throw new AppError('Authentication required', 401);
@@ -69,7 +69,7 @@ export class OrderController {
     }
   }
   
-  async updateStatus(req: AuthRequest, res: Response, next: NextFunction) {
+  async updateStatus(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.user) {
         throw new AppError('Authentication required', 401);
@@ -90,7 +90,7 @@ export class OrderController {
     }
   }
   
-  async confirmDelivery(req: AuthRequest, res: Response, next: NextFunction) {
+  async confirmDelivery(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.user) {
         throw new AppError('Authentication required', 401);
@@ -110,7 +110,7 @@ export class OrderController {
     }
   }
   
-  async createDispute(req: AuthRequest, res: Response, next: NextFunction) {
+  async createDispute(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.user) {
         throw new AppError('Authentication required', 401);
