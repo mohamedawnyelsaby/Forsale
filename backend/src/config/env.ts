@@ -20,13 +20,12 @@ const envSchema = z.object({
 const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
-  console.error('❌ Invalid environment variables:');
+  console.error('Invalid environment variables:');
   console.error(parsed.error.format());
   process.exit(1);
 }
 
 export const config = parsed.data;
-
 export const NODE_ENV = config.NODE_ENV;
 export const PORT = config.PORT;
 export const DATABASE_URL = config.DATABASE_URL;
