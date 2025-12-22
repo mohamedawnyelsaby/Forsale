@@ -21,7 +21,7 @@ const envSchema = z.object({
   S3_KEY: z.string(),
   S3_SECRET: z.string(),
   SMTP_HOST: z.string(),
-  SMTP_PORT: z.string(),
+  SMTP_PORT: z.string().transform(Number),
   SMTP_USER: z.string().email(),
   SMTP_PASS: z.string(),
   LOG_LEVEL: z.string().default('info')
