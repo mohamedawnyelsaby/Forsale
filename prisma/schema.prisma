@@ -1,0 +1,324 @@
+// ============================================
+// 📄 FILENAME: schema.prisma (FIXED FOR TERMUX)
+// 📍 PATH: backend/prisma/schema.prisma
+// ============================================
+
+generator client {
+  provider        = "prisma-client-js"
+  binaryTargets   = ["native", "linux-arm64-openssl-1.1.x", "linux-arm64-openssl-3.0.x"]
+  engineType      = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// 👤 USER MODEL
+// ============================================
+model User {
+  id              Int       @id @default(autoincrement())
+  email           String    @unique
+  password_hash   String
+  name            String?
+  role            String    @default("user")
+  email_verified  Boolean   @default(false)
+  phone           String?
+  avatar_url      String?
+  bio             String?
+  pi_wallet       String?
+  balance_pi      Float     @default(0)
+  rating_avg      Float     @default(0)
+  total_sales     Int       @default(0)
+  total_purchases Int       @default(0)
+  is_verified     Boolean   @default(false)
+  is_active       Boolean   @default(true)
+  last_login      DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  
+  products          Product[]
+  orders_as_buyer   Order[]            @relation("BuyerOrders")
+  orders_as_seller  Order[]            @relation("SellerOrders")
+  reviews_given     Review[]           @relation("ReviewsGiven")
+  reviews_received  Review[]           @relation("ReviewsReceived")
+  messages_sent     Message[]          @relation("SentMessages")
+  messages_received Message[]          @relation("ReceivedMessages")
+  refresh_tokens    RefreshToken[]
+  notifications     Notification[]
+  saved_products    SavedProduct[]
+  search_history    SearchHistory[]
+  wallet_history    WalletTransaction[]
+  
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model RefreshToken {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  token      String   @unique
+  device_id  String?
+  expires_at DateTime
+  revoked    Boolean  @default(false)
+  created_at DateTime @default(now())
+  
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@index([user_id])
+  @@map("refresh_tokens")
+}
+
+model Product {
+  id              Int      @id @default(autoincrement())
+  seller_id       Int
+  title           String
+  slug            String   @unique
+  description     String?
+  price_pi        Float
+  original_price  Float?
+  discount        Int      @default(0)
+  category        String
+  subcategory     String?
+  brand           String?
+  condition       String   @default("new")
+  images          Json     @default("[]")
+  video_url       String?
+  stock           Int      @default(1)
+  min_order       Int      @default(1)
+  tags            Json     @default("[]")
+  
+  ai_meta         Json?
+  ai_quality_score Float?
+  
+  status          String   @default("active")
+  is_featured     Boolean  @default(false)
+  view_count      Int      @default(0)
+  save_count      Int      @default(0)
+  sold_count      Int      @default(0)
+  rating_avg      Float    @default(0)
+  
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  
+  seller     User              @relation(fields: [seller_id], references: [id], onDelete: Cascade)
+  orders     Order[]
+  reviews    Review[]
+  views      ProductView[]
+  saved_by   SavedProduct[]
+  variants   ProductVariant[]
+  
+  @@index([seller_id])
+  @@index([category])
+  @@index([price_pi])
+  @@index([status])
+  @@map("products")
+}
+
+model ProductVariant {
+  id         Int      @id @default(autoincrement())
+  product_id Int
+  name       String
+  value      String
+  price_diff Float    @default(0)
+  stock      Int      @default(0)
+  sku        String?
+  created_at DateTime @default(now())
+  
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  
+  @@index([product_id])
+  @@map("product_variants")
+}
+
+model Order {
+  id              Int      @id @default(autoincrement())
+  order_number    String   @unique
+  buyer_id        Int
+  seller_id       Int
+  product_id      Int
+  quantity        Int      @default(1)
+  amount_pi       Float
+  total_amount    Float
+  
+  status          String   @default("CREATED")
+  payment_id      String?
+  txid            String?
+  payment_status  String   @default("PENDING")
+  
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  completed_at    DateTime?
+  
+  buyer       User              @relation("BuyerOrders", fields: [buyer_id], references: [id])
+  seller      User              @relation("SellerOrders", fields: [seller_id], references: [id])
+  product     Product           @relation(fields: [product_id], references: [id])
+  dispute     Dispute?
+  shipping    ShippingTracking?
+  
+  @@index([buyer_id])
+  @@index([seller_id])
+  @@index([product_id])
+  @@index([status])
+  @@map("orders")
+}
+
+model Review {
+  id          Int      @id @default(autoincrement())
+  reviewer_id Int
+  reviewee_id Int
+  product_id  Int
+  rating      Int
+  comment     String?
+  images      Json?    @default("[]")
+  helpful_count Int    @default(0)
+  verified_purchase Boolean @default(false)
+  ai_sentiment String?
+  created_at   DateTime @default(now())
+  
+  reviewer User    @relation("ReviewsGiven", fields: [reviewer_id], references: [id], onDelete: Cascade)
+  reviewee User    @relation("ReviewsReceived", fields: [reviewee_id], references: [id], onDelete: Cascade)
+  product  Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  
+  @@unique([reviewer_id, product_id])
+  @@index([product_id])
+  @@map("reviews")
+}
+
+model Dispute {
+  id              Int      @id @default(autoincrement())
+  dispute_number  String   @unique
+  order_id        Int      @unique
+  reason          String
+  description     String?
+  evidence        Json     @default("[]")
+  
+  ai_analysis     Json?
+  ai_decision     Json?
+  
+  status          String   @default("OPEN")
+  resolution      String?
+  
+  created_at      DateTime @default(now())
+  resolved_at     DateTime?
+  
+  order Order @relation(fields: [order_id], references: [id])
+  
+  @@index([status])
+  @@map("disputes")
+}
+
+model Message {
+  id              Int      @id @default(autoincrement())
+  conversation_id String
+  sender_id       Int
+  receiver_id     Int
+  content         String
+  message_type    String   @default("text")
+  read            Boolean  @default(false)
+  created_at      DateTime @default(now())
+  
+  sender   User @relation("SentMessages", fields: [sender_id], references: [id], onDelete: Cascade)
+  receiver User @relation("ReceivedMessages", fields: [receiver_id], references: [id], onDelete: Cascade)
+  
+  @@index([conversation_id])
+  @@index([sender_id])
+  @@index([receiver_id])
+  @@map("messages")
+}
+
+model Notification {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  type        String
+  title       String
+  message     String
+  data        Json?
+  read        Boolean  @default(false)
+  priority    String   @default("normal")
+  created_at  DateTime @default(now())
+  
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@index([user_id, read])
+  @@map("notifications")
+}
+
+model ProductView {
+  id           Int      @id @default(autoincrement())
+  product_id   Int
+  user_id      Int?
+  ip_address   String?
+  user_agent   String?
+  viewed_at    DateTime @default(now())
+  
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  
+  @@index([product_id])
+  @@map("product_views")
+}
+
+model SavedProduct {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  product_id  Int
+  saved_at    DateTime @default(now())
+  
+  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  
+  @@unique([user_id, product_id])
+  @@map("saved_products")
+}
+
+model SearchHistory {
+  id              Int      @id @default(autoincrement())
+  user_id         Int
+  query           String
+  filters         Json?
+  results_count   Int      @default(0)
+  created_at      DateTime @default(now())
+  
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@index([user_id])
+  @@map("search_history")
+}
+
+model ShippingTracking {
+  id                  Int      @id @default(autoincrement())
+  order_id            Int      @unique
+  carrier             String
+  tracking_code       String
+  status              String   @default("PENDING")
+  estimated_delivery  DateTime?
+  delivered_at        DateTime?
+  events              Json     @default("[]")
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+  
+  order Order @relation(fields: [order_id], references: [id])
+  
+  @@map("shipping_tracking")
+}
+
+model WalletTransaction {
+  id              Int      @id @default(autoincrement())
+  user_id         Int
+  transaction_id  String   @unique
+  type            String
+  amount          Float
+  balance_before  Float
+  balance_after   Float
+  status          String   @default("PENDING")
+  description     String?
+  created_at      DateTime @default(now())
+  
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@index([user_id])
+  @@index([type])
+  @@map("wallet_transactions")
+}

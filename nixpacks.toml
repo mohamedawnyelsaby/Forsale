@@ -1,0 +1,7 @@
+[variables]
+    NIXPACKS_NODE_VERSION = "20"
+
+[phases.build]
+    cmds = [
+        "cd backend && npm install && npx prisma generate --schema=./prisma/schema.prisma && npm run build"
+    ]
