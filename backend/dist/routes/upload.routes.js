@@ -31,9 +31,17 @@ const upload = (0, multer_1.default)({
         }
     }
 });
-router.post('/image', auth_1.authenticate, upload.single('image'), uploadController.uploadImage);
-router.post('/images', auth_1.authenticate, upload.array('images', 10), uploadController.uploadMultipleImages);
-router.post('/avatar', auth_1.authenticate, upload.single('avatar'), uploadController.uploadAvatar);
-router.delete('/image', auth_1.authenticate, uploadController.deleteImage);
+router.post('/image', auth_1.authenticate, upload.single('image'), (req, res, next) => {
+    uploadController.uploadImage(req, res, next);
+});
+router.post('/images', auth_1.authenticate, upload.array('images', 10), (req, res, next) => {
+    uploadController.uploadMultipleImages(req, res, next);
+});
+router.post('/avatar', auth_1.authenticate, upload.single('avatar'), (req, res, next) => {
+    uploadController.uploadAvatar(req, res, next);
+});
+router.delete('/image', auth_1.authenticate, (req, res, next) => {
+    uploadController.deleteImage(req, res, next);
+});
 exports.default = router;
 //# sourceMappingURL=upload.routes.js.map

@@ -23,17 +23,21 @@ class OrderService {
             amount: amount_pi,
             memo: `Order for ${product.title}`,
             metadata: {
-                product_id: product.id,
-                buyer_id: data.buyer_id
+                productId: String(product.id),
+                userId: String(data.buyer_id),
+                expectedAmount: amount_pi,
+                timestamp: Date.now()
             }
         });
         const order = await database_1.prisma.order.create({
             data: {
                 buyer_id: data.buyer_id,
+                seller_id: product.seller_id,
                 product_id: data.product_id,
                 quantity: data.quantity,
                 amount_pi,
-                status: 'PENDING_PAYMENT',
+                total_amount: amount_pi,
+                status: 'CREATED',
                 payment_id: payment.identifier
             },
             include: {
@@ -57,7 +61,7 @@ class OrderService {
             where: {
                 OR: [
                     { buyer_id: userId },
-                    { product: { seller_id: userId } }
+                    { seller_id: userId }
                 ]
             },
             include: {
@@ -98,14 +102,14 @@ class OrderService {
         if (!order) {
             throw new AppError_1.AppError('Order not found', 404);
         }
-        if (order.buyer_id !== userId && order.product.seller_id !== userId) {
+        if (order.buyer_id !== userId && order.seller_id !== userId) {
             throw new AppError_1.AppError('Not authorized to view this order', 403);
         }
         return order;
     }
     async updateStatus(id, userId, status) {
         const order = await this.getById(id, userId);
-        if (order.product.seller_id !== userId) {
+        if (order.seller_id !== userId) {
             throw new AppError_1.AppError('Only seller can update order status', 403);
         }
         const updated = await database_1.prisma.order.update({
@@ -119,7 +123,9 @@ class OrderService {
         if (order.buyer_id !== userId) {
             throw new AppError_1.AppError('Only buyer can confirm delivery', 403);
         }
-        await piService.completePayment(order.payment_id, order.txid);
+        if (order.payment_id && order.txid) {
+            await piService.completePayment(order.payment_id, order.txid);
+        }
         const updated = await database_1.prisma.order.update({
             where: { id },
             data: {
@@ -130,14 +136,14 @@ class OrderService {
     }
     async createDispute(id, userId, data) {
         const order = await this.getById(id, userId);
+        const disputeNumber = `DIS${Date.now()}${Math.floor(Math.random() * 1000)}`;
         const dispute = await database_1.prisma.dispute.create({
             data: {
+                dispute_number: disputeNumber,
                 order_id: id,
-                buyer_id: order.buyer_id,
-                seller_id: order.product.seller_id,
                 reason: data.reason,
                 description: data.description,
-                evidence: data.evidence || {}
+                evidence: data.evidence || []
             }
         });
         await database_1.prisma.order.update({

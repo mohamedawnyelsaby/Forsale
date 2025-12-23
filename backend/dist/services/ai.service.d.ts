@@ -1,4 +1,7 @@
 export declare class AIService {
+    private readonly aiServiceUrl;
+    private readonly aiServiceKey;
+    constructor();
     analyzeProduct(data: {
         description?: string;
         images?: string[];

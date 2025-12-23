@@ -8,7 +8,7 @@ class ReviewService {
         const reviews = await database_1.prisma.review.findMany({
             where: { product_id: productId },
             include: {
-                user: {
+                reviewer: {
                     select: {
                         id: true,
                         name: true
@@ -31,12 +31,16 @@ class ReviewService {
         };
     }
     async create(data) {
-        const existing = await database_1.prisma.review.findUnique({
+        const product = await database_1.prisma.product.findUnique({
+            where: { id: data.product_id }
+        });
+        if (!product) {
+            throw new AppError_1.AppError('Product not found', 404);
+        }
+        const existing = await database_1.prisma.review.findFirst({
             where: {
-                user_id_product_id: {
-                    user_id: data.user_id,
-                    product_id: data.product_id
-                }
+                reviewer_id: data.user_id,
+                product_id: data.product_id
             }
         });
         if (existing) {
@@ -53,9 +57,15 @@ class ReviewService {
             throw new AppError_1.AppError('You must purchase the product to review it', 403);
         }
         const review = await database_1.prisma.review.create({
-            data,
+            data: {
+                reviewer_id: data.user_id,
+                reviewee_id: product.seller_id,
+                product_id: data.product_id,
+                rating: data.rating,
+                comment: data.comment
+            },
             include: {
-                user: {
+                reviewer: {
                     select: {
                         id: true,
                         name: true
@@ -72,7 +82,7 @@ class ReviewService {
         if (!review) {
             throw new AppError_1.AppError('Review not found', 404);
         }
-        if (review.user_id !== userId) {
+        if (review.reviewer_id !== userId) {
             throw new AppError_1.AppError('Not authorized to delete this review', 403);
         }
         await database_1.prisma.review.delete({

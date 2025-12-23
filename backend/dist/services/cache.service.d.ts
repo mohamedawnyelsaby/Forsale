@@ -12,11 +12,6 @@ export declare class CacheService {
     expire(key: string, ttl: number): Promise<boolean>;
     incr(key: string): Promise<number>;
     decr(key: string): Promise<number>;
-    hSet(key: string, field: string, value: any): Promise<number>;
-    hGet<T = any>(key: string, field: string): Promise<T | null>;
-    hGetAll<T = any>(key: string): Promise<Record<string, T>>;
-    lPush(key: string, ...values: any[]): Promise<number>;
-    lRange<T = any>(key: string, start: number, stop: number): Promise<T[]>;
     getOrSet<T = any>(key: string, fetchFn: () => Promise<T>, ttl?: number): Promise<T | null>;
     flushAll(): Promise<void>;
 }

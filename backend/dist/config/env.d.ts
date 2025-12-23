@@ -20,5 +20,8 @@ export declare const config: {
     SMTP_PORT: number;
     SMTP_USER: string;
     SMTP_PASS: string;
+    REDIS_URL?: string | undefined;
+    AI_SERVICE_URL?: string | undefined;
+    AI_SERVICE_KEY?: string | undefined;
 };
 //# sourceMappingURL=env.d.ts.map

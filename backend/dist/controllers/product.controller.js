@@ -4,9 +4,7 @@ exports.ProductController = void 0;
 const product_service_1 = require("../services/product.service");
 const AppError_1 = require("../utils/AppError");
 const database_1 = require("../config/database");
-const ai_service_1 = require("../services/ai.service");
 const productService = new product_service_1.ProductService();
-const aiService = new ai_service_1.AIService();
 class ProductController {
     async getAll(req, res, next) {
         try {

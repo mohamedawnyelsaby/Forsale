@@ -6,6 +6,7 @@ const lib_storage_1 = require("@aws-sdk/lib-storage");
 const uuid_1 = require("uuid");
 const env_1 = require("../config/env");
 const logger_1 = require("../utils/logger");
+const AppError_1 = require("../utils/AppError");
 class UploadService {
     s3Client;
     constructor() {
@@ -43,7 +44,7 @@ class UploadService {
         }
         catch (error) {
             logger_1.logger.error('❌ Image upload failed:', error);
-            throw new Error('Failed to upload image');
+            throw new AppError_1.AppError('Failed to upload image', 500);
         }
     }
     async uploadMultipleImages(files) {
@@ -55,14 +56,14 @@ class UploadService {
         }
         catch (error) {
             logger_1.logger.error('❌ Multiple upload failed:', error);
-            throw new Error('Failed to upload images');
+            throw new AppError_1.AppError('Failed to upload images', 500);
         }
     }
     async deleteImage(url) {
         try {
             const urlParts = url.split(`/${env_1.config.S3_BUCKET}/`);
             if (urlParts.length < 2) {
-                throw new Error('Invalid image URL');
+                throw new AppError_1.AppError('Invalid image URL', 400);
             }
             const key = urlParts[1].split('?')[0];
             const command = new client_s3_1.DeleteObjectCommand({
@@ -74,7 +75,7 @@ class UploadService {
         }
         catch (error) {
             logger_1.logger.error('❌ Image deletion failed:', error);
-            throw new Error('Failed to delete image');
+            throw new AppError_1.AppError('Failed to delete image', 500);
         }
     }
     async uploadAvatar(file) {
@@ -100,7 +101,7 @@ class UploadService {
         }
         catch (error) {
             logger_1.logger.error('❌ Avatar upload failed:', error);
-            throw new Error('Failed to upload avatar');
+            throw new AppError_1.AppError('Failed to upload avatar', 500);
         }
     }
     validateFile(file) {
@@ -113,10 +114,10 @@ class UploadService {
         ];
         const maxSize = 10 * 1024 * 1024;
         if (!allowedMimes.includes(file.mimetype)) {
-            throw new Error('Invalid file type');
+            throw new AppError_1.AppError('Invalid file type', 400);
         }
         if (file.size > maxSize) {
-            throw new Error('File too large');
+            throw new AppError_1.AppError('File too large', 400);
         }
         return true;
     }

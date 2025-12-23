@@ -22,27 +22,29 @@ class PiController {
             if (!product) {
                 throw new AppError_1.AppError('Product not found', 404);
             }
-            if (product.price !== amount) {
+            if (product.price_pi !== amount) {
                 throw new AppError_1.AppError('Price mismatch', 400);
             }
             const payment = await piService.createPayment({
                 amount,
-                memo: memo || `Purchase: ${product.name}`,
+                memo: memo || `Purchase: ${product.title}`,
                 metadata: {
-                    productId,
-                    userId: req.user.id,
+                    productId: String(productId),
+                    userId: String(req.user.id),
                     expectedAmount: amount,
                     timestamp: Date.now()
                 }
             });
             await database_1.prisma.order.create({
                 data: {
-                    user_id: req.user.id,
+                    buyer_id: req.user.id,
+                    seller_id: product.seller_id,
                     product_id: productId,
                     quantity: 1,
-                    total_price: amount,
+                    amount_pi: amount,
+                    total_amount: amount,
                     payment_id: payment.identifier,
-                    status: 'PENDING'
+                    status: 'CREATED'
                 }
             });
             res.json({
@@ -71,7 +73,7 @@ class PiController {
             if (!order) {
                 throw new AppError_1.AppError('Order not found', 404);
             }
-            const expectedAmount = parseFloat(order.total_price.toString());
+            const expectedAmount = parseFloat(order.total_amount.toString());
             const paidAmount = payment.amount;
             if (Math.abs(paidAmount - expectedAmount) > 0.01) {
                 logger_1.logger.error(`Amount mismatch: expected ${expectedAmount}, got ${paidAmount}`);
@@ -113,7 +115,8 @@ class PiController {
             });
             if (existingOrder) {
                 logger_1.logger.warn(`⚠️ Duplicate completion attempt for ${paymentId}`);
-                return res.json({ success: true, message: 'Already processed' });
+                res.json({ success: true, message: 'Already processed' });
+                return;
             }
             const payment = await piService.getPayment(paymentId);
             if (payment.status !== 'completed') {
@@ -130,7 +133,7 @@ class PiController {
             if (!order) {
                 throw new AppError_1.AppError('Order not found', 404);
             }
-            const expectedAmount = parseFloat(order.total_price.toString());
+            const expectedAmount = parseFloat(order.total_amount.toString());
             const paidAmount = payment.amount;
             if (Math.abs(paidAmount - expectedAmount) > 0.01) {
                 logger_1.logger.error(`Final amount mismatch: ${expectedAmount} vs ${paidAmount}`);
@@ -210,7 +213,8 @@ class PiController {
             });
             if (existingOrder) {
                 logger_1.logger.info(`ℹ️ Webhook already processed: ${paymentId}`);
-                return res.json({ success: true });
+                res.json({ success: true });
+                return;
             }
             const verified = await piService.handleWebhook({ paymentId, txid, signature });
             if (!verified) {

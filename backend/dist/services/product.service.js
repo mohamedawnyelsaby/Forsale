@@ -57,7 +57,7 @@ class ProductService {
                 },
                 reviews: {
                     include: {
-                        user: {
+                        reviewer: {
                             select: {
                                 id: true,
                                 name: true
@@ -177,10 +177,15 @@ class ProductService {
                 images: data.images
             });
         }
+        const slug = data.title
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '') + '-' + Date.now();
         const product = await database_1.prisma.product.create({
             data: {
                 seller_id: data.seller_id,
                 title: data.title,
+                slug,
                 description: data.description,
                 price_pi: data.price_pi,
                 category: data.category,

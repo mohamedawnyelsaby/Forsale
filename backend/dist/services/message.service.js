@@ -5,30 +5,56 @@ const database_1 = require("../config/database");
 const AppError_1 = require("../utils/AppError");
 class MessageService {
     async getUserConversations(userId) {
-        const conversations = await database_1.prisma.$queryRaw `
-      SELECT DISTINCT ON (other_user_id)
-        other_user_id,
-        u.name as other_user_name,
-        u.email as other_user_email,
-        m.content as last_message,
-        m.created_at as last_message_at,
-        m.read,
-        COUNT(*) FILTER (WHERE m.receiver_id = ${userId} AND m.read = false) as unread_count
-      FROM (
-        SELECT 
-          CASE 
-            WHEN sender_id = ${userId} THEN receiver_id 
-            ELSE sender_id 
-          END as other_user_id,
-          id, content, created_at, read, receiver_id
-        FROM messages
-        WHERE sender_id = ${userId} OR receiver_id = ${userId}
-      ) m
-      JOIN users u ON u.id = m.other_user_id
-      GROUP BY other_user_id, u.name, u.email, m.content, m.created_at, m.read, m.id
-      ORDER BY other_user_id, m.created_at DESC
-    `;
-        return conversations;
+        const sentMessages = await database_1.prisma.message.groupBy({
+            by: ['receiver_id'],
+            where: { sender_id: userId },
+            _max: { created_at: true }
+        });
+        const receivedMessages = await database_1.prisma.message.groupBy({
+            by: ['sender_id'],
+            where: { receiver_id: userId },
+            _max: { created_at: true }
+        });
+        const userIds = new Set();
+        sentMessages.forEach(m => userIds.add(m.receiver_id));
+        receivedMessages.forEach(m => userIds.add(m.sender_id));
+        const conversations = await Promise.all(Array.from(userIds).map(async (otherUserId) => {
+            const lastMessage = await database_1.prisma.message.findFirst({
+                where: {
+                    OR: [
+                        { sender_id: userId, receiver_id: otherUserId },
+                        { sender_id: otherUserId, receiver_id: userId }
+                    ]
+                },
+                orderBy: { created_at: 'desc' },
+                include: {
+                    sender: {
+                        select: { id: true, name: true, email: true }
+                    }
+                }
+            });
+            const unreadCount = await database_1.prisma.message.count({
+                where: {
+                    sender_id: otherUserId,
+                    receiver_id: userId,
+                    read: false
+                }
+            });
+            const otherUser = await database_1.prisma.user.findUnique({
+                where: { id: otherUserId },
+                select: { id: true, name: true, email: true }
+            });
+            return {
+                otherUser,
+                lastMessage,
+                unreadCount
+            };
+        }));
+        return conversations.sort((a, b) => {
+            const aTime = a.lastMessage?.created_at?.getTime() || 0;
+            const bTime = b.lastMessage?.created_at?.getTime() || 0;
+            return bTime - aTime;
+        });
     }
     async getConversation(userId, otherUserId) {
         const messages = await database_1.prisma.message.findMany({
@@ -63,8 +89,14 @@ class MessageService {
         return messages;
     }
     async sendMessage(data) {
+        const conversationId = [data.sender_id, data.receiver_id]
+            .sort()
+            .join('-');
         const message = await database_1.prisma.message.create({
-            data,
+            data: {
+                ...data,
+                conversation_id: conversationId
+            },
             include: {
                 sender: {
                     select: {
