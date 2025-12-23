@@ -7,11 +7,11 @@
     "node": ">=20.0.0",
     "npm": ">=10.0.0"
   },
-  "engines": { "node": ">=20.0.0" }, "scripts": {
+  "engines": { "node": ">=20.0.0" }, "engines": { "node": ">=20.0.0" }, "scripts": {
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
     "build": "prisma generate --schema=./prisma/schema.prisma && next build",
-    "postinstall": "npx prisma generate",
+    "postinstall": "npx prisma generate --schema=./prisma/schema.prisma",
     "prisma:generate": "npx prisma generate",
     "prisma:migrate": "npx prisma migrate deploy",
     "test": "echo \"No tests yet\" && exit 0"
