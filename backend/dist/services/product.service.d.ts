@@ -1,0 +1,260 @@
+export declare class ProductService {
+    getAll(options: {
+        page: number;
+        limit: number;
+    }): Promise<{
+        products: ({
+            seller: {
+                id: number;
+                email: string;
+                name: string | null;
+            };
+        } & {
+            status: string;
+            id: number;
+            rating_avg: number;
+            created_at: Date;
+            updated_at: Date;
+            seller_id: number;
+            title: string;
+            slug: string;
+            description: string | null;
+            price_pi: number;
+            original_price: number | null;
+            discount: number;
+            category: string;
+            subcategory: string | null;
+            brand: string | null;
+            condition: string;
+            images: import("@prisma/client/runtime/library").JsonValue;
+            video_url: string | null;
+            stock: number;
+            min_order: number;
+            tags: import("@prisma/client/runtime/library").JsonValue;
+            ai_meta: import("@prisma/client/runtime/library").JsonValue | null;
+            ai_quality_score: number | null;
+            is_featured: boolean;
+            view_count: number;
+            save_count: number;
+            sold_count: number;
+        })[];
+        pagination: {
+            page: number;
+            limit: number;
+            total: number;
+            pages: number;
+        };
+    }>;
+    getById(id: number): Promise<{
+        status: string;
+        id: number;
+        rating_avg: number;
+        created_at: Date;
+        updated_at: Date;
+        seller_id: number;
+        title: string;
+        slug: string;
+        description: string | null;
+        price_pi: number;
+        original_price: number | null;
+        discount: number;
+        category: string;
+        subcategory: string | null;
+        brand: string | null;
+        condition: string;
+        images: import("@prisma/client/runtime/library").JsonValue;
+        video_url: string | null;
+        stock: number;
+        min_order: number;
+        tags: import("@prisma/client/runtime/library").JsonValue;
+        ai_meta: import("@prisma/client/runtime/library").JsonValue | null;
+        ai_quality_score: number | null;
+        is_featured: boolean;
+        view_count: number;
+        save_count: number;
+        sold_count: number;
+    }>;
+    search(params: {
+        query?: string;
+        category?: string;
+        minPrice?: number;
+        maxPrice?: number;
+        page: number;
+        limit: number;
+    }): Promise<{
+        products: ({
+            seller: {
+                id: number;
+                name: string | null;
+            };
+        } & {
+            status: string;
+            id: number;
+            rating_avg: number;
+            created_at: Date;
+            updated_at: Date;
+            seller_id: number;
+            title: string;
+            slug: string;
+            description: string | null;
+            price_pi: number;
+            original_price: number | null;
+            discount: number;
+            category: string;
+            subcategory: string | null;
+            brand: string | null;
+            condition: string;
+            images: import("@prisma/client/runtime/library").JsonValue;
+            video_url: string | null;
+            stock: number;
+            min_order: number;
+            tags: import("@prisma/client/runtime/library").JsonValue;
+            ai_meta: import("@prisma/client/runtime/library").JsonValue | null;
+            ai_quality_score: number | null;
+            is_featured: boolean;
+            view_count: number;
+            save_count: number;
+            sold_count: number;
+        })[];
+        pagination: {
+            page: number;
+            limit: number;
+            total: number;
+            pages: number;
+        };
+    }>;
+    getByCategory(category: string, options: {
+        page: number;
+        limit: number;
+    }): Promise<{
+        products: ({
+            seller: {
+                id: number;
+                name: string | null;
+            };
+        } & {
+            status: string;
+            id: number;
+            rating_avg: number;
+            created_at: Date;
+            updated_at: Date;
+            seller_id: number;
+            title: string;
+            slug: string;
+            description: string | null;
+            price_pi: number;
+            original_price: number | null;
+            discount: number;
+            category: string;
+            subcategory: string | null;
+            brand: string | null;
+            condition: string;
+            images: import("@prisma/client/runtime/library").JsonValue;
+            video_url: string | null;
+            stock: number;
+            min_order: number;
+            tags: import("@prisma/client/runtime/library").JsonValue;
+            ai_meta: import("@prisma/client/runtime/library").JsonValue | null;
+            ai_quality_score: number | null;
+            is_featured: boolean;
+            view_count: number;
+            save_count: number;
+            sold_count: number;
+        })[];
+        pagination: {
+            page: number;
+            limit: number;
+            total: number;
+            pages: number;
+        };
+    }>;
+    create(data: any): Promise<{
+        status: string;
+        id: number;
+        rating_avg: number;
+        created_at: Date;
+        updated_at: Date;
+        seller_id: number;
+        title: string;
+        slug: string;
+        description: string | null;
+        price_pi: number;
+        original_price: number | null;
+        discount: number;
+        category: string;
+        subcategory: string | null;
+        brand: string | null;
+        condition: string;
+        images: import("@prisma/client/runtime/library").JsonValue;
+        video_url: string | null;
+        stock: number;
+        min_order: number;
+        tags: import("@prisma/client/runtime/library").JsonValue;
+        ai_meta: import("@prisma/client/runtime/library").JsonValue | null;
+        ai_quality_score: number | null;
+        is_featured: boolean;
+        view_count: number;
+        save_count: number;
+        sold_count: number;
+    }>;
+    update(id: number, userId: number, data: any): Promise<{
+        status: string;
+        id: number;
+        rating_avg: number;
+        created_at: Date;
+        updated_at: Date;
+        seller_id: number;
+        title: string;
+        slug: string;
+        description: string | null;
+        price_pi: number;
+        original_price: number | null;
+        discount: number;
+        category: string;
+        subcategory: string | null;
+        brand: string | null;
+        condition: string;
+        images: import("@prisma/client/runtime/library").JsonValue;
+        video_url: string | null;
+        stock: number;
+        min_order: number;
+        tags: import("@prisma/client/runtime/library").JsonValue;
+        ai_meta: import("@prisma/client/runtime/library").JsonValue | null;
+        ai_quality_score: number | null;
+        is_featured: boolean;
+        view_count: number;
+        save_count: number;
+        sold_count: number;
+    }>;
+    delete(id: number, userId: number): Promise<void>;
+    getSellerProducts(sellerId: number): Promise<{
+        status: string;
+        id: number;
+        rating_avg: number;
+        created_at: Date;
+        updated_at: Date;
+        seller_id: number;
+        title: string;
+        slug: string;
+        description: string | null;
+        price_pi: number;
+        original_price: number | null;
+        discount: number;
+        category: string;
+        subcategory: string | null;
+        brand: string | null;
+        condition: string;
+        images: import("@prisma/client/runtime/library").JsonValue;
+        video_url: string | null;
+        stock: number;
+        min_order: number;
+        tags: import("@prisma/client/runtime/library").JsonValue;
+        ai_meta: import("@prisma/client/runtime/library").JsonValue | null;
+        ai_quality_score: number | null;
+        is_featured: boolean;
+        view_count: number;
+        save_count: number;
+        sold_count: number;
+    }[]>;
+}
+//# sourceMappingURL=product.service.d.ts.map
