@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+.turbo/
+out/
+
+# Environment variables - NEVER COMMIT!
+.env
+.env*.local
+.env.production
+
+# Testing
+coverage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+
+# Database
+*.db
+*.sqlite
+prisma/migrations/
+
+# Vercel
+.vercel
+
+# Railway
+.railway/
+
+# Mobile
+.expo/
+*.jks
+*.p8
+*.p12
+*.key
+
+# Secrets - CRITICAL!
+*.pem
+secrets/
+keys/
