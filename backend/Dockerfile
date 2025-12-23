@@ -1,34 +1,20 @@
-# ============================================
-# 📄 FILENAME: Dockerfile (Debian for Prisma)
-# 📍 PATH: backend/Dockerfile
-# ============================================
-
-FROM node:18-slim
-
-# Install OpenSSL and other dependencies
-RUN apt-get update -y && \
-    apt-get install -y openssl libssl-dev ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+FROM node:20-slim
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# تثبيت متطلبات prisma
+RUN apt-get update && apt-get install -y openssl
 
-# Install dependencies
+COPY package*.json ./
 RUN npm install
 
-# Copy prisma schema
-COPY prisma ./prisma/
-
-# Generate Prisma Client with correct binary
-RUN npx prisma generate
-
-# Copy source code
 COPY . .
 
-# Expose port
+# توليد ملفات prisma
+RUN npx prisma generate --schema=./prisma/schema.prisma
+
+RUN npm run build
+
 EXPOSE 3000
 
-# Start with tsx
-CMD ["npx", "tsx", "src/index.ts"]
+CMD ["npm", "start"]
