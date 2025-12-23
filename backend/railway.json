@@ -12,36 +12,3 @@
     "healthcheckTimeout": 30
   }
 }
-```
-
----
-
-## 5️⃣ `.gitignore` (تأكد من عدم استبعاد Prisma)
-```
-# Dependencies
-node_modules/
-
-# Environment
-.env
-.env.local
-.env.production
-
-# Build outputs
-dist/
-build/
-
-# Logs
-logs/
-*.log
-npm-debug.log*
-
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-
-# Prisma (لا تستبعد schema.prisma!)
-# prisma/migrations/ # اتركها لو محتاجها
