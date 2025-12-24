@@ -1,11 +1,11 @@
 [phases.setup]
-nixPkgs = ["nodejs", "pnpm"]
+   nixPkgs = ["nodejs", "pnpm"]
 
-[phases.install]
-cmds = ["pnpm install --frozen-lockfile"]
+   [phases.install]
+   cmds = ["pnpm install --frozen-lockfile"]
 
-[phases.build]
-cmds = ["cd apps/web && pnpm build"]
+   [phases.build]
+   cmds = ["cd apps/web && pnpm build"]
 
-[start]
-cmd = "cd apps/web && pnpm start"
+   [start]
+   cmd = "cd apps/web && pnpm start"
