@@ -1,6 +1,3 @@
-// FORSALE WEB APP - ROOT LAYOUT - COMPLETE
-// Copy to: apps/web/src/app/layout.tsx
-
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { Metadata } from 'next';
 import { Toaster } from 'sonner';
@@ -30,16 +27,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
-      <head>
+      <body className="min-h-screen bg-background font-sans antialiased">
+        {children}
+        <Toaster position="top-right" richColors />
         <script
           async
           src="https://sdk.minepi.com/pi-sdk.js"
           data-network={process.env.PI_NETWORK_MODE || 'testnet'}
         />
-      </head>
-      <body className="min-h-screen bg-background font-sans antialiased">
-        {children}
-        <Toaster position="top-right" richColors />
       </body>
     </html>
   );
