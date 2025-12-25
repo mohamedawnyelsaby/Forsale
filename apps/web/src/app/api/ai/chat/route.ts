@@ -13,19 +13,31 @@ export async function GET(request: NextRequest) {
           mode: 'insensitive',
         },
       },
+      take: 50, // limit results
     });
 
-    return NextResponse.json(products);
+    return NextResponse.json({ success: true, data: products });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
+    console.error('Failed to fetch products:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch products' }, 
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    await request.json();
-    return NextResponse.json({ success: true });
+    const body = await request.json();
+    
+    // Add your POST logic here
+    
+    return NextResponse.json({ success: true, data: body });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to process request' }, { status: 500 });
+    console.error('Failed to process request:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to process request' }, 
+      { status: 500 }
+    );
   }
 }
