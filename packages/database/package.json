@@ -4,13 +4,8 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
-    "prisma": "prisma",
     "generate": "prisma generate",
-    "postinstall": "prisma generate",
-    "db:push": "prisma db push",
-    "db:studio": "prisma studio",
-    "db:migrate": "prisma migrate dev",
-    "db:seed": "tsx src/seed.ts"
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0"
