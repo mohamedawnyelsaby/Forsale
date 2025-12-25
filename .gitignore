@@ -1,50 +1,36 @@
-# Dependencies
-node_modules/
+# dependencies
+node_modules
+.pnp
+.pnp.js
 
-# Build outputs
-dist/
-build/
+# testing
+coverage
+
+# next.js
 .next/
-.turbo/
 out/
+build
+dist/
 
-# Environment variables - NEVER COMMIT!
+# production
+.vercel
+.turbo
+.railway
+
+# misc
+.DS_Store
+*.pem
 .env
 .env*.local
-.env.production
 
-# Testing
-coverage/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-.DS_Store
-
-# Logs
-*.log
+# debug
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Database
-*.db
-*.sqlite
-prisma/migrations/
+# prisma
+packages/database/generated/
+packages/database/node_modules/.prisma/
 
-# Vercel
-.vercel
-
-# Railway
-.railway/
-
-# Mobile
-.expo/
-*.jks
-*.p8
-*.p12
-*.key
-
-# Secrets - CRITICAL!
-*.pem
-secrets/
-keys/
+# typescript
+*.tsbuildinfo
