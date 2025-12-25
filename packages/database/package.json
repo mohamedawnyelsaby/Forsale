@@ -1,14 +1,12 @@
 {
   "name": "@forsale/database",
   "version": "1.0.0",
-  "private": true,
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
-    "db:studio": "prisma studio",
-    "db:migrate": "prisma migrate dev"
+    "db:studio": "prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0"
