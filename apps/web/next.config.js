@@ -1,8 +1,11 @@
-// Forsale Web App Configuration
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  transpilePackages: ['@forsale/database', '@forsale/types', '@forsale/utils'],
-};
+  output: 'standalone',
+  experimental: {
+    serverActions: {
+      allowedOrigins: ['*']
+    }
+  }
+}
 
-export default nextConfig;
+export default nextConfig
