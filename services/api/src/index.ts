@@ -1,5 +1,5 @@
-// FORSALE MAIN API SERVER - COMPLETE
-// Copy to: services/api/src/index.ts
+// FORSALE MAIN API SERVER - PRODUCTION GRADE
+// Path: services/api/src/index.ts
 
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
@@ -23,25 +23,35 @@ const server = Fastify({
 // PLUGINS & MIDDLEWARE
 // ============================================
 
-// Security headers
+// Security headers with Pi Network compatibility
 await server.register(helmet, {
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
-      imgSrc: ["'self'", 'data:', 'https:'],
+      imgSrc: ["'self'", 'data:', 'https:', '*.minepi.com'],
+      connectSrc: ["'self'", 'https://*.minepi.com', 'https://api.minepi.com'],
     },
   },
 });
 
-// CORS
+// Advanced CORS - Modified for Pi Browser & Railway stability
 await server.register(cors, {
-  origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
+  origin: (origin, cb) => {
+    // Dynamic whitelist: Allows local dev, Railway production, and Pi Network domains
+    const allowedPatterns = [/localhost/, /\.railway\.app$/, /\.minepi\.com$/];
+    if (!origin || allowedPatterns.some(pattern => pattern.test(origin))) {
+      cb(null, true);
+      return;
+    }
+    cb(new Error("Not allowed by CORS"), false);
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 });
 
-// Rate limiting
+// Rate limiting to protect resources
 await server.register(rateLimit, {
   max: 100,
   timeWindow: '15 minutes',
@@ -76,7 +86,6 @@ server.get('/health', async () => {
 // PRODUCTS ROUTES
 // ============================================
 
-// Get all products
 server.get('/api/products', async (request, reply) => {
   try {
     const products = await prisma.product.findMany({
@@ -95,15 +104,14 @@ server.get('/api/products', async (request, reply) => {
       take: 20,
       orderBy: { createdAt: 'desc' },
     });
-
     return { success: true, data: products };
   } catch (error) {
+    server.log.error(error);
     reply.code(500);
     return { success: false, error: 'Failed to fetch products' };
   }
 });
 
-// Get single product
 server.get<{ Params: { id: string } }>(
   '/api/products/:id',
   async (request, reply) => {
@@ -141,7 +149,6 @@ server.get<{ Params: { id: string } }>(
         return { success: false, error: 'Product not found' };
       }
 
-      // Increment views
       await prisma.product.update({
         where: { id: request.params.id },
         data: { views: { increment: 1 } },
@@ -155,7 +162,6 @@ server.get<{ Params: { id: string } }>(
   }
 );
 
-// Create product
 server.post<{
   Body: {
     title: string;
@@ -168,14 +174,8 @@ server.post<{
   };
 }>('/api/products', async (request, reply) => {
   try {
-    const { title, description, category, price, quantity, images, sellerId } =
-      request.body;
-
-    // Generate slug
-    const slug =
-      title.toLowerCase().replace(/[^a-z0-9]+/g, '-') +
-      '-' +
-      Date.now().toString(36);
+    const { title, description, category, price, quantity, images, sellerId } = request.body;
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now().toString(36);
 
     const product = await prisma.product.create({
       data: {
@@ -198,170 +198,10 @@ server.post<{
   }
 });
 
-// Search products
-server.get<{
-  Querystring: {
-    q?: string;
-    category?: string;
-    minPrice?: string;
-    maxPrice?: string;
-  };
-}>('/api/products/search', async (request, reply) => {
-  try {
-    const { q, category, minPrice, maxPrice } = request.query;
-
-    const where: any = { status: 'ACTIVE' };
-
-    if (q) {
-      where.OR = [
-        { title: { contains: q, mode: 'insensitive' } },
-        { description: { contains: q, mode: 'insensitive' } },
-      ];
-    }
-
-    if (category) {
-      where.category = category;
-    }
-
-    if (minPrice) {
-      where.price = { ...where.price, gte: parseFloat(minPrice) };
-    }
-
-    if (maxPrice) {
-      where.price = { ...where.price, lte: parseFloat(maxPrice) };
-    }
-
-    const products = await prisma.product.findMany({
-      where,
-      include: {
-        seller: {
-          select: {
-            firstName: true,
-            lastName: true,
-            avatar: true,
-            averageRating: true,
-          },
-        },
-      },
-      take: 50,
-      orderBy: { createdAt: 'desc' },
-    });
-
-    return { success: true, data: products, total: products.length };
-  } catch (error) {
-    reply.code(500);
-    return { success: false, error: 'Search failed' };
-  }
-});
-
-// ============================================
-// ORDERS ROUTES
-// ============================================
-
-// Create order
-server.post<{
-  Body: {
-    buyerId: string;
-    sellerId: string;
-    items: Array<{
-      productId: string;
-      quantity: number;
-      price: number;
-    }>;
-    shippingCost: number;
-  };
-}>('/api/orders', async (request, reply) => {
-  try {
-    const { buyerId, sellerId, items, shippingCost } = request.body;
-
-    // Calculate totals
-    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const commission = subtotal * 0.03; // 3% average
-    const total = subtotal + shippingCost;
-
-    // Generate order number
-    const orderNumber = 'ORD-' + Date.now().toString(36).toUpperCase();
-
-    const order = await prisma.order.create({
-      data: {
-        orderNumber,
-        buyerId,
-        sellerId,
-        subtotal,
-        shippingCost,
-        commission,
-        total,
-        status: 'PENDING',
-        items: {
-          create: items.map((item) => ({
-            productId: item.productId,
-            title: '', // Would fetch from product
-            price: item.price,
-            quantity: item.quantity,
-            commission: item.price * 0.03,
-          })),
-        },
-      },
-      include: {
-        items: true,
-      },
-    });
-
-    return { success: true, data: order };
-  } catch (error) {
-    reply.code(500);
-    return { success: false, error: 'Failed to create order' };
-  }
-});
-
-// Get user orders
-server.get<{ Querystring: { userId: string } }>(
-  '/api/orders',
-  async (request, reply) => {
-    try {
-      const { userId } = request.query;
-
-      const orders = await prisma.order.findMany({
-        where: {
-          OR: [{ buyerId: userId }, { sellerId: userId }],
-        },
-        include: {
-          items: {
-            include: {
-              product: true,
-            },
-          },
-          buyer: {
-            select: {
-              firstName: true,
-              lastName: true,
-              avatar: true,
-            },
-          },
-          seller: {
-            select: {
-              firstName: true,
-              lastName: true,
-              avatar: true,
-            },
-          },
-        },
-        orderBy: { createdAt: 'desc' },
-      });
-
-      return { success: true, data: orders };
-    } catch (error) {
-      reply.code(500);
-      return { success: false, error: 'Failed to fetch orders' };
-    }
-  }
-);
-
 // ============================================
 // PI NETWORK PAYMENT ROUTES
 // ============================================
 
-// Create Pi payment
 server.post<{
   Body: {
     orderId: string;
@@ -379,7 +219,6 @@ server.post<{
       uid: buyerUid,
     });
 
-    // Update order with payment ID
     await prisma.order.update({
       where: { id: orderId },
       data: {
@@ -395,7 +234,6 @@ server.post<{
   }
 });
 
-// Complete Pi payment
 server.post<{
   Body: {
     paymentId: string;
@@ -404,10 +242,8 @@ server.post<{
 }>('/api/payments/pi/complete', async (request, reply) => {
   try {
     const { paymentId, txid } = request.body;
-
     await piNetworkClient.completePayment(paymentId, txid);
 
-    // Update order status
     const order = await prisma.order.findFirst({
       where: { piTransactionId: paymentId },
     });
@@ -427,50 +263,14 @@ server.post<{
 });
 
 // ============================================
-// USER ROUTES
-// ============================================
-
-// Get user profile
-server.get<{ Params: { id: string } }>(
-  '/api/users/:id',
-  async (request, reply) => {
-    try {
-      const user = await prisma.user.findUnique({
-        where: { id: request.params.id },
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          avatar: true,
-          bio: true,
-          averageRating: true,
-          totalSales: true,
-          verificationLevel: true,
-          createdAt: true,
-        },
-      });
-
-      if (!user) {
-        reply.code(404);
-        return { success: false, error: 'User not found' };
-      }
-
-      return { success: true, data: user };
-    } catch (error) {
-      reply.code(500);
-      return { success: false, error: 'Failed to fetch user' };
-    }
-  }
-);
-
-// ============================================
-// START SERVER
+// START SERVER - OPTIMIZED FOR RAILWAY & LOCAL
 // ============================================
 
 const start = async () => {
   try {
-    const port = parseInt(process.env.PORT || '4000', 10);
-    const host = process.env.HOST || '0.0.0.0';
+    // Modified: Dynamic port detection for Railway (8080) and Local (4000)
+    const port = Number(process.env.PORT) || 4000;
+    const host = '0.0.0.0'; // Critical for cloud deployment
 
     await server.listen({ port, host });
 
@@ -478,7 +278,6 @@ const start = async () => {
 🚀 Forsale API Server Running!
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📍 URL: http://${host}:${port}
-🔒 Pi Network: ${piNetworkClient.getNetworkInfo().mode}
 📊 Environment: ${process.env.NODE_ENV || 'development'}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     `);
@@ -490,9 +289,8 @@ const start = async () => {
 
 start();
 
-// Graceful shutdown
+// Graceful shutdown for production stability
 process.on('SIGTERM', async () => {
-  console.log('SIGTERM received, shutting down gracefully...');
   await server.close();
   await prisma.$disconnect();
   process.exit(0);
