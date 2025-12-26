@@ -91,7 +91,7 @@ server.get('/health', async () => {
 // PRODUCTS ROUTES (SIMPLIFIED FOR PRODUCTION)
 // ============================================
 
-server.get('/api/products', async (request, reply) => {
+server.get('/api/products', async (_request, reply) => {
   try {
     const products = await prisma.product.findMany({
       where: { status: 'ACTIVE' },
