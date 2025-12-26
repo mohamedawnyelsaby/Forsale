@@ -88,6 +88,15 @@ server.get('/health', async () => {
 });
 
 // ============================================
+// PI NETWORK VALIDATION
+// ============================================
+
+server.get('/validation-key.txt', async (_request, reply) => {
+  reply.type('text/plain');
+  return process.env.PI_VALIDATION_KEY || 'KEY_NOT_SET';
+});
+
+// ============================================
 // PRODUCTS ROUTES (SIMPLIFIED FOR PRODUCTION)
 // ============================================
 
