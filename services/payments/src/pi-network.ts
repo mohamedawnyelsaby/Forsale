@@ -142,4 +142,4 @@ export class PiNetworkClient {
   }
 }
 
-export const piNetworkClient = new PiNetworkClient();
+export { piNetworkClient } from './pi-network.js';
