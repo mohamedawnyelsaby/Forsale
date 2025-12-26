@@ -142,4 +142,3 @@ export class PiNetworkClient {
   }
 }
 
-export { piNetworkClient } from './pi-network';
