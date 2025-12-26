@@ -12,7 +12,7 @@ import { prisma } from '@forsale/database';
  * This ensures Node.js v24 locates the export in the payments module
  * specifically for environments where workspace symlinks may fail.
  */
-import { piNetworkClient } from '../../payments/src/index.js';
+import { piNetworkClient } from '../../payments/src/index';
 
 // ============================================
 // FASTIFY SERVER SETUP
