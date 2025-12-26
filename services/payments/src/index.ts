@@ -4,5 +4,9 @@
  */
 
 // Export everything from the pi-network module
-// The .js extension is mandatory for ESM compatibility in Node.js v24
-export * from './pi-network.js';
+// Remove .js extension for TypeScript source files
+export * from './pi-network';
+
+// Export a singleton instance for convenience
+import { PiNetworkClient } from './pi-network';
+export const piNetworkClient = new PiNetworkClient();
