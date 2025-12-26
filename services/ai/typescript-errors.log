@@ -1,0 +1,9 @@
+../../services/ai/src/logy-engine.ts(4,23): error TS2307: Cannot find module '@anthropic-ai/sdk' or its corresponding type declarations.
+../../services/ai/src/logy-engine.ts(5,51): error TS2307: Cannot find module '@forsale/types' or its corresponding type declarations.
+../../services/ai/src/logy-engine.ts(254,11): error TS6133: 'response' is declared but its value is never read.
+undefined
+/data/data/com.termux/files/home/Forsale/Forsale/packages/database:
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command failed with exit code 1: tsc --noEmit
+../../services/ai/src/logy-engine.ts(4,23): error TS2307: Cannot find module '@anthropic-ai/sdk' or its corresponding type declarations.
+../../services/ai/src/logy-engine.ts(5,51): error TS2307: Cannot find module '@forsale/types' or its corresponding type declarations.
+../../services/ai/src/logy-engine.ts(254,11): error TS6133: 'response' is declared but its value is never read.
