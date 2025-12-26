@@ -6,7 +6,10 @@ import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
 import { prisma } from '@forsale/database';
-import { piNetworkClient } from '@forsale/payments';
+
+// MODIFIED FOR ESM COMPATIBILITY: Using direct relative path with .js extension 
+// to resolve the @forsale/payments module correctly in Node.js v24.
+import { piNetworkClient } from '../../payments/src/index.js';
 
 // ============================================
 // FASTIFY SERVER SETUP
