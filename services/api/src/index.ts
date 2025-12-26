@@ -7,8 +7,8 @@ import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
 import { prisma } from '@forsale/database';
 
-// MODIFIED FOR ESM COMPATIBILITY: Using direct relative path with .js extension 
-// to resolve the @forsale/payments module correctly in Node.js v24.
+// GLOBAL ENGINEERING FIX: Using direct relative path with .js extension.
+// This bypasses the symlink resolution issue in Node.js v24 & Termux.
 import { piNetworkClient } from '../../payments/src/index.js';
 
 // ============================================
@@ -42,7 +42,6 @@ await server.register(helmet, {
 // Advanced CORS - Modified for Pi Browser & Railway stability
 await server.register(cors, {
   origin: (origin, cb) => {
-    // Dynamic whitelist: Allows local dev, Railway production, and Pi Network domains
     const allowedPatterns = [/localhost/, /\.railway\.app$/, /\.minepi\.com$/];
     if (!origin || allowedPatterns.some(pattern => pattern.test(origin))) {
       cb(null, true);
@@ -271,9 +270,8 @@ server.post<{
 
 const start = async () => {
   try {
-    // Modified: Dynamic port detection for Railway (8080) and Local (4000)
     const port = Number(process.env.PORT) || 4000;
-    const host = '0.0.0.0'; // Critical for cloud deployment
+    const host = '0.0.0.0';
 
     await server.listen({ port, host });
 
@@ -292,7 +290,7 @@ const start = async () => {
 
 start();
 
-// Graceful shutdown for production stability
+// Graceful shutdown
 process.on('SIGTERM', async () => {
   await server.close();
   await prisma.$disconnect();
