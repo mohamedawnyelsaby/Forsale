@@ -2,12 +2,16 @@
   "name": "@forsale/api",
   "version": "1.0.0",
   "private": true,
+  "description": "Forsale API Server - Production Grade",
   "type": "module",
+  "main": "./dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "start": "node dist/index.js",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest"
   },
   "dependencies": {
     "@forsale/database": "workspace:*",
@@ -17,11 +21,18 @@
     "@fastify/cors": "^10.0.1",
     "@fastify/helmet": "^12.0.1",
     "@fastify/rate-limit": "^10.1.1",
-    "fastify": "^5.2.0"
+    "fastify": "^5.2.0",
+    "pino": "^10.1.0",
+    "pino-pretty": "^12.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "tsc-alias": "^1.8.10",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   }
 }
