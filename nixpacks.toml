@@ -1,0 +1,18 @@
+[phases.setup]
+nixPkgs = ["nodejs-22_x"]
+
+[phases.install]
+cmds = [
+  "corepack enable",
+  "corepack prepare pnpm@9.15.0 --activate",
+  "pnpm install --frozen-lockfile"
+]
+
+[phases.build]
+cmds = [
+  "pnpm db:generate",
+  "pnpm build:web"
+]
+
+[start]
+cmd = "cd apps/web && pnpm start"
