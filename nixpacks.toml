@@ -1,4 +1,5 @@
 [phases.setup]
+<<<<<<< HEAD
 nixPkgs = ["nodePackages.pnpm", "nodejs-20_x"]
 
 [phases.install]
@@ -9,3 +10,22 @@ cmds = ["pnpm --filter web build"]
 
 [start]
 cmd = "pnpm --filter web start"
+=======
+nixPkgs = ["nodejs-22_x"]
+
+[phases.install]
+cmds = [
+  "corepack enable",
+  "corepack prepare pnpm@9.15.0 --activate",
+  "pnpm install --frozen-lockfile"
+]
+
+[phases.build]
+cmds = [
+  "pnpm db:generate",
+  "pnpm build:web"
+]
+
+[start]
+cmd = "cd apps/web && pnpm start"
+>>>>>>> 07e892c67373cc3766dceda4fc58b2b6a6180222
