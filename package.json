@@ -2,7 +2,6 @@
   "name": "forsale",
   "version": "1.0.0",
   "private": true,
-<<<<<<< HEAD
   "description": "AI-powered global marketplace on Pi Network",
   "author": "Forsale Team",
   "license": "PROPRIETARY",
@@ -11,20 +10,6 @@
     "services/*",
     "packages/*"
   ],
-  "scripts": {
-    "dev": "turbo run dev",
-    "dev:web": "turbo run dev --filter=web",
-    "dev:api": "turbo run dev --filter=api",
-    "build": "turbo run build",
-    "test": "turbo run test",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "type-check": "turbo run type-check",
-    "clean": "turbo run clean && rm -rf node_modules",
-    "db:generate": "cd packages/database && prisma generate",
-    "db:push": "cd packages/database && prisma db push",
-    "db:studio": "cd packages/database && prisma studio"
-=======
   "packageManager": "pnpm@9.15.0",
   "engines": {
     "node": ">=22.0.0",
@@ -34,12 +19,17 @@
     "postinstall": "pnpm db:generate",
     "dev": "turbo run dev --parallel",
     "dev:web": "turbo run dev --filter=web",
+    "dev:api": "turbo run dev --filter=api",
     "build": "turbo run build",
     "build:web": "pnpm db:generate && turbo run build --filter=web",
+    "test": "turbo run test",
     "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "type-check": "turbo run type-check",
-    "db:generate": "prisma generate --schema=./packages/database/prisma/schema.prisma"
->>>>>>> 07e892c67373cc3766dceda4fc58b2b6a6180222
+    "clean": "turbo run clean && rm -rf node_modules",
+    "db:generate": "prisma generate --schema=./packages/database/prisma/schema.prisma",
+    "db:push": "cd packages/database && prisma db push",
+    "db:studio": "cd packages/database && prisma studio"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
@@ -49,21 +39,8 @@
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.4.2",
-<<<<<<< HEAD
     "prettier-plugin-tailwindcss": "^0.6.9",
-    "turbo": "^2.3.3",
-    "typescript": "^5.7.2"
-  },
-  "engines": {
-    "node": ">=22.0.0",
-    "pnpm": ">=9.0.0"
-  },
-  "packageManager": "pnpm@9.15.0"
-}
- 
-=======
     "turbo": "^2.3.3",
     "typescript": "^5.7.2"
   }
 }
->>>>>>> 07e892c67373cc3766dceda4fc58b2b6a6180222
