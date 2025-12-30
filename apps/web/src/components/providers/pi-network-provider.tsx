@@ -8,10 +8,27 @@
 
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import Script from 'next/script';
-import { logger } from '@forsale/logger';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from './security-provider';
+
+// ============================================
+// LOGGER (Client-side)
+// ============================================
+
+const logger = {
+  info: (message: string, data?: any) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[INFO] ${message}`, data);
+    }
+  },
+  warn: (message: string, data?: any) => {
+    console.warn(`[WARN] ${message}`, data);
+  },
+  error: (message: string, error?: Error, data?: any) => {
+    console.error(`[ERROR] ${message}`, error, data);
+  },
+};
 
 // ============================================
 // TYPES & INTERFACES
@@ -330,8 +347,6 @@ export function PiNetworkProvider({ children }: { children: ReactNode }) {
                 if (!response.ok) {
                   throw new Error('Server completion failed');
                 }
-
-                const data = await response.json();
 
                 logger.info('Payment completed', { paymentId, txid });
 
