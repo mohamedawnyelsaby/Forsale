@@ -25,7 +25,7 @@ export function SecurityProvider({
 
 import { ReactNode, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { logger } from '@forsale/logger';
+
 
 export function AnalyticsProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
