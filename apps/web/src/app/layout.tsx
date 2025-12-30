@@ -13,8 +13,6 @@ import { Toaster } from 'sonner';
 // Internal components
 import { PiNetworkProvider } from '@/components/providers/pi-network-provider';
 import { SecurityProvider } from '@/components/providers/security-provider';
-import { AnalyticsProvider } from '@/components/providers/analytics-provider';
-import { ErrorBoundary } from '@/components/error-boundary';
 
 // Styles
 import './globals.css';
@@ -141,7 +139,6 @@ export const metadata: Metadata = {
       {
         rel: 'mask-icon',
         url: '/safari-pinned-tab.svg',
-        color: '#5bbad5',
       },
     ],
   },
@@ -160,7 +157,6 @@ export const metadata: Metadata = {
   
   // Additional metadata
   category: 'E-commerce',
-  classification: 'Marketplace',
   
   // Alternate languages
   alternates: {
@@ -183,7 +179,6 @@ export const viewport: Viewport = {
   minimumScale: 1,
   maximumScale: 5,
   userScalable: true,
-  viewportFit: 'cover',
   
   // Theme colors for different modes
   themeColor: [
@@ -202,15 +197,14 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Get request headers for security context
-  const headersList = headers();
+  // Get request headers for security context (Next.js 15 - await headers)
+  const headersList = await headers();
   const nonce = headersList.get('x-nonce') || undefined;
 
   return (
     <html
       lang="en"
       className={`${inter.variable} ${spaceGrotesk.variable}`}
-      suppressHydrationMismatch
     >
       <head>
         {/* Preconnect to external domains for performance */}
@@ -242,34 +236,27 @@ export default async function RootLayout({
       
       <body
         className="min-h-screen bg-background font-sans antialiased"
-        suppressHydrationMismatch
       >
-        {/* Error Boundary for graceful error handling */}
-        <ErrorBoundary>
-          {/* Security Provider for CSP, nonce, etc. */}
-          <SecurityProvider nonce={nonce}>
-            {/* Pi Network Provider */}
-            <PiNetworkProvider>
-              {/* Analytics (with privacy) */}
-              <AnalyticsProvider>
-                {/* Main content */}
-                <div className="relative flex min-h-screen flex-col">
-                  {children}
-                </div>
+        {/* Security Provider for CSP, nonce, etc. */}
+        <SecurityProvider nonce={nonce}>
+          {/* Pi Network Provider */}
+          <PiNetworkProvider>
+            {/* Main content */}
+            <div className="relative flex min-h-screen flex-col">
+              {children}
+            </div>
 
-                {/* Toast notifications */}
-                <Toaster
-                  position="top-right"
-                  richColors
-                  closeButton
-                  duration={4000}
-                  expand={false}
-                  pauseWhenPageIsHidden
-                />
-              </AnalyticsProvider>
-            </PiNetworkProvider>
-          </SecurityProvider>
-        </ErrorBoundary>
+            {/* Toast notifications */}
+            <Toaster
+              position="top-right"
+              richColors
+              closeButton
+              duration={4000}
+              expand={false}
+              pauseWhenPageIsHidden
+            />
+          </PiNetworkProvider>
+        </SecurityProvider>
         
         {/* Development tools (only in dev) */}
         {process.env.NODE_ENV === 'development' && (
