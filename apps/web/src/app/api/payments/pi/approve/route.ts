@@ -79,4 +79,34 @@ export async function POST(req: NextRequest) {
 
     const { paymentId } = body;
 
-    logger.info('Payment approval
+    logger.info('Payment approval requested', { paymentId, userId: user.uid });
+
+    // 4. Approve payment with Pi Network
+    const approved = await approvePiPayment(paymentId, accessToken);
+
+    if (!approved) {
+      logger.error('Pi Network payment approval failed', undefined, { paymentId });
+      return NextResponse.json(
+        { error: 'Payment approval failed' },
+        { status: 500 }
+      );
+    }
+
+    logger.info('Payment approved successfully', { paymentId });
+
+    // 5. Return success response
+    return NextResponse.json({
+      success: true,
+      paymentId,
+      message: 'Payment approved successfully',
+    });
+
+  } catch (error) {
+    logger.error('Payment approval error', error as Error);
+    
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
