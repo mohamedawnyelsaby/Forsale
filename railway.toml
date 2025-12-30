@@ -1,7 +1,7 @@
 [build]
 builder = "nixpacks"
-installCommand = "pnpm install --no-frozen-lockfile"
-buildCommand = "npx turbo run build"
+installCommand = "pnpm install --frozen-lockfile"
+buildCommand = "npx turbo run build --filter=web..."
 
 [deploy]
 startCommand = "pnpm --filter web start"
