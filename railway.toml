@@ -3,6 +3,5 @@ builder = "nixpacks"
 
 [deploy]
 startCommand = "pnpm --filter web start"
-healthcheckPath = "/api/health"
 restartPolicyType = "always"
 restartPolicyMaxRetries = 10
