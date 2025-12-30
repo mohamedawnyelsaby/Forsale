@@ -154,7 +154,7 @@ export interface PiPayment {
   } | null;
 }
 
-export interface PiTransaction {
+interface PiTransaction {
   txid: string;
   amount: number;
   verified: boolean;
