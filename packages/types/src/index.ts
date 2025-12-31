@@ -1,16 +1,32 @@
-// FORSALE SHARED TYPES - COMPLETE
-// Copy to: packages/types/src/index.ts
-
-// ============================================
-// PI NETWORK TYPES
-// ============================================
-
 export type PiNetworkMode = 'testnet' | 'mainnet';
 
-export interface PiNetworkConfig {
-  mode: PiNetworkMode;
-  apiUrl: string;
-  apiKey: string;
+export interface PiUser {
+  uid: string;
+  username: string;
+}
+
+export interface PiPaymentDTO {
+  amount: number;
+  memo: string;
+  metadata: Record<string, any>;
+}
+
+export interface PiTransaction {
+  txid: string;
+  amount: number;
+  verified: boolean;
+  timestamp: string;
+  from_address: string;
+  to_address: string;
+  _link: string;
+}
+
+export interface PiPaymentStatus {
+  developer_approved: boolean;
+  transaction_verified: boolean;
+  developer_completed: boolean;
+  cancelled: boolean;
+  user_cancelled: boolean;
 }
 
 export interface PiPayment {
@@ -19,99 +35,49 @@ export interface PiPayment {
   amount: number;
   memo: string;
   metadata: Record<string, any>;
-  network: PiNetworkMode;
-  status: {
-    developer_approved: boolean;
-    transaction_verified: boolean;
-    developer_completed: boolean;
-    cancelled: boolean;
-  };
+  from_address: string;
+  to_address: string;
+  direction: 'user_to_app' | 'app_to_user';
+  created_at: string;
+  network: string;
+  status: PiPaymentStatus;
+  transaction: PiTransaction | null;
 }
 
-export interface PiUser {
-  uid: string;
-  username: string;
+export interface PiNetworkConfig {
+  mode: PiNetworkMode;
+  apiUrl: string;
+  apiKey: string;
 }
 
-// ============================================
-// COMMISSION TYPES
-// ============================================
-
-export type ProductCategory = 
-  | 'REAL_ESTATE'
-  | 'VEHICLES'
-  | 'LUXURY_GOODS'
-  | 'ELECTRONICS'
-  | 'FASHION'
-  | 'HOME_GARDEN'
-  | 'BOOKS_MEDIA'
-  | 'FOOD_GROCERY'
-  | 'TOYS_HOBBIES'
-  | 'FREELANCE_SERVICES'
-  | 'DIGITAL_PRODUCTS'
-  | 'DEFAULT';
-
-export interface CommissionRule {
-  category: ProductCategory;
-  sellerCommission: number;
-  buyerFee: number;
-  minCommission: number;
-  maxCommission: number;
-  volumeDiscounts: VolumeDiscount[];
+export enum ProductCategory {
+  ELECTRONICS = 'ELECTRONICS',
+  FASHION = 'FASHION',
+  HOME_GARDEN = 'HOME_GARDEN',
+  BOOKS_MEDIA = 'BOOKS_MEDIA',
+  SPORTS_OUTDOORS = 'SPORTS_OUTDOORS',
+  TOYS_GAMES = 'TOYS_GAMES',
+  HEALTH_BEAUTY = 'HEALTH_BEAUTY',
+  AUTOMOTIVE = 'AUTOMOTIVE',
+  FOOD_BEVERAGES = 'FOOD_BEVERAGES',
+  SERVICES = 'SERVICES',
+  OTHER = 'OTHER',
 }
 
-export interface VolumeDiscount {
-  minMonthlyVolume: number;
-  discountPercentage: number;
+export interface CommissionTier {
+  minAmount: number;
+  maxAmount: number;
+  rate: number;
 }
 
-export interface CommissionCalculation {
+export interface CommissionResult {
   grossPrice: number;
   commission: number;
   netToSeller: number;
   effectiveRate: number;
-  volumeDiscount: number;
-}
-
-// ============================================
-// API RESPONSE TYPES
-// ============================================
-
-export interface ApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  error?: {
-    code: string;
-    message: string;
+  breakdown: {
+    baseRate: number;
+    volumeDiscount: number;
+    categoryMultiplier: number;
   };
 }
-
-// ============================================
-// SEARCH TYPES
-// ============================================
-
-export interface SearchFilters {
-  query?: string;
-  category?: ProductCategory;
-  minPrice?: number;
-  maxPrice?: number;
-  sortBy?: 'relevance' | 'price_asc' | 'price_desc' | 'newest';
-}
-
-export interface SearchResult<T> {
-  items: T[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
-
-// ============================================
-// CONSTANTS
-// ============================================
-
-export const APP_CONFIG = {
-  APP_NAME: 'Forsale',
-  APP_VERSION: '1.0.0',
-  DEFAULT_LANGUAGE: 'en',
-  DEFAULT_CURRENCY: 'PI',
-} as const;
