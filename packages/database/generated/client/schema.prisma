@@ -1,0 +1,235 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  BUYER
+  SELLER
+  BOTH
+  ADMIN
+}
+
+enum VerificationLevel {
+  UNVERIFIED
+  EMAIL_VERIFIED
+  PHONE_VERIFIED
+  PI_KYC_VERIFIED
+  FORSALE_VERIFIED
+  PREMIUM_SELLER
+  ENTERPRISE
+}
+
+model User {
+  id                String            @id @default(cuid())
+  email             String            @unique
+  emailVerified     DateTime?
+  phone             String?           @unique
+  phoneVerified     DateTime?
+  piUserId          String?           @unique
+  piUsername        String?
+  role              UserRole          @default(BUYER)
+  verificationLevel VerificationLevel @default(UNVERIFIED)
+
+  firstName String?
+  lastName  String?
+  avatar    String?
+  bio       String?
+  language  String  @default("en")
+  country   String?
+  city      String?
+
+  trustScore       Int     @default(0)
+  kycVerified      Boolean @default(false)
+  twoFactorEnabled Boolean @default(false)
+
+  totalOrders   Int   @default(0)
+  totalSales    Int   @default(0)
+  totalSpent    Float @default(0)
+  totalEarned   Float @default(0)
+  averageRating Float @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products  Product[]
+  orders    Order[]   @relation("BuyerOrders")
+  sales     Order[]   @relation("SellerOrders")
+  reviews   Review[]
+  addresses Address[]
+  wallets   Wallet[]
+
+  @@index([email])
+  @@index([piUserId])
+  @@map("users")
+}
+
+// ============================================
+// PRODUCTS
+// ============================================
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  SOLD
+  ARCHIVED
+}
+
+model Product {
+  id       String @id @default(cuid())
+  sellerId String
+  seller   User   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String
+  category    String
+  price       Float
+  quantity    Int           @default(1)
+  status      ProductStatus @default(DRAFT)
+
+  images String[]
+  slug   String   @unique
+
+  views Int @default(0)
+  saves Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders  OrderItem[]
+  reviews Review[]
+
+  @@index([sellerId])
+  @@index([category])
+  @@index([status])
+  @@map("products")
+}
+
+// ============================================
+// ORDERS
+// ============================================
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  COMPLETED
+  CANCELLED
+}
+
+model Order {
+  id          String @id @default(cuid())
+  orderNumber String @unique
+
+  buyerId  String
+  buyer    User   @relation("BuyerOrders", fields: [buyerId], references: [id])
+  sellerId String
+  seller   User   @relation("SellerOrders", fields: [sellerId], references: [id])
+
+  status OrderStatus @default(PENDING)
+
+  subtotal     Float
+  shippingCost Float @default(0)
+  commission   Float
+  total        Float
+
+  piTransactionId String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items OrderItem[]
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  title      String
+  price      Float
+  quantity   Int
+  commission Float
+
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+// ============================================
+// REVIEWS
+// ============================================
+
+model Review {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  rating  Int
+  comment String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([productId, userId])
+  @@index([productId])
+  @@map("reviews")
+}
+
+// ============================================
+// WALLETS
+// ============================================
+
+model Wallet {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  piAddress        String @unique
+  piBalance        Float  @default(0)
+  availableBalance Float  @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("wallets")
+}
+
+// ============================================
+// ADDRESSES
+// ============================================
+
+model Address {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  fullName     String
+  phone        String
+  addressLine1 String
+  city         String
+  postalCode   String
+  country      String
+
+  isDefault Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("addresses")
+}
