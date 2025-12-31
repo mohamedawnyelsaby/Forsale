@@ -1,8 +1,6 @@
 /**
- * FORSALE ROOT LAYOUT - ULTRA SECURE
- * World-class security implementation with Pi Network integration
- * @security Level: MAXIMUM
- * @compliance: OWASP, PCI-DSS, GDPR, SOC2
+ * FORSALE ROOT LAYOUT - UPDATED WITH HEADER & FOOTER
+ * apps/web/src/app/layout.tsx
  */
 
 import type { Metadata, Viewport } from 'next';
@@ -13,13 +11,13 @@ import { Toaster } from 'sonner';
 // Internal components
 import { PiNetworkProvider } from '@/components/providers/pi-network-provider';
 import { SecurityProvider } from '@/components/providers/security-provider';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 
 // Styles
 import './globals.css';
 
-// ============================================
-// FONTS CONFIGURATION
-// ============================================
+// Fonts
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
@@ -38,25 +36,19 @@ const spaceGrotesk = Space_Grotesk({
   adjustFontFallback: true,
 });
 
-// ============================================
-// METADATA (SEO + Security)
-// ============================================
+// Metadata
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://forsale.app';
 const APP_NAME = 'Forsale';
 const APP_DESCRIPTION = 'AI-Powered Global Marketplace on Pi Network - Buy and sell securely with cryptocurrency';
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
-  
-  // Basic metadata
   title: {
     default: `${APP_NAME} - AI-Powered Global Marketplace`,
     template: `%s | ${APP_NAME}`,
   },
   description: APP_DESCRIPTION,
   applicationName: APP_NAME,
-  
-  // Keywords for SEO
   keywords: [
     'marketplace',
     'pi network',
@@ -68,13 +60,9 @@ export const metadata: Metadata = {
     'secure payments',
     'blockchain marketplace',
   ],
-  
-  // Authors and creators
   authors: [{ name: 'Forsale Team', url: APP_URL }],
   creator: 'Forsale',
   publisher: 'Forsale',
-  
-  // Robots
   robots: {
     index: true,
     follow: true,
@@ -87,117 +75,46 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  
-  // Open Graph
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    alternateLocale: ['ar_EG', 'fr_FR', 'es_ES', 'de_DE', 'zh_CN'],
     url: APP_URL,
     title: `${APP_NAME} - AI-Powered Global Marketplace`,
     description: APP_DESCRIPTION,
     siteName: APP_NAME,
-    images: [
-      {
-        url: '/images/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: `${APP_NAME} Marketplace`,
-        type: 'image/png',
-      },
-      {
-        url: '/images/og-square.png',
-        width: 800,
-        height: 800,
-        alt: `${APP_NAME} Logo`,
-        type: 'image/png',
-      },
-    ],
   },
-  
-  // Twitter
   twitter: {
     card: 'summary_large_image',
     site: '@forsale_app',
     creator: '@forsale_app',
     title: `${APP_NAME} - AI-Powered Global Marketplace`,
     description: APP_DESCRIPTION,
-    images: ['/images/twitter-image.png'],
   },
-  
-  // Icons
   icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
-      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
-    ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
-    other: [
-      {
-        rel: 'mask-icon',
-        url: '/safari-pinned-tab.svg',
-      },
-    ],
+    icon: [{ url: '/favicon.ico', sizes: 'any' }],
   },
-  
-  // Manifest
   manifest: '/manifest.json',
-  
-  // Verification
-  verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
-    yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION,
-    other: {
-      'facebook-domain-verification': process.env.NEXT_PUBLIC_FB_VERIFICATION || '',
-    },
-  },
-  
-  // Additional metadata
   category: 'E-commerce',
-  
-  // Alternate languages
-  alternates: {
-    canonical: APP_URL,
-    languages: {
-      'en-US': `${APP_URL}/en`,
-      'ar-EG': `${APP_URL}/ar`,
-      'fr-FR': `${APP_URL}/fr`,
-      'es-ES': `${APP_URL}/es`,
-    },
-  },
 };
 
-// ============================================
-// VIEWPORT (Mobile Optimization + Security)
-// ============================================
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   minimumScale: 1,
   maximumScale: 5,
   userScalable: true,
-  
-  // Theme colors for different modes
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
     { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
   ],
-  
   colorScheme: 'light dark',
 };
 
-// ============================================
-// ROOT LAYOUT COMPONENT
-// ============================================
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Get request headers for security context (Next.js 15 - await headers)
   const headersList = await headers();
   const nonce = headersList.get('x-nonce') || undefined;
 
@@ -207,43 +124,32 @@ export default async function RootLayout({
       className={`${inter.variable} ${spaceGrotesk.variable}`}
     >
       <head>
-        {/* Preconnect to external domains for performance */}
         <link rel="preconnect" href="https://sdk.minepi.com" />
         <link rel="dns-prefetch" href="https://sdk.minepi.com" />
-        
-        {/* Security: Prevent clickjacking */}
         <meta httpEquiv="X-Frame-Options" content="SAMEORIGIN" />
-        
-        {/* Security: Prevent MIME sniffing */}
         <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
-        
-        {/* Security: XSS Protection */}
         <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
-        
-        {/* Mobile optimization */}
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content={APP_NAME} />
-        
-        {/* PWA tags */}
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="application-name" content={APP_NAME} />
-        <meta name="msapplication-TileColor" content="#5bbad5" />
-        <meta name="msapplication-config" content="/browserconfig.xml" />
       </head>
       
-      <body
-        className="min-h-screen bg-background font-sans antialiased"
-      >
-        {/* Security Provider for CSP, nonce, etc. */}
+      <body className="min-h-screen bg-background font-sans antialiased">
         <SecurityProvider nonce={nonce}>
-          {/* Pi Network Provider */}
           <PiNetworkProvider>
-            {/* Main content */}
             <div className="relative flex min-h-screen flex-col">
-              {children}
+              {/* Header */}
+              <Header />
+
+              {/* Main Content */}
+              <main className="flex-1">
+                {children}
+              </main>
+
+              {/* Footer */}
+              <Footer />
             </div>
 
             {/* Toast notifications */}
@@ -258,7 +164,7 @@ export default async function RootLayout({
           </PiNetworkProvider>
         </SecurityProvider>
         
-        {/* Development tools (only in dev) */}
+        {/* Development indicator */}
         {process.env.NODE_ENV === 'development' && (
           <div className="fixed bottom-0 left-0 z-50 rounded-tr bg-black/80 px-3 py-1 text-xs text-white">
             DEV MODE
@@ -269,8 +175,5 @@ export default async function RootLayout({
   );
 }
 
-// ============================================
-// SECURITY: Force HTTPS in production
-// ============================================
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
