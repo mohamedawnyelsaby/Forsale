@@ -1,94 +1,28 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "../../tsconfig.json",
-  "display": "Forsale Web App - Ultra-Secure Production Config",
-  
   "compilerOptions": {
-    // ============================================
-    // NEXT.JS 15 INTEGRATION
-    // ============================================
     "plugins": [
       {
         "name": "next"
       }
     ],
-    
-    // ============================================
-    // MODULE RESOLUTION - ADVANCED
-    // ============================================
     "baseUrl": ".",
     "paths": {
-      // ══════════════════════════════════════
-      // LOCAL APP PATHS (Recommended Pattern)
-      // ══════════════════════════════════════
       "@/*": ["./src/*"],
       "@/components/*": ["./src/components/*"],
       "@/lib/*": ["./src/lib/*"],
-      "@/styles/*": ["./src/styles/*"],
       "@/hooks/*": ["./src/hooks/*"],
-      "@/utils/*": ["./src/utils/*"],
-      "@/config/*": ["./src/config/*"],
-      "@/types/*": ["./src/types/*"],
-      "@/api/*": ["./src/app/api/*"],
-      "@/contexts/*": ["./src/contexts/*"],
-      "@/store/*": ["./src/store/*"],
-      
-      // ══════════════════════════════════════
-      // WORKSPACE PACKAGES (Monorepo)
-      // ══════════════════════════════════════
       "@forsale/types": ["../../packages/types/src/index.ts"],
       "@forsale/types/*": ["../../packages/types/src/*"],
-      
       "@forsale/utils": ["../../packages/utils/src/index.ts"],
       "@forsale/utils/*": ["../../packages/utils/src/*"],
-      
       "@forsale/database": ["../../packages/database/src/index.ts"],
-      "@forsale/database/*": ["../../packages/database/src/*"],
-      
-      "@forsale/config": ["../../packages/config/src/index.ts"],
-      "@forsale/config/*": ["../../packages/config/src/*"],
-      
-      "@forsale/ui": ["../../packages/ui/src/index.ts"],
-      "@forsale/ui/*": ["../../packages/ui/src/*"]
+      "@forsale/database/*": ["../../packages/database/src/*"]
     },
-    
-    // ============================================
-    // TYPE SAFETY - MAXIMUM SECURITY
-    // ============================================
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "useUnknownInCatchVariables": true,
-    
-    // ============================================
-    // ADDITIONAL CHECKS - ENTERPRISE QUALITY
-    // ============================================
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "allowUnusedLabels": false,
-    "allowUnreachableCode": false,
-    "exactOptionalPropertyTypes": true,
-    "forceConsistentCasingInFileNames": true,
-    
-    // ============================================
-    // JSX & REACT - LATEST STANDARDS
-    // ============================================
+    "target": "ES2022",
+    "lib": ["ES2022", "ES2023", "DOM", "DOM.Iterable", "WebWorker"],
     "jsx": "preserve",
-    "jsxImportSource": "react",
-    
-    // ============================================
-    // MODULE SYSTEM - OPTIMIZED
-    // ============================================
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
@@ -96,96 +30,23 @@
     "esModuleInterop": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-    
-    // ============================================
-    // EMIT OPTIONS - PRODUCTION READY
-    // ============================================
     "noEmit": true,
     "incremental": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "removeComments": false,
-    "importHelpers": true,
-    
-    // ============================================
-    // LANGUAGE FEATURES - MODERN
-    // ============================================
-    "target": "ES2022",
-    "lib": [
-      "ES2022",
-      "ES2023",
-      "DOM",
-      "DOM.Iterable",
-      "WebWorker"
-    ],
-    "downlevelIteration": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    
-    // ============================================
-    // PERFORMANCE - OPTIMIZED
-    // ============================================
+    "strict": true,
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    
-    // ============================================
-    // COMPATIBILITY - CROSS-PLATFORM
-    // ============================================
-    "allowJs": false,
-    "checkJs": false,
-    "composite": false,
-    "preserveConstEnums": true
+    "forceConsistentCasingInFileNames": true
   },
-  
-  // ============================================
-  // FILE INCLUDES - COMPREHENSIVE
-  // ============================================
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "**/*.mts",
-    "**/*.cts",
     ".next/types/**/*.ts",
-    "../../packages/*/src/**/*.ts",
-    "../../global.d.ts"
+    "../../packages/*/src/**/*.ts"
   ],
-  
-  // ============================================
-  // FILE EXCLUDES - OPTIMIZED
-  // ============================================
   "exclude": [
     "node_modules",
     ".next",
     "out",
-    "dist",
-    "build",
-    "coverage",
-    "**/*.spec.ts",
-    "**/*.test.ts",
-    "**/*.spec.tsx",
-    "**/*.test.tsx",
-    "**/__tests__/**",
-    "**/__mocks__/**",
-    ".turbo",
-    "*.config.js",
-    "*.config.mjs",
-    "*.config.ts"
-  ],
-  
-  // ============================================
-  // PROJECT REFERENCES (Optional for monorepo)
-  // ============================================
-  "references": [
-    {
-      "path": "../../packages/types"
-    },
-    {
-      "path": "../../packages/utils"
-    },
-    {
-      "path": "../../packages/database"
-    }
+    "dist"
   ]
 }
