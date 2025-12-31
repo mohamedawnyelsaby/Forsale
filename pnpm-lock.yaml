@@ -86,11 +86,10 @@ importers:
         version: 5.9.3
 
   packages/database:
-    dependencies:
+    devDependencies:
       '@prisma/client':
         specifier: ^5.22.0
         version: 5.22.0(prisma@5.22.0)
-    devDependencies:
       prisma:
         specifier: ^5.22.0
         version: 5.22.0

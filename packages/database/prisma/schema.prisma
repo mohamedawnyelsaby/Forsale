@@ -1,20 +1,12 @@
-// FORSALE DATABASE SCHEMA - COMPLETE
-// Copy this entire file to: packages/database/prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/client"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
-
-// ============================================
-// USER MANAGEMENT
-// ============================================
 
 enum UserRole {
   BUYER
