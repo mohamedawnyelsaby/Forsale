@@ -1,3 +1,2 @@
-// Copy to: packages/utils/src/index.ts
-
-export * from './commission';
+export { CommissionCalculator } from './commission';
+export { default } from './commission';
