@@ -1,15 +1,8 @@
-# RAILWAY DEPLOYMENT CONFIGURATION
-# File: railway.toml
-
 [build]
 builder = "nixpacks"
 installCommand = "pnpm install --frozen-lockfile"
-# التعديل الجوهري هنا: إضافة --webpack لإيقاف Turbopack تماماً
-buildCommand = "pnpm db:generate && pnpm --filter web build -- --webpack"
+buildCommand = "pnpm db:generate && pnpm --filter web build"
 
 [deploy]
 startCommand = "cd apps/web && pnpm start"
-healthcheckPath = "/api/health"
-healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 10
