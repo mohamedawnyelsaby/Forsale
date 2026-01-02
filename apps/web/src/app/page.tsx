@@ -1,41 +1,83 @@
+// File: apps/web/src/app/page.tsx
+// Fixed Main Homepage with proper Pi SDK initialization
+
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function HomePage() {
+  const [piReady, setPiReady] = useState(false);
   
-  // Force Init inside useEffect to clear any block
+  // Check and initialize Pi SDK on component mount
   useEffect(() => {
-    const initPi = async () => {
-      if (typeof window !== 'undefined' && (window as any).Pi) {
-        try {
-          await (window as any).Pi.init({ version: "2.0", sandbox: false });
-          console.log("Pi Ready");
-        } catch (e) {
-          console.error(e);
+    const initializePi = async () => {
+      // Wait for Pi SDK to load
+      const checkPi = () => {
+        if (typeof window !== 'undefined' && (window as any).Pi) {
+          setPiReady(true);
+          
+          // Initialize Pi SDK
+          (window as any).Pi.init({ version: "2.0", sandbox: false })
+            .then(() => {
+              console.log("✅ Pi SDK initialized successfully");
+            })
+            .catch((e: any) => {
+              console.error("Pi SDK init error:", e);
+            });
+        } else {
+          setTimeout(checkPi, 500);
         }
-      }
+      };
+      
+      checkPi();
     };
-    initPi();
+
+    initializePi();
   }, []);
 
   const handleStartShopping = async () => {
-    if (typeof window !== 'undefined' && (window as any).Pi) {
+    if (!piReady || typeof window === 'undefined' || !(window as any).Pi) {
+      alert('Please open this page in Pi Browser');
+      return;
+    }
+
+    try {
+      const Pi = (window as any).Pi;
+      
+      // Ensure SDK is initialized
       try {
-        // Direct Call without any extra logic
-        (window as any).Pi.createPayment({
+        await Pi.init({ version: "2.0", sandbox: false });
+      } catch (initError) {
+        console.log('SDK already initialized');
+      }
+
+      // Wait a moment
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Create payment
+      Pi.createPayment(
+        {
           amount: 3.14,
           memo: "Step 10 Validation",
           metadata: { orderId: "123" }
-        }, {
-          onReadyForServerApproval: (id: string) => console.log(id),
-          onReadyForServerCompletion: (id: string, tx: string) => alert("Done"),
-          onCancel: (id: string) => console.log("Cancel"),
-          onError: (err: any) => alert(err.message),
-        });
-      } catch (err) {
-        alert("Retry again");
-      }
+        },
+        {
+          onReadyForServerApproval: (id: string) => {
+            console.log('Payment ID:', id);
+          },
+          onReadyForServerCompletion: (id: string, tx: string) => {
+            alert(`Payment successful! TX: ${tx.substring(0, 10)}...`);
+          },
+          onCancel: (id: string) => {
+            console.log("Payment cancelled:", id);
+          },
+          onError: (err: any) => {
+            alert(`Payment error: ${err.message}`);
+          },
+        }
+      );
+    } catch (err: any) {
+      alert(`Error: ${err.message || 'Unknown error'}. Please try again.`);
     }
   };
 
@@ -46,9 +88,9 @@ export default function HomePage() {
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="text-2xl font-bold">Forsale</div>
           <nav className="flex gap-4">
-            <a href="#" className="text-sm">Browse</a>
-            <a href="#" className="text-sm">Sell</a>
-            <a href="#" className="text-sm">Sign In</a>
+            <a href="/products" className="text-sm hover:text-purple-600">Browse</a>
+            <a href="/test-payment" className="text-sm hover:text-purple-600">Test Payment</a>
+            <a href="#" className="text-sm hover:text-purple-600">Sign In</a>
           </nav>
         </div>
       </header>
@@ -68,13 +110,27 @@ export default function HomePage() {
             <div className="flex justify-center gap-4">
               <button 
                 onClick={handleStartShopping}
-                className="rounded-lg bg-purple-600 px-8 py-3 text-white hover:bg-purple-700"
+                disabled={!piReady}
+                className="rounded-lg bg-purple-600 px-8 py-3 text-white hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
               >
-                Start Shopping
+                {piReady ? 'Start Shopping' : 'Loading Pi SDK...'}
               </button>
-              <button className="rounded-lg border border-purple-600 px-8 py-3 text-purple-600 hover:bg-purple-50">
-                Start Selling
-              </button>
+              <a 
+                href="/test-payment"
+                className="inline-block rounded-lg border border-purple-600 px-8 py-3 text-purple-600 hover:bg-purple-50 transition-colors"
+              >
+                Test Payment
+              </a>
+            </div>
+
+            {/* SDK Status Indicator */}
+            <div className="mt-6">
+              <p className="text-sm text-gray-500">
+                Pi SDK Status: {' '}
+                <span className={piReady ? 'text-green-600 font-semibold' : 'text-orange-600'}>
+                  {piReady ? '✅ Ready' : '⏳ Loading...'}
+                </span>
+              </p>
             </div>
           </div>
         </section>
