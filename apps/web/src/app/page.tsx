@@ -7,103 +7,101 @@ export default function HomePage() {
 
   useEffect(() => {
     const initPi = async () => {
-      const checkPi = () => {
-        // التحقق من وجود SDK في نافذة المتصفح
-        if (typeof window !== 'undefined' && (window as any).Pi) {
-          (window as any).Pi.init({ version: "2.0", sandbox: false })
-            .then(() => {
-              setPiReady(true);
-              console.log("Pi SDK Connected");
-            })
-            .catch((e: any) => console.error(e));
-        } else {
-          // إعادة المحاولة حتى يتم تحميل الـ SDK
-          setTimeout(checkPi, 500);
-        }
-      };
-      checkPi();
+      if (typeof window !== 'undefined' && (window as any).Pi) {
+        (window as any).Pi.init({ version: "2.0", sandbox: false })
+          .then(() => setPiReady(true))
+          .catch(() => {});
+      } else {
+        const interval = setInterval(() => {
+          if ((window as any).Pi) {
+            (window as any).Pi.init({ version: "2.0", sandbox: false })
+              .then(() => {
+                setPiReady(true);
+                clearInterval(interval);
+              });
+          }
+        }, 500);
+      }
     };
     initPi();
   }, []);
 
-  const handleStartShopping = () => {
-    if (!piReady) return;
-    const Pi = (window as any).Pi;
-
-    // وظيفة الدفع الأساسية - سيتم ربط مروان هنا غداً
-    Pi.createPayment({
-      amount: 3.14,
-      memo: "Step 10 Final",
-      metadata: { orderId: "initial_order_" + Date.now() }
-    }, {
-      onReadyForServerApproval: (id: string) => console.log("Payment ID:", id),
-      onReadyForServerCompletion: (id: string, tx: string) => alert("Success!"),
-      onCancel: (id: string) => console.log("Cancelled"),
-      onError: (err: any) => console.error(err),
-    });
-  };
-
   return (
-    <div className="flex min-h-screen flex-col bg-white text-black">
-      {/* Navbar بنفس التصميم الأصلي */}
-      <header className="border-b p-4 flex justify-between items-center bg-white">
-        <div className="text-2xl font-bold tracking-tighter">Forsale</div>
-        <div className="flex gap-6 text-sm font-bold text-gray-500">
-          <span className="text-purple-600 cursor-pointer">Browse</span>
-          <span className="cursor-pointer hover:text-purple-600 transition-colors">Sell</span>
-          <span className="cursor-pointer hover:text-purple-600 transition-colors">Sign In</span>
-        </div>
+    <div className="flex min-h-screen flex-col bg-white font-sans">
+      {/* Navbar */}
+      <header className="flex items-center justify-between px-8 py-6">
+        <div className="text-2xl font-black tracking-tighter text-black">Forsale</div>
+        <nav className="flex gap-8">
+          <span className="text-sm font-bold text-purple-600 cursor-pointer">Browse</span>
+          <span className="text-sm font-bold text-gray-400 cursor-pointer hover:text-black">Sell</span>
+          <span className="text-sm font-bold text-gray-400 cursor-pointer hover:text-black">Sign In</span>
+        </nav>
       </header>
 
-      {/* Hero Section */}
-      <main className="flex-1 container mx-auto px-4 py-20 text-center">
-        <h1 className="mb-6 text-5xl md:text-6xl font-black italic tracking-tight">
-          Buy & Sell Globally with <span className="text-purple-600">AI</span>
+      {/* Main Hero */}
+      <main className="flex flex-1 flex-col items-center justify-center px-4 text-center">
+        <h1 className="max-w-4xl text-6xl font-black leading-none tracking-tight text-black md:text-8xl">
+          BUY & SELL <br />
+          GLOBALLY WITH <span className="text-purple-600 italic">AI</span>
         </h1>
-        <p className="mb-12 text-xl text-gray-400 max-w-2xl mx-auto font-medium">
+        
+        <p className="mt-8 max-w-xl text-lg font-medium text-gray-400">
           The world's first AI-native marketplace powered by Pi Network.
         </p>
-        
-        <div className="flex flex-col items-center gap-6">
+
+        <div className="mt-12 flex flex-col items-center gap-6">
           <button 
-            onClick={handleStartShopping}
-            className="rounded-2xl bg-purple-600 px-16 py-5 text-white font-black text-xl shadow-[0_8px_0_rgb(126,34,206)] hover:bg-purple-700 transition-all active:translate-y-1 active:shadow-none"
+            className="group relative rounded-2xl bg-purple-600 px-16 py-6 text-xl font-black text-white transition-all active:translate-y-1"
+            style={{ boxShadow: '0 8px 0 rgb(126, 34, 206)' }}
+            onClick={() => {
+              if(piReady) {
+                (window as any).Pi.createPayment({
+                  amount: 3.14,
+                  memo: "Test",
+                  metadata: { orderId: "1" }
+                }, {
+                  onReadyForServerApproval: (id: string) => console.log(id),
+                  onReadyForServerCompletion: (id: string, tx: string) => console.log(tx),
+                  onCancel: () => {},
+                  onError: () => {}
+                });
+              }
+            }}
           >
             {piReady ? 'START SHOPPING' : 'CONNECTING...'}
           </button>
-          
-          {/* مؤشر اتصال الـ SDK */}
-          <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full border border-gray-100">
-            <span className={`h-2.5 w-2.5 rounded-full ${piReady ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-red-500'}`}></span>
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-              {piReady ? 'SDK READY' : 'CONNECTING SDK'}
+
+          {/* Status Indicator */}
+          <div className="flex items-center gap-2">
+            <div className={`h-2 w-2 rounded-full ${piReady ? 'bg-green-500' : 'bg-red-500'}`}></div>
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-300">
+              {piReady ? 'SDK Connected' : 'Waiting for Pi Browser'}
             </span>
           </div>
         </div>
 
-        {/* Features Grid */}
-        <div className="mt-24 grid md:grid-cols-3 gap-8 text-left">
-          <div className="p-8 border-2 border-gray-50 rounded-[40px] hover:border-purple-100 transition-all group">
-            <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🤖</div>
-            <h3 className="font-bold text-lg mb-2">Logy AI</h3>
-            <p className="text-sm text-gray-400 leading-relaxed">Your intelligent assistant for seamless global trading.</p>
+        {/* Features Minimalist */}
+        <div className="mt-32 grid w-full max-w-5xl grid-cols-1 gap-12 md:grid-cols-3">
+          <div className="flex flex-col items-center">
+            <span className="text-3xl mb-2">🤖</span>
+            <h3 className="font-bold text-black">Logy AI</h3>
           </div>
-          <div className="p-8 border-2 border-gray-50 rounded-[40px] hover:border-purple-100 transition-all group">
-            <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">💎</div>
-            <h3 className="font-bold text-lg mb-2">Pi Payments</h3>
-            <p className="text-sm text-gray-400 leading-relaxed">Secure and fast decentralized blockchain transactions.</p>
+          <div className="flex flex-col items-center">
+            <span className="text-3xl mb-2">💎</span>
+            <h3 className="font-bold text-black">Pi Payments</h3>
           </div>
-          <div className="p-8 border-2 border-gray-50 rounded-[40px] hover:border-purple-100 transition-all group">
-            <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🌍</div>
-            <h3 className="font-bold text-lg mb-2">Global Market</h3>
-            <p className="text-sm text-gray-400 leading-relaxed">Connect with millions of Pioneers across the globe.</p>
+          <div className="flex flex-col items-center">
+            <span className="text-3xl mb-2">🌍</span>
+            <h3 className="font-bold text-black">Global Market</h3>
           </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="py-10 text-center text-gray-300 text-[10px] font-bold tracking-[0.4em] uppercase">
-        © 2026 FORSALE • POWERED BY PI NETWORK
+      <footer className="py-12 text-center">
+        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-200">
+          © 2026 FORSALE • TECHNOLOGY
+        </p>
       </footer>
     </div>
   );
