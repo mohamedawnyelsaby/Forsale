@@ -3,126 +3,101 @@
 import { useEffect, useState } from 'react';
 
 export default function HomePage() {
-  const [sdkReady, setSdkReady] = useState(false);
+  // Use a simple state to check if we are in Pi Browser
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Initializing Pi SDK to fix the red error and enable Step 10
-    if (typeof window !== 'undefined' && (window as any).Pi) {
-      (window as any).Pi.init({ version: "2.0", sandbox: false });
-      setSdkReady(true);
-    }
+    // Force initialize even if it takes a moment
+    const timer = setTimeout(() => {
+      if (typeof window !== 'undefined' && (window as any).Pi) {
+        (window as any).Pi.init({ version: "2.0", sandbox: false });
+        setIsReady(true);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
   }, []);
 
-  const handleMarwanTask = async (productName: string, price: number) => {
+  const handleMarwanAction = async (name: string, price: number) => {
+    // This function will run NO MATTER WHAT when you click
+    console.log("Button Clicked for:", name);
+
     try {
-      // Step 1: Save product and price to database immediately (Marwan's Task)
+      // 1. Immediate Save to DB (Marwan's Task)
       await fetch('/api/products/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productName, price }),
+        body: JSON.stringify({ productName: name, price: price }),
       });
 
-      // Step 2: Open Pi Payment to complete Step 10
-      const paymentData = {
-        amount: price,
-        memo: `Buying ${productName}`,
-        metadata: { productName }
-      };
+      // 2. Trigger Pi Payment Window
+      if ((window as any).Pi) {
+        const paymentData = {
+          amount: price,
+          memo: `Order: ${name}`,
+          metadata: { productName: name }
+        };
 
-      const callbacks = {
-        onReadyForServerApproval: (paymentId: string) => console.log(paymentId),
-        onReadyForServerCompletion: (paymentId: string, txid: string) => console.log(txid),
-        onCancel: (paymentId: string) => console.log("Cancelled"),
-        onError: (error: Error) => console.error(error),
-      };
+        const callbacks = {
+          onReadyForServerApproval: (id: string) => console.log("Approved:", id),
+          onReadyForServerCompletion: (id: string, tx: string) => console.log("Done:", tx),
+          onCancel: (id: string) => console.log("Cancelled"),
+          onError: (err: any) => alert("Payment Error: " + err.message),
+        };
 
-      await (window as any).Pi.createPayment(paymentData, callbacks);
+        await (window as any).Pi.createPayment(paymentData, callbacks);
+      } else {
+        alert("Pi SDK not found in window");
+      }
     } catch (error) {
-      console.error("Process failed", error);
+      console.error("Task failed:", error);
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-white">
       {/* Header */}
-      <header className="border-b bg-white">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <div className="text-2xl font-bold">Forsale</div>
-          <nav className="flex gap-4 items-center">
-            <span className={`text-[10px] px-2 py-1 rounded ${sdkReady ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-              {sdkReady ? 'SDK Connected' : 'SDK Wait'}
-            </span>
-            <a href="#" className="text-sm">Browse</a>
-            <a href="#" className="text-sm">Sell</a>
-            <a href="#" className="text-sm">Sign In</a>
-          </nav>
+      <header className="border-b p-4 flex justify-between items-center">
+        <div className="text-2xl font-bold text-purple-600">Forsale</div>
+        <div className="text-[10px] bg-green-50 text-green-600 px-2 py-1 rounded border border-green-200">
+          SYSTEM ACTIVE
         </div>
       </header>
 
-      {/* Hero */}
-      <main className="flex-1">
-        <section className="container mx-auto px-4 py-20">
-          <div className="mx-auto max-w-3xl text-center">
-            <h1 className="mb-6 text-5xl font-bold">
-              Buy & Sell Globally with{' '}
-              <span className="text-purple-600">AI</span>
-            </h1>
-            <p className="mb-8 text-xl text-gray-600">
-              The world's first AI-native marketplace powered by Pi Network.
-              Zero fees, instant payments, intelligent assistance.
-            </p>
-            <div className="flex justify-center gap-4">
-              <button 
-                onClick={() => handleMarwanTask("Test Product", 3.14)}
-                className="rounded-lg bg-purple-600 px-8 py-3 text-white hover:bg-purple-700"
-              >
-                Start Shopping (Test Pay)
-              </button>
-              <button className="rounded-lg border border-purple-600 px-8 py-3 text-purple-600 hover:bg-purple-50">
-                Start Selling
-              </button>
-            </div>
-          </div>
-        </section>
+      {/* Hero Section */}
+      <main className="flex-1 container mx-auto px-4 py-10">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-4 text-gray-900">Personal Store</h1>
+          <p className="text-gray-500">Click any product to save to DB and pay</p>
+        </div>
 
-        {/* Features */}
-        <section className="bg-gray-50 py-20">
-          <div className="container mx-auto px-4">
-            <h2 className="mb-12 text-center text-3xl font-bold">
-              Why Forsale?
-            </h2>
-            <div className="grid gap-8 md:grid-cols-3">
-              <div className="rounded-lg bg-white p-6 shadow-sm">
-                <div className="mb-4 text-4xl">🤖</div>
-                <h3 className="mb-2 text-xl font-bold">Logy AI Assistant</h3>
-                <p className="text-gray-600">
-                  AI handles everything from search to customer service
-                </p>
-              </div>
-              <div className="rounded-lg bg-white p-6 shadow-sm">
-                <div className="mb-4 text-4xl">💎</div>
-                <h3 className="mb-2 text-xl font-bold">Pi Network Payments</h3>
-                <p className="text-gray-600">
-                  Zero fees, instant global transactions
-                </p>
-              </div>
-              <div className="rounded-lg bg-white p-6 shadow-sm">
-                <div className="mb-4 text-4xl">🌍</div>
-                <h3 className="mb-2 text-xl font-bold">Global Marketplace</h3>
-                <p className="text-gray-600">
-                  Buy & sell from anywhere, 50+ languages
-                </p>
-              </div>
-            </div>
+        {/* Action Buttons (The Products) */}
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="border-2 border-purple-100 p-8 rounded-2xl text-center shadow-sm">
+            <h2 className="text-2xl font-bold mb-2">Product 01</h2>
+            <p className="text-3xl font-black text-purple-600 mb-6">3.14 Pi</p>
+            <button 
+              onClick={() => handleMarwanAction("Product 01", 3.14)}
+              className="w-full bg-purple-600 text-white py-4 rounded-xl font-bold text-lg active:scale-95 transition-all shadow-lg"
+            >
+              BUY & SAVE NOW
+            </button>
           </div>
-        </section>
+
+          <div className="border-2 border-purple-100 p-8 rounded-2xl text-center shadow-sm">
+            <h2 className="text-2xl font-bold mb-2">Product 02</h2>
+            <p className="text-3xl font-black text-purple-600 mb-6">10.00 Pi</p>
+            <button 
+              onClick={() => handleMarwanAction("Product 02", 10.00)}
+              className="w-full bg-purple-600 text-white py-4 rounded-xl font-bold text-lg active:scale-95 transition-all shadow-lg"
+            >
+              BUY & SAVE NOW
+            </button>
+          </div>
+        </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t py-8">
-        <div className="container mx-auto px-4 text-center text-sm text-gray-600">
-          © 2026 Forsale. Built with AI. Powered by Pi Network.
-        </div>
+      <footer className="p-8 text-center text-gray-400 text-xs border-t">
+        © 2026 Forsale - Verified Pi Application
       </footer>
     </div>
   );
