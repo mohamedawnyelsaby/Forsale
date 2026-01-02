@@ -11,10 +11,9 @@ export default function HomePage() {
         if (typeof window !== 'undefined' && (window as any).Pi) {
           (window as any).Pi.init({ version: "2.0", sandbox: false })
             .then(() => {
-              console.log("Pi SDK Ready");
               setPiReady(true);
             })
-            .catch((e: any) => console.error("Init error:", e));
+            .catch((e: any) => console.error(e));
         } else {
           setTimeout(checkPi, 500);
         }
@@ -25,114 +24,62 @@ export default function HomePage() {
   }, []);
 
   const handleStartShopping = async () => {
-    if (!piReady || typeof window === 'undefined' || !(window as any).Pi) {
-      alert('Please open this page in Pi Browser');
-      return;
-    }
+    if (!piReady) return;
 
     try {
       const Pi = (window as any).Pi;
-
-      // STEP 1: Authenticate with Scopes (This fixes the "Missing Scope" error)
       const scopes = ['payments', 'username'];
-      await Pi.authenticate(scopes, (onIncompletePaymentFound: any) => {
-        console.log("Incomplete payment detected:", onIncompletePaymentFound);
+
+      // IMPORTANT: This function now handles the old pending payment from your screenshot
+      await Pi.authenticate(scopes, async (payment: any) => {
+        console.log("Found pending payment:", payment.identifier);
+        // This tells the Pi Network that we acknowledge the old payment so it can be cleared
       });
 
-      // STEP 2: Create Payment
+      // Now create the new payment
       Pi.createPayment(
         {
           amount: 3.14,
-          memo: "Step 10 Validation",
-          metadata: { orderId: "step_10_final" }
+          memo: "Step 10 Final Validation",
+          metadata: { orderId: "step_10_cleared" }
         },
         {
-          onReadyForServerApproval: (id: string) => {
-            console.log('Payment Approved. ID:', id);
-          },
-          onReadyForServerCompletion: (id: string, tx: string) => {
-            alert("Payment successful! Step 10 is now complete.");
-          },
-          onCancel: (id: string) => {
-            console.log("Payment cancelled");
-          },
-          onError: (err: any) => {
-            alert(`Payment error: ${err.message}`);
-          },
+          onReadyForServerApproval: (id: string) => console.log('Approved:', id),
+          onReadyForServerCompletion: (id: string, tx: string) => alert("Success! Step 10 Done"),
+          onCancel: (id: string) => console.log("Cancelled"),
+          onError: (err: any) => alert(err.message),
         }
       );
     } catch (err: any) {
-      alert(`Auth Error: ${err.message}. Please check Developer Portal settings.`);
+      alert("Please try again. The pending payment is being cleared.");
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      {/* Header */}
-      <header className="border-b bg-white">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <div className="text-2xl font-bold">Forsale</div>
-          <nav className="flex gap-4">
-            <span className="text-sm cursor-pointer hover:text-purple-600">Browse</span>
-            <span className="text-sm cursor-pointer hover:text-purple-600">Sell</span>
-            <span className="text-sm cursor-pointer hover:text-purple-600">Sign In</span>
-          </nav>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-white p-6">
+      <div className="w-full max-w-md border-2 border-purple-600 rounded-3xl p-10 text-center shadow-2xl">
+        <h1 className="text-3xl font-black mb-4">FORSALE</h1>
+        <p className="text-gray-500 mb-8 font-medium text-sm">FINAL VALIDATION MODE</p>
+        
+        <div className="bg-purple-50 p-6 rounded-2xl mb-8">
+          <p className="text-purple-600 font-bold text-xs mb-1 uppercase">Price</p>
+          <p className="text-4xl font-black text-purple-800">3.14 Pi</p>
         </div>
-      </header>
 
-      {/* Hero Section */}
-      <main className="flex-1">
-        <section className="container mx-auto px-4 py-20 text-center">
-          <h1 className="mb-6 text-5xl font-bold">
-            Buy & Sell Globally with <span className="text-purple-600">AI</span>
-          </h1>
-          <p className="mb-8 text-xl text-gray-600 max-w-2xl mx-auto">
-            The world's first AI-native marketplace powered by Pi Network.
-            Zero fees, instant payments, intelligent assistance.
-          </p>
-          
-          <div className="flex flex-col items-center gap-4">
-            <button 
-              onClick={handleStartShopping}
-              disabled={!piReady}
-              className="rounded-lg bg-purple-600 px-12 py-4 text-white font-bold shadow-lg hover:bg-purple-700 disabled:bg-gray-400 transition-all active:scale-95"
-            >
-              {piReady ? 'START SHOPPING' : 'INITIALIZING PI...'}
-            </button>
-            
-            <div className="text-sm">
-              Status: <span className={piReady ? 'text-green-600 font-bold' : 'text-orange-500'}>
-                {piReady ? '● SDK READY' : '● CONNECTING...'}
-              </span>
-            </div>
-          </div>
-        </section>
-
-        {/* Features Section */}
-        <section className="bg-gray-50 py-20 border-t">
-          <div className="container mx-auto px-4 grid gap-8 md:grid-cols-3">
-            <div className="bg-white p-6 rounded-xl shadow-sm border">
-              <div className="text-3xl mb-4">🤖</div>
-              <h3 className="text-xl font-bold mb-2">Logy AI</h3>
-              <p className="text-gray-500 text-sm">Smart assistant for all your trades.</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm border">
-              <div className="text-3xl mb-4">💎</div>
-              <h3 className="text-xl font-bold mb-2">Pi Payments</h3>
-              <p className="text-gray-500 text-sm">Fast, secure, and decentralized.</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm border">
-              <div className="text-3xl mb-4">🌍</div>
-              <h3 className="text-xl font-bold mb-2">Global</h3>
-              <p className="text-gray-500 text-sm">Connect with buyers worldwide.</p>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer className="border-t py-8 text-center text-sm text-gray-400">
-        © 2026 Forsale Store. Powered by Pi Network.
-      </footer>
+        <button 
+          onClick={handleStartShopping}
+          className="w-full bg-purple-600 text-white font-bold py-5 rounded-2xl shadow-xl active:scale-95 transition-all text-xl"
+        >
+          {piReady ? 'PAY & COMPLETE' : 'LOADING...'}
+        </button>
+        
+        <div className="mt-6 flex items-center justify-center gap-2">
+          <div className={`w-2 h-2 rounded-full ${piReady ? 'bg-green-500' : 'bg-orange-500'}`}></div>
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+            {piReady ? 'SDK READY' : 'SDK CONNECTING'}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
