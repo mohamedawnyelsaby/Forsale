@@ -1,67 +1,77 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function HomePage() {
-  
+  const [loading, setLoading] = useState(false);
+  const [piReady, setPiReady] = useState(false);
+
   useEffect(() => {
-    // Initialize Pi SDK immediately to clear the path for buttons
-    if (typeof window !== 'undefined' && (window as any).Pi) {
-      try {
-        (window as any).Pi.init({ version: "2.0", sandbox: false });
-      } catch (e) {
-        console.error("SDK Init error:", e);
+    // Check for SDK every 1 second until found
+    const interval = setInterval(() => {
+      if (typeof window !== 'undefined' && (window as any).Pi) {
+        try {
+          (window as any).Pi.init({ version: "2.0", sandbox: false });
+          setPiReady(true);
+          clearInterval(interval);
+        } catch (e) {
+          console.log("Waiting for Pi...");
+        }
       }
-    }
+    }, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleStartShopping = async () => {
-    console.log("Button clicked!");
-    
-    // Check if Pi SDK exists in window
-    if (typeof window !== 'undefined' && (window as any).Pi) {
-      try {
-        // 1. Save record for Marwan
-        await fetch('/api/products/save', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ productName: "First Sale", price: 3.14 }),
-        });
+    if (!piReady) {
+      alert("Pi Network is still loading... Please wait 3 seconds.");
+      return;
+    }
 
-        // 2. Open Payment Window to complete Step 10
-        const paymentData = {
-          amount: 3.14,
-          memo: "Initial App Testing",
-          metadata: { internalId: "test-001" }
-        };
+    setLoading(true);
+    try {
+      // 1. Save to Database for Marwan
+      await fetch('/api/products/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productName: "Final Test", price: 3.14 }),
+      });
 
-        const callbacks = {
-          onReadyForServerApproval: (id: string) => console.log("Approved:", id),
-          onReadyForServerCompletion: (id: string, tx: string) => console.log("Success:", tx),
-          onCancel: (id: string) => console.log("Cancelled"),
-          onError: (err: any) => alert("Pi Error: " + err.message),
-        };
+      // 2. Trigger Payment Window
+      const paymentData = {
+        amount: 3.14,
+        memo: "Completing Step 10",
+        metadata: { orderId: "step10-test" }
+      };
 
-        (window as any).Pi.createPayment(paymentData, callbacks);
-      } catch (error) {
-        alert("Action failed. Check console.");
-      }
-    } else {
-      alert("Pi SDK not detected. Please open in Pi Browser.");
+      (window as any).Pi.createPayment(paymentData, {
+        onReadyForServerApproval: (id: string) => console.log("Approved:", id),
+        onReadyForServerCompletion: (id: string, tx: string) => {
+          console.log("Success:", tx);
+          alert("Payment Successful! Step 10 is now green.");
+        },
+        onCancel: (id: string) => setLoading(false),
+        onError: (err: any) => {
+          setLoading(false);
+          alert("Payment Error: " + err.message);
+        },
+      });
+    } catch (error) {
+      setLoading(false);
+      alert("System Busy. Please try again in a moment.");
     }
   };
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
       {/* Header */}
-      <header className="border-b">
+      <header className="border-b bg-white">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="text-2xl font-bold">Forsale</div>
-          <nav className="flex gap-4">
-            <a href="#" className="text-sm">Browse</a>
-            <a href="#" className="text-sm">Sell</a>
-            <a href="#" className="text-sm">Sign In</a>
-          </nav>
+          <div className="flex items-center gap-2">
+            <span className={`h-3 w-3 rounded-full ${piReady ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'}`}></span>
+            <span className="text-xs text-gray-500">{piReady ? 'Ready' : 'Connecting Pi...'}</span>
+          </div>
         </div>
       </header>
 
@@ -70,8 +80,7 @@ export default function HomePage() {
         <section className="container mx-auto px-4 py-20 text-center">
           <div className="mx-auto max-w-3xl">
             <h1 className="mb-6 text-5xl font-bold">
-              Buy & Sell Globally with{' '}
-              <span className="text-purple-600">AI</span>
+              Buy & Sell Globally with <span className="text-purple-600">AI</span>
             </h1>
             <p className="mb-8 text-xl text-gray-600">
               The world's first AI-native marketplace powered by Pi Network.
@@ -80,9 +89,12 @@ export default function HomePage() {
             <div className="flex justify-center gap-4">
               <button 
                 onClick={handleStartShopping}
-                className="rounded-lg bg-purple-600 px-8 py-3 text-white hover:bg-purple-700 font-bold shadow-lg active:scale-95 transition-transform"
+                disabled={loading}
+                className={`rounded-lg px-8 py-3 text-white font-bold shadow-lg transition-all ${
+                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-700 active:scale-95'
+                }`}
               >
-                Start Shopping
+                {loading ? 'Processing...' : 'Start Shopping'}
               </button>
               <button className="rounded-lg border border-purple-600 px-8 py-3 text-purple-600 hover:bg-purple-50">
                 Start Selling
@@ -91,42 +103,33 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Features Section */}
+        {/* Why Forsale Section */}
         <section className="bg-gray-50 py-20">
           <div className="container mx-auto px-4">
-            <h2 className="mb-12 text-center text-3xl font-bold">
-              Why Forsale?
-            </h2>
+            <h2 className="mb-12 text-center text-3xl font-bold">Why Forsale?</h2>
             <div className="grid gap-8 md:grid-cols-3">
-              <div className="rounded-lg bg-white p-6 shadow-sm">
+              <div className="rounded-lg bg-white p-6 shadow-sm border">
                 <div className="mb-4 text-4xl">🤖</div>
                 <h3 className="mb-2 text-xl font-bold">Logy AI Assistant</h3>
-                <p className="text-gray-600">
-                  AI handles everything from search to customer service
-                </p>
+                <p className="text-gray-600">AI handles everything from search to customer service</p>
               </div>
-              <div className="rounded-lg bg-white p-6 shadow-sm">
+              <div className="rounded-lg bg-white p-6 shadow-sm border">
                 <div className="mb-4 text-4xl">💎</div>
                 <h3 className="mb-2 text-xl font-bold">Pi Network Payments</h3>
-                <p className="text-gray-600">
-                  Zero fees, instant global transactions
-                </p>
+                <p className="text-gray-600">Zero fees, instant global transactions</p>
               </div>
-              <div className="rounded-lg bg-white p-6 shadow-sm">
+              <div className="rounded-lg bg-white p-6 shadow-sm border">
                 <div className="mb-4 text-4xl">🌍</div>
                 <h3 className="mb-2 text-xl font-bold">Global Marketplace</h3>
-                <p className="text-gray-600">
-                  Buy & sell from anywhere, 50+ languages
-                </p>
+                <p className="text-gray-600">Buy & sell from anywhere, 50+ languages</p>
               </div>
             </div>
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t py-8 text-center text-sm text-gray-500">
-        © 2026 Forsale. Built with AI. Powered by Pi Network.
+      <footer className="border-t py-8 text-center text-sm text-gray-400">
+        © 2026 Forsale. Verified Pi Network Merchant.
       </footer>
     </div>
   );
