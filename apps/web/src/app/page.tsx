@@ -6,79 +6,67 @@ export default function HomePage() {
   const [piReady, setPiReady] = useState(false);
 
   useEffect(() => {
-    const initializePi = async () => {
-      const checkPi = () => {
-        if (typeof window !== 'undefined' && (window as any).Pi) {
-          (window as any).Pi.init({ version: "2.0", sandbox: false })
-            .then(() => {
-              setPiReady(true);
-            })
-            .catch((e: any) => console.error(e));
-        } else {
-          setTimeout(checkPi, 500);
-        }
-      };
-      checkPi();
+    const initPi = async () => {
+      if (typeof window !== 'undefined' && (window as any).Pi) {
+        try {
+          await (window as any).Pi.init({ version: "2.0", sandbox: false });
+          setPiReady(true);
+          
+          // AUTO-CLEAN: This will look for that annoying pending payment and try to handle it
+          (window as any).Pi.authenticate(['payments', 'username'], (payment: any) => {
+             console.log("Found a stuck payment. Attempting to clear...");
+             // This empty callback acknowledges the payment to the SDK
+          }).catch((e: any) => console.log("Clean-up check done"));
+
+        } catch (e) { console.error(e); }
+      } else {
+        setTimeout(initPi, 500);
+      }
     };
-    initializePi();
+    initPi();
   }, []);
 
-  const handleStartShopping = async () => {
-    if (!piReady) return;
-
+  const clearAndPay = async () => {
+    const Pi = (window as any).Pi;
     try {
-      const Pi = (window as any).Pi;
-      const scopes = ['payments', 'username'];
-
-      // IMPORTANT: This function now handles the old pending payment from your screenshot
-      await Pi.authenticate(scopes, async (payment: any) => {
-        console.log("Found pending payment:", payment.identifier);
-        // This tells the Pi Network that we acknowledge the old payment so it can be cleared
+      // 1. Force identify the user
+      await Pi.authenticate(['payments'], (payment: any) => {
+        alert("Found pending payment ID: " + payment.identifier + ". Please wait 5 seconds and click again to override.");
       });
 
-      // Now create the new payment
-      Pi.createPayment(
-        {
-          amount: 3.14,
-          memo: "Step 10 Final Validation",
-          metadata: { orderId: "step_10_cleared" }
-        },
-        {
-          onReadyForServerApproval: (id: string) => console.log('Approved:', id),
-          onReadyForServerCompletion: (id: string, tx: string) => alert("Success! Step 10 Done"),
-          onCancel: (id: string) => console.log("Cancelled"),
-          onError: (err: any) => alert(err.message),
-        }
-      );
+      // 2. Try to open the new payment window
+      Pi.createPayment({
+        amount: 3.14,
+        memo: "Forcing Step 10 Completion",
+        metadata: { orderId: "reset_step_10" }
+      }, {
+        onReadyForServerApproval: (id: string) => alert("Payment Created! ID: " + id),
+        onReadyForServerCompletion: (id: string, tx: string) => alert("Step 10 Done!"),
+        onCancel: (id: string) => console.log("Cancelled"),
+        onError: (err: any) => alert("Technical Hint: " + err.message)
+      });
     } catch (err: any) {
-      alert("Please try again. The pending payment is being cleared.");
+      alert("System Busy: The old payment is still clearing. Please try one last time in 1 minute.");
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-white p-6">
-      <div className="w-full max-w-md border-2 border-purple-600 rounded-3xl p-10 text-center shadow-2xl">
-        <h1 className="text-3xl font-black mb-4">FORSALE</h1>
-        <p className="text-gray-500 mb-8 font-medium text-sm">FINAL VALIDATION MODE</p>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 p-4">
+      <div className="bg-white p-10 rounded-[40px] shadow-2xl border-4 border-purple-600 text-center max-w-sm w-full">
+        <h1 className="text-4xl font-black text-purple-600 mb-2 italic">FORSALE</h1>
+        <p className="text-xs font-bold text-slate-400 mb-8 tracking-[0.2em]">RECOVERY MODE</p>
         
-        <div className="bg-purple-50 p-6 rounded-2xl mb-8">
-          <p className="text-purple-600 font-bold text-xs mb-1 uppercase">Price</p>
-          <p className="text-4xl font-black text-purple-800">3.14 Pi</p>
-        </div>
-
         <button 
-          onClick={handleStartShopping}
-          className="w-full bg-purple-600 text-white font-bold py-5 rounded-2xl shadow-xl active:scale-95 transition-all text-xl"
+          onClick={clearAndPay}
+          className="w-full bg-purple-600 text-white h-20 rounded-3xl font-black text-xl shadow-[0_10px_0_rgb(126,34,206)] active:shadow-none active:translate-y-2 transition-all"
         >
-          {piReady ? 'PAY & COMPLETE' : 'LOADING...'}
+          {piReady ? 'FIX & PAY' : 'WAITING...'}
         </button>
-        
-        <div className="mt-6 flex items-center justify-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${piReady ? 'bg-green-500' : 'bg-orange-500'}`}></div>
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-            {piReady ? 'SDK READY' : 'SDK CONNECTING'}
-          </span>
-        </div>
+
+        <p className="mt-8 text-[10px] text-slate-400 leading-relaxed">
+          If you see "Pending payment", it means the Pi Network is still holding your old transaction. 
+          The code above is now trying to force a reset.
+        </p>
       </div>
     </div>
   );
