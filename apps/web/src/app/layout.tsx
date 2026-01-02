@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { headers } from 'next/headers';
 import { Toaster } from 'sonner';
-import Script from 'next/script'; // Import Next.js Script component
+import Script from 'next/script';
 
 // Internal components
 import { PiNetworkProvider } from '@/components/providers/pi-network-provider';
@@ -13,7 +13,6 @@ import { Footer } from '@/components/layout/Footer';
 // Styles
 import './globals.css';
 
-// Fonts configuration
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
@@ -26,25 +25,14 @@ const spaceGrotesk = Space_Grotesk({
   display: 'swap',
 });
 
-// Metadata setup
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://forsale.app';
-const APP_NAME = 'Forsale';
-const APP_DESCRIPTION = 'AI-Powered Global Marketplace on Pi Network';
-
 export const metadata: Metadata = {
-  metadataBase: new URL(APP_URL),
-  title: {
-    default: `${APP_NAME} - AI Marketplace`,
-    template: `%s | ${APP_NAME}`,
-  },
-  description: APP_DESCRIPTION,
-  manifest: '/manifest.json',
+  title: 'Forsale - AI Marketplace',
+  description: 'AI-Powered Global Marketplace on Pi Network',
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#ffffff',
 };
 
 export default async function RootLayout({
@@ -58,16 +46,11 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <head>
-        {/* Important: Load Pi Network SDK */}
+        {/* Load Pi SDK correctly to enable payment buttons */}
         <Script 
           src="https://sdk.minepi.com/pi-sdk.js" 
-          strategy="beforeInteractive" 
+          strategy="beforeInteractive"
         />
-        
-        <link rel="preconnect" href="https://sdk.minepi.com" />
-        <link rel="dns-prefetch" href="https://sdk.minepi.com" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
       
       <body className="min-h-screen bg-background font-sans antialiased">
