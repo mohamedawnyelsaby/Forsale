@@ -1,3 +1,6 @@
+// File: apps/web/src/app/layout.tsx
+// Root Layout - Main Application Wrapper
+
 import type { Metadata, Viewport } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { headers } from 'next/headers';
@@ -46,7 +49,10 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <head>
-        {/* Load Pi SDK with beforeInteractive strategy to fix button issues */}
+        {/* 
+          CRITICAL: Load Pi SDK BEFORE any React components render
+          This ensures Pi object is available when PiNetworkProvider initializes
+        */}
         <Script 
           src="https://sdk.minepi.com/pi-sdk.js" 
           strategy="beforeInteractive"
