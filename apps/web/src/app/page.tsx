@@ -1,95 +1,120 @@
 'use client';
 
+import { useEffect } from 'react';
+
 export default function HomePage() {
   
-  const handleStartShopping = () => {
-    // 1. الوصول المباشر لـ SDK بدون أي تعقيدات برمجية
+  // Force Init inside useEffect to clear any block
+  useEffect(() => {
+    const initPi = async () => {
+      if (typeof window !== 'undefined' && (window as any).Pi) {
+        try {
+          await (window as any).Pi.init({ version: "2.0", sandbox: false });
+          console.log("Pi Ready");
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    };
+    initPi();
+  }, []);
+
+  const handleStartShopping = async () => {
     if (typeof window !== 'undefined' && (window as any).Pi) {
-      const pi = (window as any).Pi;
-      
-      // 2. طلب الدفع فوراً (هذا ما تطلبه الخطوة 10)
-      pi.createPayment({
-        amount: 3.14,
-        memo: "Testing Payment Step 10",
-        metadata: { productId: "item_001" }
-      }, {
-        onReadyForServerApproval: (id: string) => {
-          console.log("Approved", id);
-          // 3. حفظ البيانات لمروان في الخلفية بعد التأكد من فتح النافذة
-          fetch('/api/products/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productName: "Test Product", price: 3.14 }),
-          });
-        },
-        onReadyForServerCompletion: (id: string, tx: string) => alert("Success! Step 10 Green"),
-        onCancel: (id: string) => console.log("Cancelled"),
-        onError: (err: any) => alert("Error: " + err.message),
-      });
-    } else {
-      alert("Please open in Pi Browser");
+      try {
+        // Direct Call without any extra logic
+        (window as any).Pi.createPayment({
+          amount: 3.14,
+          memo: "Step 10 Validation",
+          metadata: { orderId: "123" }
+        }, {
+          onReadyForServerApproval: (id: string) => console.log(id),
+          onReadyForServerCompletion: (id: string, tx: string) => alert("Done"),
+          onCancel: (id: string) => console.log("Cancel"),
+          onError: (err: any) => alert(err.message),
+        });
+      } catch (err) {
+        alert("Retry again");
+      }
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-white font-sans">
-      {/* Header - تصميمك الأصلي */}
-      <header className="border-b p-4 flex justify-between items-center bg-white">
-        <div className="text-2xl font-bold">Forsale</div>
-        <div className="flex gap-4 text-sm font-medium">
-          <span className="text-purple-600">Browse</span>
-          <span>Sell</span>
-          <span>Sign In</span>
+    <div className="flex min-h-screen flex-col">
+      {/* Header */}
+      <header className="border-b bg-white">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4">
+          <div className="text-2xl font-bold">Forsale</div>
+          <nav className="flex gap-4">
+            <a href="#" className="text-sm">Browse</a>
+            <a href="#" className="text-sm">Sell</a>
+            <a href="#" className="text-sm">Sign In</a>
+          </nav>
         </div>
       </header>
 
-      {/* Hero Section - تصميمك الأصلي */}
-      <main className="flex-1 container mx-auto px-4 py-20 text-center">
-        <h1 className="mb-6 text-6xl font-black tracking-tighter">
-          Buy & Sell Globally with <span className="text-purple-600">AI</span>
-        </h1>
-        <p className="mb-10 text-xl text-gray-500 max-w-2xl mx-auto">
-          The world's first AI-native marketplace powered by Pi Network.
-          Zero fees, instant payments, intelligent assistance.
-        </p>
-        
-        <div className="flex justify-center gap-4">
-          <button 
-            onClick={handleStartShopping}
-            className="rounded-xl bg-purple-600 px-12 py-4 text-white font-bold text-lg shadow-xl active:scale-90 transition-all"
-          >
-            Start Shopping
-          </button>
-          <button className="rounded-xl border-2 border-purple-600 px-12 py-4 text-purple-600 font-bold text-lg">
-            Start Selling
-          </button>
-        </div>
-
-        {/* Why Forsale - تصميمك الأصلي */}
-        <div className="mt-32">
-            <h2 className="text-4xl font-bold mb-16">Why Forsale?</h2>
-            <div className="grid gap-8 md:grid-cols-3 text-left">
-                <div className="p-8 border rounded-3xl">
-                    <div className="text-4xl mb-4">🤖</div>
-                    <h3 className="text-xl font-bold mb-2">Logy AI Assistant</h3>
-                    <p className="text-gray-500">AI handles everything from search to customer service.</p>
-                </div>
-                <div className="p-8 border rounded-3xl">
-                    <div className="text-4xl mb-4">💎</div>
-                    <h3 className="text-xl font-bold mb-2">Pi Payments</h3>
-                    <p className="text-gray-500">Zero fees, instant global transactions on the blockchain.</p>
-                </div>
-                <div className="p-8 border rounded-3xl">
-                    <div className="text-4xl mb-4">🌍</div>
-                    <h3 className="text-xl font-bold mb-2">Global Access</h3>
-                    <p className="text-gray-500">Buy & sell from anywhere in the world with ease.</p>
-                </div>
+      {/* Hero Section */}
+      <main className="flex-1">
+        <section className="container mx-auto px-4 py-20">
+          <div className="mx-auto max-w-3xl text-center">
+            <h1 className="mb-6 text-5xl font-bold">
+              Buy & Sell Globally with{' '}
+              <span className="text-purple-600">AI</span>
+            </h1>
+            <p className="mb-8 text-xl text-gray-600">
+              The world's first AI-native marketplace powered by Pi Network.
+              Zero fees, instant payments, intelligent assistance.
+            </p>
+            <div className="flex justify-center gap-4">
+              <button 
+                onClick={handleStartShopping}
+                className="rounded-lg bg-purple-600 px-8 py-3 text-white hover:bg-purple-700"
+              >
+                Start Shopping
+              </button>
+              <button className="rounded-lg border border-purple-600 px-8 py-3 text-purple-600 hover:bg-purple-50">
+                Start Selling
+              </button>
             </div>
-        </div>
+          </div>
+        </section>
+
+        {/* Features */}
+        <section className="bg-gray-50 py-20">
+          <div className="container mx-auto px-4">
+            <h2 className="mb-12 text-center text-3xl font-bold">
+              Why Forsale?
+            </h2>
+            <div className="grid gap-8 md:grid-cols-3">
+              <div className="rounded-lg bg-white p-6 shadow-sm">
+                <div className="mb-4 text-4xl">🤖</div>
+                <h3 className="mb-2 text-xl font-bold">Logy AI Assistant</h3>
+                <p className="text-gray-600">
+                  AI handles everything from search to customer service
+                </p>
+              </div>
+              <div className="rounded-lg bg-white p-6 shadow-sm">
+                <div className="mb-4 text-4xl">💎</div>
+                <h3 className="mb-2 text-xl font-bold">Pi Network Payments</h3>
+                <p className="text-gray-600">
+                  Zero fees, instant global transactions
+                </p>
+              </div>
+              <div className="rounded-lg bg-white p-6 shadow-sm">
+                <div className="mb-4 text-4xl">🌍</div>
+                <h3 className="mb-2 text-xl font-bold">Global Marketplace</h3>
+                <p className="text-gray-600">
+                  Buy & sell from anywhere, 50+ languages
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
-      <footer className="py-10 text-center text-gray-400 text-xs border-t">
-        © 2026 Forsale - Verified Pi Network Merchant
+      {/* Footer */}
+      <footer className="border-t py-8 text-center text-sm text-gray-600">
+        © 2026 Forsale. Built with AI. Powered by Pi Network.
       </footer>
     </div>
   );
