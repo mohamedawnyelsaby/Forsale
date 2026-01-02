@@ -1,103 +1,124 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 export default function HomePage() {
-  // Use a simple state to check if we are in Pi Browser
-  const [isReady, setIsReady] = useState(false);
-
+  
   useEffect(() => {
-    // Force initialize even if it takes a moment
-    const timer = setTimeout(() => {
-      if (typeof window !== 'undefined' && (window as any).Pi) {
-        (window as any).Pi.init({ version: "2.0", sandbox: false });
-        setIsReady(true);
-      }
-    }, 500);
-    return () => clearTimeout(timer);
+    // This initializes the SDK to remove the red error and enable Step 10
+    if (typeof window !== 'undefined' && (window as any).Pi) {
+      (window as any).Pi.init({ version: "2.0", sandbox: false });
+    }
   }, []);
 
-  const handleMarwanAction = async (name: string, price: number) => {
-    // This function will run NO MATTER WHAT when you click
-    console.log("Button Clicked for:", name);
-
+  const handleStartShopping = async () => {
+    // Marwan's Goal: Save to DB and Open Pi Payment
     try {
-      // 1. Immediate Save to DB (Marwan's Task)
+      // 1. Save data to database
       await fetch('/api/products/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productName: name, price: price }),
+        body: JSON.stringify({ productName: "Test Product", price: 3.14 }),
       });
 
-      // 2. Trigger Pi Payment Window
+      // 2. Open Pi Payment window
       if ((window as any).Pi) {
         const paymentData = {
-          amount: price,
-          memo: `Order: ${name}`,
-          metadata: { productName: name }
+          amount: 3.14,
+          memo: "Testing Step 10",
+          metadata: { productName: "Test Product" }
         };
 
         const callbacks = {
-          onReadyForServerApproval: (id: string) => console.log("Approved:", id),
-          onReadyForServerCompletion: (id: string, tx: string) => console.log("Done:", tx),
+          onReadyForServerApproval: (id: string) => console.log(id),
+          onReadyForServerCompletion: (id: string, tx: string) => console.log(tx),
           onCancel: (id: string) => console.log("Cancelled"),
-          onError: (err: any) => alert("Payment Error: " + err.message),
+          onError: (err: any) => console.error(err),
         };
 
         await (window as any).Pi.createPayment(paymentData, callbacks);
-      } else {
-        alert("Pi SDK not found in window");
       }
     } catch (error) {
-      console.error("Task failed:", error);
+      console.error("Payment failed", error);
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col">
       {/* Header */}
-      <header className="border-b p-4 flex justify-between items-center">
-        <div className="text-2xl font-bold text-purple-600">Forsale</div>
-        <div className="text-[10px] bg-green-50 text-green-600 px-2 py-1 rounded border border-green-200">
-          SYSTEM ACTIVE
+      <header className="border-b bg-white">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4">
+          <div className="text-2xl font-bold">Forsale</div>
+          <nav className="flex gap-4">
+            <a href="#" className="text-sm">Browse</a>
+            <a href="#" className="text-sm">Sell</a>
+            <a href="#" className="text-sm">Sign In</a>
+          </nav>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <main className="flex-1 container mx-auto px-4 py-10">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 text-gray-900">Personal Store</h1>
-          <p className="text-gray-500">Click any product to save to DB and pay</p>
-        </div>
-
-        {/* Action Buttons (The Products) */}
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="border-2 border-purple-100 p-8 rounded-2xl text-center shadow-sm">
-            <h2 className="text-2xl font-bold mb-2">Product 01</h2>
-            <p className="text-3xl font-black text-purple-600 mb-6">3.14 Pi</p>
-            <button 
-              onClick={() => handleMarwanAction("Product 01", 3.14)}
-              className="w-full bg-purple-600 text-white py-4 rounded-xl font-bold text-lg active:scale-95 transition-all shadow-lg"
-            >
-              BUY & SAVE NOW
-            </button>
+      {/* Hero Section - YOUR ORIGINAL DESIGN */}
+      <main className="flex-1">
+        <section className="container mx-auto px-4 py-20">
+          <div className="mx-auto max-w-3xl text-center">
+            <h1 className="mb-6 text-5xl font-bold">
+              Buy & Sell Globally with{' '}
+              <span className="text-purple-600">AI</span>
+            </h1>
+            <p className="mb-8 text-xl text-gray-600">
+              The world's first AI-native marketplace powered by Pi Network.
+              Zero fees, instant payments, intelligent assistance.
+            </p>
+            <div className="flex justify-center gap-4">
+              <button 
+                onClick={handleStartShopping}
+                className="rounded-lg bg-purple-600 px-8 py-3 text-white hover:bg-purple-700 font-bold"
+              >
+                Start Shopping
+              </button>
+              <button className="rounded-lg border border-purple-600 px-8 py-3 text-purple-600 hover:bg-purple-50">
+                Start Selling
+              </button>
+            </div>
           </div>
+        </section>
 
-          <div className="border-2 border-purple-100 p-8 rounded-2xl text-center shadow-sm">
-            <h2 className="text-2xl font-bold mb-2">Product 02</h2>
-            <p className="text-3xl font-black text-purple-600 mb-6">10.00 Pi</p>
-            <button 
-              onClick={() => handleMarwanAction("Product 02", 10.00)}
-              className="w-full bg-purple-600 text-white py-4 rounded-xl font-bold text-lg active:scale-95 transition-all shadow-lg"
-            >
-              BUY & SAVE NOW
-            </button>
+        {/* Features - YOUR ORIGINAL DESIGN */}
+        <section className="bg-gray-50 py-20">
+          <div className="container mx-auto px-4">
+            <h2 className="mb-12 text-center text-3xl font-bold">
+              Why Forsale?
+            </h2>
+            <div className="grid gap-8 md:grid-cols-3">
+              <div className="rounded-lg bg-white p-6 shadow-sm">
+                <div className="mb-4 text-4xl">🤖</div>
+                <h3 className="mb-2 text-xl font-bold">Logy AI Assistant</h3>
+                <p className="text-gray-600">
+                  AI handles everything from search to customer service
+                </p>
+              </div>
+              <div className="rounded-lg bg-white p-6 shadow-sm">
+                <div className="mb-4 text-4xl">💎</div>
+                <h3 className="mb-2 text-xl font-bold">Pi Network Payments</h3>
+                <p className="text-gray-600">
+                  Zero fees, instant global transactions
+                </p>
+              </div>
+              <div className="rounded-lg bg-white p-6 shadow-sm">
+                <div className="mb-4 text-4xl">🌍</div>
+                <h3 className="mb-2 text-xl font-bold">Global Marketplace</h3>
+                <p className="text-gray-600">
+                  Buy & sell from anywhere, 50+ languages
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
       </main>
 
-      <footer className="p-8 text-center text-gray-400 text-xs border-t">
-        © 2026 Forsale - Verified Pi Application
+      {/* Footer */}
+      <footer className="border-t py-8 text-center text-sm text-gray-600">
+        © 2026 Forsale. Built with AI. Powered by Pi Network.
       </footer>
     </div>
   );
