@@ -1,112 +1,126 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 export default function HomePage() {
-  
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [statusMessage, setStatusMessage] = useState('');
+  const [user, setUser] = useState<any>(null);
+
+  // 1. Initialize Pi SDK
   useEffect(() => {
-    // Basic init on load, but we will force it again on click
     if (typeof window !== 'undefined' && (window as any).Pi) {
       try {
         (window as any).Pi.init({ version: "2.0", sandbox: false });
+        console.log("✅ Pi SDK Ready");
       } catch (e) {
-        console.log("Pi Init wait...");
+        console.log("⏳ Initializing...");
       }
     }
   }, []);
 
+  // 2. Handle Incomplete Payments (Cleaning legacy pending)
+  const handleIncompletePayment = useCallback(async (payment: any) => {
+    console.log("⚠️ Found incomplete payment:", payment.identifier);
+    setStatusMessage(`⚠️ Cleaning pending transaction...`);
+
+    try {
+      const response = await fetch('/api/payments/incomplete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paymentId: payment.identifier,
+          reason: 'Auto-cancel legacy pending'
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setStatusMessage('✅ Account cleared successfully!');
+        setTimeout(() => setStatusMessage(''), 3000);
+      }
+    } catch (error) {
+      console.error("❌ Cleaning failed:", error);
+      setStatusMessage('⚠️ Auto-clean failed. Try manual cancel.');
+    }
+  }, []);
+
+  // 3. Payment Logic & Backend Integration
   const handleStartShopping = async () => {
+    if (isProcessing) return;
     if (typeof window !== 'undefined' && (window as any).Pi) {
       const pi = (window as any).Pi;
-      
+      setIsProcessing(true);
+      setStatusMessage('🔐 Authenticating...');
+
       try {
-        // Force Re-init to wake up the SDK
-        await pi.init({ version: "2.0", sandbox: false });
+        const authResult = await pi.authenticate(['payments', 'username'], handleIncompletePayment);
+        setUser(authResult.user);
+        setStatusMessage(`💰 Creating payment for 3.14 Pi...`);
 
-        const paymentData = {
+        await pi.createPayment({
           amount: 3.14,
-          memo: "Step 10 Verification",
-          metadata: { orderId: "step_10_final" }
-        };
-
-        const callbacks = {
-          onReadyForServerApproval: (id: string) => {
-            console.log("Payment Approved:", id);
-            // Marwan's DB Save
-            fetch('/api/products/save', {
+          memo: "Forsale Step 10 Verification",
+          metadata: { orderId: "order_01", userId: authResult.user.uid }
+        }, {
+          onReadyForServerApproval: async (paymentId: string) => {
+            const res = await fetch('/api/payments/approve', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ productName: "Product 01", price: 3.14 }),
+              body: JSON.stringify({ 
+                paymentId, 
+                userId: authResult.user.uid, 
+                amount: 3.14, 
+                productName: "Product 01" 
+              })
             });
+            const data = await res.json();
+            if (data.success) setStatusMessage('✅ Approved! Please sign in your wallet');
           },
-          onReadyForServerCompletion: (id: string, tx: string) => {
-            alert("Payment Success! Step 10 is complete.");
+          onReadyForServerCompletion: async (paymentId: string, txid: string) => {
+            const res = await fetch('/api/payments/complete', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ paymentId, txid })
+            });
+            const data = await res.json();
+            if (data.success) {
+              setStatusMessage('🎉 Success! Product saved to database');
+              setIsProcessing(false);
+            }
           },
-          onCancel: (id: string) => console.log("Cancelled"),
-          onError: (err: any) => alert("Pi Error: " + err.message),
-        };
-
-        pi.createPayment(paymentData, callbacks);
+          onCancel: () => { setStatusMessage('❌ Payment Cancelled'); setIsProcessing(false); },
+          onError: (error: any) => { setStatusMessage(`❌ Error: ${error.message}`); setIsProcessing(false); }
+        });
       } catch (err) {
-        alert("Action failed. Please try one more time.");
+        setIsProcessing(false);
       }
-    } else {
-      alert("Please open this app inside the Pi Browser.");
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      <header className="border-b p-4 flex justify-between items-center">
-        <div className="text-2xl font-bold text-black">Forsale</div>
-        <div className="flex gap-4 text-sm font-medium text-gray-600">
-          <span>Browse</span>
-          <span>Sell</span>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-white p-4 text-black">
+      <h1 className="text-4xl font-black text-purple-600 mb-4 tracking-tighter">FORSALE</h1>
+      <p className="text-gray-500 mb-8 font-bold text-center uppercase text-xs tracking-widest">
+        AI-Native Marketplace | Step 10 Active
+      </p>
+      
+      {statusMessage && (
+        <div className="mb-6 p-4 rounded-xl bg-purple-50 border border-purple-200 text-purple-700 font-bold animate-pulse text-sm">
+          {statusMessage}
         </div>
-      </header>
+      )}
 
-      <main className="flex-1 container mx-auto px-4 py-20 text-center">
-        <h1 className="mb-6 text-5xl font-extrabold text-black">
-          Buy & Sell Globally with <span className="text-purple-600">AI</span>
-        </h1>
-        <p className="mb-10 text-xl text-gray-500 max-w-2xl mx-auto">
-          The world's first AI-native marketplace powered by Pi Network.
-          Zero fees, instant payments, intelligent assistance.
-        </p>
-        
-        <div className="flex justify-center gap-4">
-          <button 
-            onClick={handleStartShopping}
-            className="rounded-xl bg-purple-600 px-10 py-4 text-white font-bold shadow-lg hover:bg-purple-700 active:scale-95 transition-all"
-          >
-            Start Shopping
-          </button>
-          <button className="rounded-xl border-2 border-purple-600 px-10 py-4 text-purple-600 font-bold">
-            Start Selling
-          </button>
-        </div>
+      <button 
+        onClick={handleStartShopping}
+        disabled={isProcessing}
+        className="px-12 py-5 bg-purple-600 text-white rounded-2xl font-black text-xl shadow-2xl hover:bg-purple-700 active:scale-95 disabled:opacity-50 transition-all uppercase"
+      >
+        {isProcessing ? 'Processing...' : 'Start Shopping'}
+      </button>
 
-        <div className="mt-24 grid gap-8 md:grid-cols-3 text-left">
-          <div className="p-8 border rounded-2xl shadow-sm">
-            <div className="text-4xl mb-4">🤖</div>
-            <h3 className="text-xl font-bold mb-2 text-black">Logy AI Assistant</h3>
-            <p className="text-gray-500 text-sm">AI handles everything from search to customer service.</p>
-          </div>
-          <div className="p-8 border rounded-2xl shadow-sm">
-            <div className="text-4xl mb-4">💎</div>
-            <h3 className="text-xl font-bold mb-2 text-black">Pi Payments</h3>
-            <p className="text-gray-500 text-sm">Zero fees, instant global transactions on the blockchain.</p>
-          </div>
-          <div className="p-8 border rounded-2xl shadow-sm">
-            <div className="text-4xl mb-4">🌍</div>
-            <h3 className="text-xl font-bold mb-2 text-black">Global Access</h3>
-            <p className="text-gray-500 text-sm">Buy & sell from anywhere in the world with ease.</p>
-          </div>
-        </div>
-      </main>
-
-      <footer className="py-10 text-center text-gray-400 text-xs border-t">
-        © 2026 Forsale - Verified Pi Network Merchant
+      <footer className="mt-20 text-gray-400 text-[10px] font-bold uppercase tracking-widest">
+        Verified Pi Merchant v2.0
       </footer>
     </div>
   );
