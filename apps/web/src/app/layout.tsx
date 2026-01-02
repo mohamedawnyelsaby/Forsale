@@ -46,7 +46,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <head>
-        {/* Load Pi SDK correctly to enable payment buttons */}
+        {/* Load Pi SDK with beforeInteractive strategy to fix button issues */}
         <Script 
           src="https://sdk.minepi.com/pi-sdk.js" 
           strategy="beforeInteractive"
