@@ -4,19 +4,24 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build --webpack",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@forsale/database": "workspace:*",
     "@forsale/types": "workspace:*",
     "@forsale/utils": "workspace:*",
+    "@prisma/client": "^6.1.0",
     "next": "16.1.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "sonner": "^1.7.1"
+    "sonner": "^1.7.1",
+    "lucide-react": "^0.468.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
@@ -25,6 +30,7 @@
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^4.0.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "prisma": "^6.1.0"
   }
 }
