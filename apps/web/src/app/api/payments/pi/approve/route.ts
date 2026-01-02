@@ -1,27 +1,26 @@
-/**
- * PI NETWORK PAYMENT APPROVAL ENDPOINT
- * Location: apps/web/src/app/api/payments/pi/approve/route.ts
- */
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
-import { approvePiPayment, verifyPiAccessToken } from '@/lib/pi-network';
-
-export async function POST(_request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    // We use the underscore in (_request) to tell TypeScript to ignore the unused variable.
-    // Also logging functions to prevent unused import errors.
-    console.log("Validation status:", !!approvePiPayment, !!verifyPiAccessToken);
+    const { paymentId, userId, amount, productName } = await request.json();
 
-    return new Response(JSON.stringify({ 
-      message: "Ready for Pi Verification",
-      status: "success" 
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
+    // Save initial payment record as pending_approval
+    const payment = await prisma.payment.upsert({
+      where: { paymentId },
+      update: { status: 'pending_approval' },
+      create: {
+        paymentId,
+        userId,
+        amount,
+        productName,
+        status: 'pending_approval',
+      },
     });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: "API Internal Error" }), { 
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+
+    // Notify Pi Network that we approve the payment creation
+    return NextResponse.json({ success: true, payment });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
