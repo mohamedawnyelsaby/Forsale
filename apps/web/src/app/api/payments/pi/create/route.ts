@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
     const authHeader = req.headers.get('authorization');
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      logger.error('Missing authorization header');
+      logger.error('Missing authorization header', undefined);
       return NextResponse.json(
         { error: 'Unauthorized - Missing access token' },
         { status: 401 }
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     const user = await verifyPiAccessToken(accessToken);
 
     if (!user) {
-      logger.error('Invalid access token');
+      logger.error('Invalid access token', undefined);
       return NextResponse.json(
         { error: 'Unauthorized - Invalid access token' },
         { status: 401 }
@@ -173,7 +173,7 @@ export async function POST(req: NextRequest) {
 
     // Check if order already has a payment
     if (order.piTransactionId) {
-      logger.warn('Order already has payment', { 
+      logger.info('Order already has payment', { 
         orderId, 
         existingPaymentId: order.piTransactionId 
       });

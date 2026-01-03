@@ -33,7 +33,7 @@ export default function CheckoutPage() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [orderId, setOrderId] = useState<string | null>(null);
+  const [_orderId, setOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     // Redirect if cart is empty
@@ -85,7 +85,7 @@ export default function CheckoutPage() {
           'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
-          items: items.map((item) => ({
+          items: items.map((item: any) => ({
             productId: item.productId,
             quantity: item.quantity,
           })),
@@ -194,7 +194,7 @@ export default function CheckoutPage() {
                     label="Full Name"
                     placeholder="John Doe"
                     value={shipping.fullName}
-                    onChange={(e) => handleInputChange('fullName', e.target.value)}
+                    onChange={(e: any) => handleInputChange('fullName', e.target.value)}
                     required
                   />
                   
@@ -203,7 +203,7 @@ export default function CheckoutPage() {
                     type="tel"
                     placeholder="+1234567890"
                     value={shipping.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
+                    onChange={(e: any) => handleInputChange('phone', e.target.value)}
                     required
                   />
 
@@ -211,7 +211,7 @@ export default function CheckoutPage() {
                     label="Address"
                     placeholder="123 Main Street, Apt 4B"
                     value={shipping.addressLine1}
-                    onChange={(e) => handleInputChange('addressLine1', e.target.value)}
+                    onChange={(e: any) => handleInputChange('addressLine1', e.target.value)}
                     required
                   />
 
@@ -220,7 +220,7 @@ export default function CheckoutPage() {
                       label="City"
                       placeholder="New York"
                       value={shipping.city}
-                      onChange={(e) => handleInputChange('city', e.target.value)}
+                      onChange={(e: any) => handleInputChange('city', e.target.value)}
                       required
                     />
                     
@@ -228,7 +228,7 @@ export default function CheckoutPage() {
                       label="Postal Code"
                       placeholder="10001"
                       value={shipping.postalCode}
-                      onChange={(e) => handleInputChange('postalCode', e.target.value)}
+                      onChange={(e: any) => handleInputChange('postalCode', e.target.value)}
                       required
                     />
                   </div>
@@ -237,7 +237,7 @@ export default function CheckoutPage() {
                     label="Country"
                     placeholder="United States"
                     value={shipping.country}
-                    onChange={(e) => handleInputChange('country', e.target.value)}
+                    onChange={(e: any) => handleInputChange('country', e.target.value)}
                     required
                   />
                 </div>
@@ -254,7 +254,7 @@ export default function CheckoutPage() {
               <CardBody>
                 {/* Items */}
                 <div className="space-y-3 mb-6">
-                  {items.map((item) => (
+                  {items.map((item: any) => (
                     <div key={item.productId} className="flex justify-between text-sm">
                       <span className="text-gray-600">
                         {item.title} × {item.quantity}

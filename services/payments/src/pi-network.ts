@@ -25,7 +25,7 @@ class PiNetworkConfigManager {
   }
 
   private determineNetworkMode(): PiNetworkMode {
-    const envMode = process.env.PI_NETWORK_MODE?.toLowerCase();
+    const envMode = process.env['PI_NETWORK_MODE']?.toLowerCase();
     if (envMode === 'mainnet' || envMode === 'testnet') {
       return envMode as PiNetworkMode;
     }

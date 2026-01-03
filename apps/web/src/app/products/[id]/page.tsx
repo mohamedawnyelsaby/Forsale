@@ -44,12 +44,12 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     fetchProduct();
-  }, [params.id]);
+  }, [params['id']]);
 
   const fetchProduct = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/products/${params.id}`);
+      const res = await fetch(`/api/products/${params['id']}`);
       const data = await res.json();
 
       if (data.success) {

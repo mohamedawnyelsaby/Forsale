@@ -1,83 +1,55 @@
-// FORSALE HOMEPAGE - COMPLETE
-// Copy to: apps/web/src/app/page.tsx
+'use client';
+import React, { useEffect, useState } from 'react';
 
 export default function HomePage() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    // جلب المنتجات التي أضافها مروان وحفظها لوجي
+    fetch('/api/products')
+      .then(res => res.json())
+      .then(data => setProducts(data))
+      .catch(err => console.error("Error:", err));
+  }, []);
+
   return (
-    <div className="flex min-h-screen flex-col">
-      {/* Header */}
-      <header className="border-b">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <div className="text-2xl font-bold">Forsale</div>
-          <nav className="flex gap-4">
-            <a href="#" className="text-sm">Browse</a>
-            <a href="#" className="text-sm">Sell</a>
-            <a href="#" className="text-sm">Sign In</a>
-          </nav>
+    <div className="min-h-screen bg-white" dir="rtl">
+      <header className="p-6 border-b flex justify-between items-center">
+        <span className="font-black text-purple-900 text-2xl tracking-tighter">FORSALE</span>
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
+          <span className="text-[10px] font-bold text-gray-500">PI NETWORK LIVE</span>
         </div>
       </header>
-
-      {/* Hero */}
-      <main className="flex-1">
-        <section className="container mx-auto px-4 py-20">
-          <div className="mx-auto max-w-3xl text-center">
-            <h1 className="mb-6 text-5xl font-bold">
-              Buy & Sell Globally with{' '}
-              <span className="text-purple-600">AI</span>
-            </h1>
-            <p className="mb-8 text-xl text-gray-600">
-              The world's first AI-native marketplace powered by Pi Network.
-              Zero fees, instant payments, intelligent assistance.
-            </p>
-            <div className="flex justify-center gap-4">
-              <button className="rounded-lg bg-purple-600 px-8 py-3 text-white hover:bg-purple-700">
-                Start Shopping
-              </button>
-              <button className="rounded-lg border border-purple-600 px-8 py-3 text-purple-600 hover:bg-purple-50">
-                Start Selling
-              </button>
-            </div>
+      
+      <main className="p-6">
+        <h2 className="text-gray-400 font-bold uppercase text-[10px] tracking-[0.2em] mb-8 text-right">المعروضات الجديدة</h2>
+        
+        {products.length === 0 ? (
+          <div className="text-center py-20 text-gray-300 font-bold border-4 border-dashed rounded-[40px]">
+            لا توجد منتجات حالياً.. ابدأ بالإظافة من مركز مروان
           </div>
-        </section>
-
-        {/* Features */}
-        <section className="bg-gray-50 py-20">
-          <div className="container mx-auto px-4">
-            <h2 className="mb-12 text-center text-3xl font-bold">
-              Why Forsale?
-            </h2>
-            <div className="grid gap-8 md:grid-cols-3">
-              <div className="rounded-lg bg-white p-6">
-                <div className="mb-4 text-4xl">🤖</div>
-                <h3 className="mb-2 text-xl font-bold">Logy AI Assistant</h3>
-                <p className="text-gray-600">
-                  AI handles everything from search to customer service
-                </p>
+        ) : (
+          <div className="grid grid-cols-1 gap-8">
+            {products.map((p: any) => (
+              <div key={p.id} className="bg-white rounded-[45px] overflow-hidden shadow-xl border border-gray-50 p-2">
+                <div className="h-64 bg-slate-100 rounded-[35px] flex items-center justify-center text-slate-300 font-bold">
+                   صورة {p.title}
+                </div>
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-2xl font-black text-gray-900">{p.title}</h3>
+                    <span className="text-2xl font-black text-purple-600">π {p.price}</span>
+                  </div>
+                  <button className="w-full bg-purple-600 text-white py-5 rounded-[25px] font-black text-lg shadow-lg shadow-purple-200">
+                    شراء الآن
+                  </button>
+                </div>
               </div>
-              <div className="rounded-lg bg-white p-6">
-                <div className="mb-4 text-4xl">💎</div>
-                <h3 className="mb-2 text-xl font-bold">Pi Network Payments</h3>
-                <p className="text-gray-600">
-                  Zero fees, instant global transactions
-                </p>
-              </div>
-              <div className="rounded-lg bg-white p-6">
-                <div className="mb-4 text-4xl">🌍</div>
-                <h3 className="mb-2 text-xl font-bold">Global Marketplace</h3>
-                <p className="text-gray-600">
-                  Buy & sell from anywhere, 50+ languages
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
-        </section>
+        )}
       </main>
-
-      {/* Footer */}
-      <footer className="border-t py-8">
-        <div className="container mx-auto px-4 text-center text-sm text-gray-600">
-          © 2025 Forsale. Built with AI. Powered by Pi Network.
-        </div>
-      </footer>
     </div>
   );
 }

@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
 
     // Validate quantities
     for (const item of items) {
-      const product = products.find(p => p.id === item.productId);
+      const product = products.find((p: any) => p.id === item.productId);
       if (!product || product.quantity < item.quantity) {
         return NextResponse.json(
           { error: `Insufficient quantity for product: ${product?.title}` },
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check all items are from same seller
-    const sellerIds = [...new Set(products.map(p => p.sellerId))];
+    const sellerIds = [...new Set(products.map((p: any) => p.sellerId))];
     if (sellerIds.length > 1) {
       return NextResponse.json(
         { error: 'All items must be from the same seller' },
@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
     let totalCommission = 0;
 
     const orderItems = items.map((item: any) => {
-      const product = products.find(p => p.id === item.productId)!;
+      const product = products.find((p: any) => p.id === item.productId)!;
       const itemTotal = product.price * item.quantity;
       
       const commission = CommissionCalculator.calculate(
