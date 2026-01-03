@@ -1,6 +1,3 @@
-# RAILWAY DEPLOYMENT CONFIGURATION
-# File: railway.toml
-
 [build]
 builder = "nixpacks"
 installCommand = "pnpm install --frozen-lockfile"
@@ -8,7 +5,4 @@ buildCommand = "pnpm db:generate && pnpm --filter web build"
 
 [deploy]
 startCommand = "cd apps/web && pnpm start"
-healthcheckPath = "/api/health"
-healthcheckTimeout = 100
-restartPolicyType = "on-failure"
-restartPolicyMaxRetries = 10
+restartPolicyType = "ON_FAILURE"

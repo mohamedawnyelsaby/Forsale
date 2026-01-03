@@ -6,3 +6,5 @@ export class CommissionCalculator {
     return { grossPrice: amount, commission, netToSeller: amount - commission, effectiveRate: rate, baseRate: rate, volumeDiscount };
   }
 }
+
+export default CommissionCalculator;

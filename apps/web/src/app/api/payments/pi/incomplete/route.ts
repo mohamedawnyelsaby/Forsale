@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPiPayment, approvePiPayment, completePiPayment } from '@/lib/pi-network';
-import { prisma } from '@forsale/database';
+import { prisma } from '@/lib/prisma';
 
 const logger = {
   info: (msg: string, data?: any) => console.log(`[INCOMPLETE INFO] ${msg}`, data || ''),
@@ -40,6 +39,7 @@ export async function POST(req: NextRequest) {
           { status: 500 }
         );
       }
+    }).catch(() => console.log("Record not found in DB, skipping local update."));
 
       await prisma.payment.update({
         where: { piPaymentId: paymentId },
