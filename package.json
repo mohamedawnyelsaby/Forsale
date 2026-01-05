@@ -20,7 +20,7 @@
     "dev": "turbo run dev --parallel",
     "dev:web": "turbo run dev --filter=web",
     "dev:api": "turbo run dev --filter=api",
-    "build": "turbo run build",
+    "build": "npx turbo run build --continue",
     "build:web": "pnpm db:generate && turbo run build --filter=web",
     "test": "turbo run test",
     "lint": "turbo run lint",
