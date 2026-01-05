@@ -1,5 +1,18 @@
-export type PiNetworkMode = 'testnet' | 'mainnet';
-export interface PiUser { uid: string; username: string; }
-export interface ApiResponse<T> { success: boolean; data?: T; error?: string; }
-export type OrderStatus = 'PENDING' | 'PAID' | 'COMPLETED' | 'CANCELLED';
-export interface Product { id: string; title: string; price: number; }
+export interface PiNetworkConfig {
+  apiKey: string;
+  walletPrivateKey: string;
+}
+
+export interface PiPayment {
+  identifier: string;
+  amount: number;
+  memo: string;
+  metadata: Object;
+  to_address: string;
+}
+
+export interface User {
+  id: string;
+  username: string;
+  roles: string[];
+}
