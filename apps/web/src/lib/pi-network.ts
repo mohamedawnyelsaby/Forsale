@@ -1,25 +1,6 @@
-import type { PiPayment, PiUser } from '@forsale/types';
+import PiNetwork from "@pi-apps/pi-platform-sdk";
 
-export async function verifyPiAccessToken(token: string): Promise<PiUser | null> {
-  return { uid: 'test', username: 'test_user' };
-}
+const apiKey = process.env.PI_API_KEY || "";
+const walletPrivateKey = process.env.PI_WALLET_PRIVATE_KEY || "";
 
-export async function completePiPayment(paymentId: string, txid: string, accessToken?: string) {
-  return { success: true };
-}
-
-export async function approvePiPayment(paymentId: string) {
-  return { success: true };
-}
-
-export async function getPiPayment(paymentId: string): Promise<PiPayment | null> {
-  return null;
-}
-
-export async function verifyPiTransaction(txid: string): Promise<boolean> {
-  return true;
-}
-
-export function isValidPiAmount(amount: number): boolean {
-  return amount > 0;
-}
+export const pi = new PiNetwork(apiKey, walletPrivateKey);
