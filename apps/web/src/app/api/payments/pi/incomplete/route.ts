@@ -1,78 +1,27 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import { pi } from "@/lib/pi-network";
+import { prisma } from "@/lib/prisma";
 
-const logger = {
-  info: (msg: string, data?: any) => console.log(`[INCOMPLETE INFO] ${msg}`, data || ''),
-  error: (msg: string, error?: any) => console.error(`[INCOMPLETE ERROR] ${msg}`, error || ''),
-};
-
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const { paymentId } = await req.json();
+    const payment = await request.json();
+    const paymentId = payment.identifier;
 
-    if (!paymentId) {
-      return NextResponse.json(
-        { error: 'Missing paymentId' },
-        { status: 400 }
-      );
-    }
-
-    const payment = await getPiPayment(paymentId);
-
-    if (!payment) {
-      logger.error('Payment not found on Pi Network', { paymentId });
-      return NextResponse.json(
-        { error: 'Payment not found' },
-        { status: 404 }
-      );
-    }
-
-    const { status } = payment;
-
-    if (!status.developer_approved) {
-      const approved = await approvePiPayment(paymentId);
-      
-      if (!approved) {
-        logger.error('Failed to approve payment', { paymentId });
-        return NextResponse.json(
-          { error: 'Failed to approve payment' },
-          { status: 500 }
-        );
-      }
-    }).catch(() => console.log("Record not found in DB, skipping local update."));
-
+    // محاولة تحديث قاعدة البيانات إذا وجد السجل
+    try {
       await prisma.payment.update({
         where: { piPaymentId: paymentId },
-        data: { status: 'APPROVED' },
+        data: { status: "COMPLETED" },
       });
+    } catch (e) {
+      console.log("Record not found in DB, skipping local update.");
     }
 
-    if (status.transaction_verified && !status.developer_completed) {
-      const completed = await completePiPayment(paymentId, payment.transaction?.txid || '');
-      
-      if (!completed) {
-        logger.error('Failed to complete payment', { paymentId });
-        return NextResponse.json(
-          { error: 'Failed to complete payment' },
-          { status: 500 }
-        );
-      }
-
-      await prisma.payment.update({
-        where: { piPaymentId: paymentId },
-        data: {
-          status: 'COMPLETED',
-          completedAt: new Date(),
-        },
-      });
-    }
-
-    return NextResponse.json({ payment });
-  } catch (error) {
-    logger.error('Incomplete payment error', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    // إكمال العملية في Pi Network
+    await pi.completePayment(paymentId, payment.transaction.txid);
+    
+    return NextResponse.json({ status: "success" });
+  } catch (error: any) {
+    return NextResponse.json({ status: "error", message: error.message }, { status: 500 });
   }
 }
