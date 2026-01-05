@@ -1,15 +1,36 @@
 import { NextResponse } from "next/server";
 import { pi } from "@/lib/pi-network";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
-    const incompletePayment = await pi.getIncompletePayment();
-    if (incompletePayment) {
-      await pi.cancelPayment(incompletePayment.identifier);
-      return NextResponse.json({ status: "success", message: "Pending payment cancelled", id: incompletePayment.identifier });
+    // التأكد من أن المكتبة تم تحميلها
+    if (!pi) {
+      throw new Error("Pi SDK not initialized");
     }
-    return NextResponse.json({ status: "clean", message: "No pending payments found" });
+
+    const incompletePayment = await pi.getIncompletePayment();
+    
+    if (incompletePayment) {
+      // إكمال العملية أو إلغاؤها إذا كانت موجودة
+      await pi.completePayment(incompletePayment.identifier, "FORCE_CANCEL_BY_USER");
+      return NextResponse.json({ 
+        status: "success", 
+        message: "Incomplete payment found and cleared.",
+        id: incompletePayment.identifier 
+      });
+    }
+
+    return NextResponse.json({ 
+      status: "success", 
+      message: "No incomplete payments found. Your account is clear." 
+    });
   } catch (error: any) {
-    return NextResponse.json({ status: "error", message: error.message }, { status: 500 });
+    console.error("Force clear error:", error);
+    return NextResponse.json({ 
+      status: "error", 
+      message: error.message || "Failed to clear payments" 
+    }, { status: 500 });
   }
 }
