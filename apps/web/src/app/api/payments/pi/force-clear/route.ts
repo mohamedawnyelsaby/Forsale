@@ -1,15 +1,15 @@
-import { NextResponse } from 'next/server';
-import pi from '@/lib/pi-network'; 
+import { NextResponse } from "next/server";
+import { pi } from "@/lib/pi-network";
 
 export async function GET() {
   try {
-    const payment = await pi.getIncompletePayment();
-    if (payment) {
-      await pi.cancelPayment(payment.identifier);
-      return NextResponse.json({ success: true, message: "تم إلغاء العملية المعلقة بنجاح: " + payment.identifier });
+    const incompletePayment = await pi.getIncompletePayment();
+    if (incompletePayment) {
+      await pi.cancelPayment(incompletePayment.identifier);
+      return NextResponse.json({ status: "success", message: "Pending payment cancelled", id: incompletePayment.identifier });
     }
-    return NextResponse.json({ success: true, message: "لا توجد عمليات معلقة، حسابك نظيف." });
-  } catch (error) {
-    return NextResponse.json({ success: false, error: "فشل في إلغاء التعليق" }, { status: 500 });
+    return NextResponse.json({ status: "clean", message: "No pending payments found" });
+  } catch (error: any) {
+    return NextResponse.json({ status: "error", message: error.message }, { status: 500 });
   }
 }
