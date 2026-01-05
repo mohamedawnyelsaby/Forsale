@@ -7,11 +7,11 @@ export async function GET() {
   try {
     const incomplete = await pi.getIncompletePayment();
     if (incomplete) {
-      await pi.completePayment(incomplete.identifier, "CANCEL");
-      return NextResponse.json({ status: "success", msg: "cleared" });
+      await pi.completePayment(incomplete.identifier, "CANCEL_FORCE");
+      return NextResponse.json({ status: "success", message: "Cleared" });
     }
-    return NextResponse.json({ status: "success", msg: "already clear" });
-  } catch (e: any) {
-    return NextResponse.json({ status: "success", msg: "ready" });
+    return NextResponse.json({ status: "success", message: "No pending payment" });
+  } catch (error: any) {
+    return NextResponse.json({ status: "success", message: "Account is ready" });
   }
 }
