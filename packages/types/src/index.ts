@@ -1,8 +1,8 @@
-export type PiNetworkMode = 'sandbox' | 'production';
+export type PiNetworkMode = 'sandbox' | 'production' | 'mainnet' | 'testnet';
 
 export interface PiNetworkConfig {
   apiKey: string;
-  walletPrivateKey: string;
+  walletPrivateKey?: string;
   mode: PiNetworkMode;
   apiUrl: string;
 }
