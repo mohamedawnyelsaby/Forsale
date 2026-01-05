@@ -1,6 +1,10 @@
+export type PiNetworkMode = 'sandbox' | 'production';
+
 export interface PiNetworkConfig {
   apiKey: string;
   walletPrivateKey: string;
+  mode: PiNetworkMode;
+  apiUrl: string;
 }
 
 export interface PiPayment {
@@ -9,6 +13,12 @@ export interface PiPayment {
   memo: string;
   metadata: Object;
   to_address: string;
+  status?: string;
+}
+
+export interface PiUser {
+  uid: string;
+  username: string;
 }
 
 export interface User {
