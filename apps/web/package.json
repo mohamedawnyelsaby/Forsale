@@ -11,21 +11,22 @@
     "postinstall": "prisma generate --schema=../../packages/database/prisma/schema.prisma"
   },
   "dependencies": {
+    "@prisma/client": "^5.12.1",
+    "framer-motion": "^12.24.0",
+    "lucide-react": "^0.368.0",
     "next": "14.2.35",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "@prisma/client": "^5.12.1",
-    "lucide-react": "^0.368.0",
     "sonner": "^1.4.41"
   },
   "devDependencies": {
-    "typescript": "^5.4.5",
     "@types/node": "^20.12.7",
     "@types/react": "^18.2.75",
     "@types/react-dom": "^18.2.24",
-    "postcss": "^8.4.38",
-    "tailwindcss": "^3.4.3",
     "autoprefixer": "^10.4.19",
-    "prisma": "^5.12.1"
+    "postcss": "^8.4.38",
+    "prisma": "^5.12.1",
+    "tailwindcss": "^3.4.3",
+    "typescript": "^5.4.5"
   }
 }
