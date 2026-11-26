@@ -13,7 +13,7 @@
 --btn:linear-gradient(135deg,#F2750A,#E55B00);--btnink:#fff;--acc:linear-gradient(135deg,#FFE8D3,#FFD3AD);--accink:#B84700;
 --sec:#fff8f1;--sect:#1d1409;--tbg:#1d1409;--glass:#ffffffee;--sh:0 16px 36px #e55b0026;
 --hov:linear-gradient(180deg,#ffffff00 55%,#fff);--ftr:#fff4e8;--ftrc:#85532c;--ts:none;
---htx:#1d1409;--hsub:#5f3b1e;--gl:#ffffffd0;--glb:#f5e4d3;--em:linear-gradient(90deg,#E55B00,#FFB21A);--ey:#E55B00;
+--htx:#1d1409;--hsub:#5f3b1e;--gl:#ffffffd0;--glb:#f5e4d3;--em:linear-gradient(90deg,#D94F00,#F2750A);--ey:#E55B00;
 --fb:#f5e4d3;--fbg:#fff;--fp:#85532c;--glow:#ffd9b84d}
 [data-theme=dark]{--bg:#07171B;--surf:#0E2A30;--ink:#ecf9f7;--mut:#8fb9bb;--line:#16414a;--gold:#e8c987;--gold2:#e8c987;
 --btn:linear-gradient(135deg,#EFD296,#D9B466);--btnink:#06242a;--acc:linear-gradient(135deg,#ecd08e,#c1954a);--accink:#06242a;
@@ -120,6 +120,7 @@ footer{background:var(--ftr);color:var(--ftrc);padding:44px 0;font-size:14px}foo
 .stats{gap:22px;flex-wrap:nowrap;margin-top:28px}.stats b{font-size:26px}.stats span{font-size:12px}
 .pill{padding:8px 13px;font-size:13px}.logo{font-size:22px}.logo i{width:30px;height:30px}.nr{gap:6px}
 .sbar{border-radius:22px}.hero h1{font-size:40px}.head h2{font-size:30px}}
+input::placeholder{color:#a8693a;opacity:1}[data-theme=dark] input::placeholder{color:#8fb9bb}
 </style>
 </head>
 <body>
@@ -211,7 +212,7 @@ function scene(l,w=400,h=260,uid=''){
 function hero(){$('heroBg').setAttribute('viewBox','0 0 1400 700');
  if(theme==='dark'){$('heroBg').setAttribute('preserveAspectRatio','xMidYMid slice');$('heroBg').innerHTML=scene({id:9,pal:7,ty:'com'},1400,700,'h').replace(/<\/?svg[^>]*>/g,'');return}
  $('heroBg').setAttribute('preserveAspectRatio','xMaxYMin slice');
- $('heroBg').innerHTML=`<defs><linearGradient id="hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF1E2"/><stop offset="1" stop-color="#fff"/></linearGradient></defs><rect width="1400" height="700" fill="url(#hl)"/><circle cx="1180" cy="170" r="95" fill="#FFB02E" opacity=".9"/>`}
+ $('heroBg').innerHTML=`<defs><linearGradient id="hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF1E2"/><stop offset="1" stop-color="#fff"/></linearGradient></defs><rect width="1400" height="700" fill="url(#hl)"/>`}
 let theme;try{theme=localStorage.getItem('fs-theme2')}catch(e){}
 theme=theme||'light';
 function setTheme(t){theme=t;document.documentElement.dataset.theme=t;$('theme').textContent=t==='dark'?'☀️':'🌙';try{localStorage.setItem('fs-theme2',t)}catch(e){}hero()}
