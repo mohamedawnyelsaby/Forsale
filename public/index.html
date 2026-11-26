@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Forsale — عقارات العالم بعملة Pi</title>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<style>
+:root{--bg:#0b0d12;--card:#141824;--tx:#f4f1ea;--mut:#8b92a5;--gold:#d4af37;--line:#232a3b}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--tx);font-family:system-ui,"Segoe UI",Tahoma,sans-serif;padding-top:env(safe-area-inset-top)}
+header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#0b0d12ee;backdrop-filter:blur(10px);z-index:5}
+.logo{font-size:24px;font-weight:800;letter-spacing:1px}.logo b{color:var(--gold)}
+button{cursor:pointer;border:0;border-radius:12px;padding:10px 16px;font-weight:700;background:var(--gold);color:#111}
+button.ghost{background:transparent;color:var(--tx);border:1px solid var(--line)}
+.hero{padding:48px 20px 24px;text-align:center;background:radial-gradient(circle at 50% 0,#2a2210,transparent 60%)}
+.hero h1{font-size:clamp(28px,6vw,52px);line-height:1.2}.hero h1 span{color:var(--gold)}
+.hero p{color:var(--mut);margin:12px auto 24px;max-width:560px}
+.search{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:820px;margin:auto}
+input,select{background:var(--card);border:1px solid var(--line);color:var(--tx);border-radius:12px;padding:12px;font-size:15px;flex:1;min-width:130px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px;padding:24px 20px;max-width:1200px;margin:auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:.2s}
+.card:hover{transform:translateY(-4px);border-color:var(--gold)}
+.img{height:150px;display:flex;align-items:flex-end;padding:10px;font-size:40px}
+.body{padding:14px}.price{color:var(--gold);font-size:20px;font-weight:800}
+.meta{color:var(--mut);font-size:13px;margin:6px 0 12px}.tag{font-size:11px;background:#1d2336;padding:3px 8px;border-radius:20px;color:var(--gold)}
+.fab{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:20px;width:58px;height:58px;border-radius:50%;font-size:24px;box-shadow:0 8px 30px #d4af3755}
+dialog{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:20px;padding:20px;width:min(440px,92vw)}
+dialog::backdrop{background:#000a}
+#log{max-height:260px;overflow:auto;margin:12px 0;font-size:14px;line-height:1.7}
+.row{display:flex;gap:8px;margin-top:10px}.f{display:grid;gap:10px}
+#toast{position:fixed;bottom:90px;right:50%;transform:translateX(50%);background:var(--gold);color:#111;padding:10px 18px;border-radius:12px;display:none;font-weight:700}
+</style>
+</head>
+<body>
+<header><div class="logo">For<b>sale</b></div><div><button class="ghost" id="add">+ أضف عقار</button> <button id="login">دخول بـ Pi</button></div></header>
+<section class="hero">
+  <h1>اشترِ وبِع أي عقار في العالم <span>بعملة Pi</span></h1>
+  <p>عقارات موثّقة، فلاتر ذكية، ومساعد ذكاء اصطناعي يفهمك بلغتك.</p>
+  <div class="search">
+    <input id="q" placeholder="ابحث بالمدينة أو الدولة...">
+    <select id="t"><option value="">كل الأنواع</option><option>شقة</option><option>فيلا</option><option>تجاري</option><option>أرض</option></select>
+    <select id="p"><option value="0">أي سعر</option><option value="100000">حتى 100k π</option><option value="500000">حتى 500k π</option></select>
+  </div>
+</section>
+<main class="grid" id="grid"></main>
+<button class="fab" id="aiBtn" title="مساعد Forsale AI">✦</button>
+
+<dialog id="ai"><b>✦ Forsale AI</b><div id="log"></div>
+  <div class="row"><input id="aq" placeholder="مثال: عايز فيلا قريبة من البحر"><button id="send">إرسال</button></div>
+  <div class="row"><button class="ghost" onclick="ai.close()">إغلاق</button></div></dialog>
+
+<dialog id="addD"><b>إضافة عقار (رسوم الإدراج 1 π)</b>
+  <div class="f" style="margin-top:12px"><input id="nt" placeholder="العنوان"><input id="nc" placeholder="المدينة, الدولة">
+  <select id="nty"><option>شقة</option><option>فيلا</option><option>تجاري</option><option>أرض</option></select>
+  <input id="np" type="number" placeholder="السعر بـ π"><button id="pay">ادفع 1 π وانشر</button><button class="ghost" onclick="addD.close()">إلغاء</button></div></dialog>
+<div id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const L=[
+ {id:1,t:'برج مطل على النيل',c:'القاهرة, مصر',ty:'شقة',p:85000,e:'🏙️',g:'#3a2a10'},
+ {id:2,t:'فيلا على البحر',c:'دبي, الإمارات',ty:'فيلا',p:480000,e:'🏖️',g:'#10303a'},
+ {id:3,t:'شقة بلوفت عصرية',c:'برلين, ألمانيا',ty:'شقة',p:150000,e:'🏢',g:'#2a1a3a'},
+ {id:4,t:'مساحة تجارية بوسط المدينة',c:'لندن, بريطانيا',ty:'تجاري',p:900000,e:'🏬',g:'#1a3a22'},
+ {id:5,t:'أرض استثمارية',c:'إسطنبول, تركيا',ty:'أرض',p:60000,e:'🌄',g:'#3a1a1a'},
+ {id:6,t:'بنتهاوس بإطلالة بانورامية',c:'نيويورك, أمريكا',ty:'شقة',p:1200000,e:'🌆',g:'#1a2a3a'}];
+let user=null;
+const toast=m=>{const t=$('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2800)};
+function render(){
+ const q=$('q').value.trim(),t=$('t').value,p=+$('p').value;
+ $('grid').innerHTML=L.filter(x=>(!q||(x.t+x.c).includes(q))&&(!t||x.ty===t)&&(!p||x.p<=p)).map(x=>`
+ <div class="card"><div class="img" style="background:linear-gradient(135deg,${x.g},#0b0d12)">${x.e}</div>
+ <div class="body"><span class="tag">${x.ty}</span><h3 style="margin-top:8px;font-size:16px">${x.t}</h3>
+ <div class="meta">📍 ${x.c}</div><div class="price">${x.p.toLocaleString()} π</div>
+ <div class="row"><button onclick="buy(${x.id})">اشترِ بـ Pi</button></div></div></div>`).join('')||'<p style="color:var(--mut)">لا نتائج</p>';
+}
+['q','t','p'].forEach(i=>$(i).addEventListener('input',render));
+
+// ---- Pi Network ----
+try{Pi.init({version:'2.0',sandbox:true})}catch(e){} // غيّر sandbox إلى false عند الإطلاق
+const onIncomplete=p=>fetch('/api/pi/complete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({paymentId:p.identifier,txid:p.transaction&&p.transaction.txid})});
+$('login').onclick=async()=>{
+ try{const a=await Pi.authenticate(['username','payments'],onIncomplete);user=a.user;$('login').textContent='@'+user.username;toast('أهلاً @'+user.username)}
+ catch(e){toast('افتح التطبيق من Pi Browser')}};
+async function pay(amount,memo,meta,done){
+ if(!user)return toast('سجّل الدخول بـ Pi أولاً');
+ Pi.createPayment({amount,memo,metadata:meta},{
+  onReadyForServerApproval:id=>fetch('/api/pi/approve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({paymentId:id})}),
+  onReadyForServerCompletion:(id,txid)=>fetch('/api/pi/complete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({paymentId:id,txid})}).then(()=>{toast('تمت العملية ✔');done&&done()}),
+  onCancel:()=>toast('أُلغيت العملية'),onError:e=>toast('خطأ: '+e.message)});
+}
+window.buy=id=>{const x=L.find(v=>v.id===id);pay(x.p,'شراء: '+x.t,{listingId:id})};
+$('add').onclick=()=>addD.showModal();
+$('pay').onclick=()=>{const n={id:Date.now(),t:$('nt').value||'عقار جديد',c:$('nc').value||'—',ty:$('nty').value,p:+$('np').value||1,e:'🏡',g:'#2a2a2a'};
+ pay(1,'رسوم إدراج عقار',{type:'listing'},()=>{L.unshift(n);render();addD.close()})};
+
+// ---- AI ----
+$('aiBtn').onclick=()=>ai.showModal();
+$('send').onclick=async()=>{const q=$('aq').value.trim();if(!q)return;
+ $('log').innerHTML+=`<p><b>أنت:</b> ${q.replace(/</g,'&lt;')}</p>`;$('aq').value='';
+ try{const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q,listings:L})});
+ const d=await r.json();$('log').innerHTML+=`<p style="color:var(--gold)">✦ ${d.text.replace(/</g,'&lt;')}</p>`}
+ catch(e){$('log').innerHTML+='<p>تعذر الاتصال</p>'}$('log').scrollTop=1e9};
+render();
+</script>
+</body></html>
