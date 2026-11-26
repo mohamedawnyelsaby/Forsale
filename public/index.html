@@ -8,14 +8,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 <style>
-:root{--bg:#fffcf7;--surf:#fff;--ink:#0f3d4a;--mut:#5c8088;--line:#dcf2ef;--gold:#f26a0f;--gold2:#ffb21a;--pi:#f26a0f;--r:22px;
---btn:linear-gradient(135deg,#ff9d2e,#f26a0f);--btnink:#fff;--acc:linear-gradient(135deg,#b8f0ea,#5fdcd0);--accink:#0a5a58;
+:root{--bg:#fffcf7;--surf:#fff;--ink:#0f3d4a;--mut:#5c8088;--line:#dcf2ef;--gold:#E55B00;--gold2:#FFB21A;--pi:#E55B00;--r:22px;
+--btn:linear-gradient(135deg,#F2750A,#E55B00);--btnink:#fff;--acc:linear-gradient(135deg,#b8f0ea,#5fdcd0);--accink:#0a5a58;
 --sec:linear-gradient(135deg,#d6f6f1,#fff3e0 55%,#ffe3c2);--sect:#0f3d4a;--tbg:#0f3d4a;--glass:#ffffffee;--sh:0 22px 48px #f5a05a33;
 --hov:linear-gradient(180deg,#fffcf700 55%,#fffcf7);--ftr:#dff6f3;--ftrc:#45767a;--ts:none;
---htx:#0f3d4a;--hsub:#3f6a70;--gl:#ffffffc8;--glb:#fff;--em:linear-gradient(90deg,#ff7a1a,#ffb21a);--ey:#f26a0f;
+--htx:#0f3d4a;--hsub:#3f6a70;--gl:#ffffffc8;--glb:#fff;--em:linear-gradient(90deg,#E55B00,#FFB21A);--ey:#E55B00;
 --fb:#fff;--fbg:#ffffffd9;--fp:#45767a;--glow:#ffc98a66}
-[data-theme=dark]{--bg:#06171b;--surf:#0d2a30;--ink:#ecf9f7;--mut:#8fb9bb;--line:#16414a;--gold:#e8c987;--gold2:#e8c987;
---btn:linear-gradient(135deg,#ecd08e,#c1954a);--btnink:#06242a;--acc:linear-gradient(135deg,#ecd08e,#c1954a);--accink:#06242a;
+[data-theme=dark]{--bg:#07171B;--surf:#0E2A30;--ink:#ecf9f7;--mut:#8fb9bb;--line:#16414a;--gold:#e8c987;--gold2:#e8c987;
+--btn:linear-gradient(135deg,#EFD296,#D9B466);--btnink:#06242a;--acc:linear-gradient(135deg,#ecd08e,#c1954a);--accink:#06242a;
 --sec:linear-gradient(135deg,#0c2e35,#12454e);--sect:#fff;--tbg:#16414a;--glass:#0d2a30ee;--sh:0 24px 50px #0009;
 --hov:linear-gradient(180deg,#00000066,#00000000 40%,#06171bf2);--ftr:#04100f;--ftrc:#ffffff99;--ts:none;
 --htx:#fff;--hsub:#ffffffcc;--gl:#ffffff1f;--glb:#ffffff40;--em:linear-gradient(90deg,#e8c987,#fff);--ey:#e8c987;
@@ -182,7 +182,7 @@ const L=[
 {id:6,pal:5,ty:'land',t:{en:'Bosphorus Land Plot',ar:'قطعة أرض على البوسفور'},c:{en:'Istanbul, Türkiye',ar:'إسطنبول، تركيا'},p:60000,b:0,ba:0,a:1200}];
 
 /* architectural scenes (SVG) */
-const PAL=[['#c3f3ee','#ffe3c2','#fff6df','#2ec4b6'],['#d2f6e9','#ffe1b5','#fff8dc','#17b6a0'],['#ffe0c2','#ffc9a0','#fff1d6','#ff9a4d'],['#dff7e6','#fbeec6','#fff9e6','#58c996'],['#cdf5f0','#ffd9b8','#fff3cf','#ff8a3d'],['#e0faf7','#fff0c2','#fffbe8','#ffb21a'],['#bdf1ea','#e6faf7','#fff1da','#3ccfc1'],['#04121a','#0e4a52','#d98b3a','#06242a']];
+const PAL=[['#c3f3ee','#ffe3c2','#fff6df','#2ec4b6'],['#d2f6e9','#ffe1b5','#fff8dc','#17b6a0'],['#ffe0c2','#ffc9a0','#fff1d6','#ff9a4d'],['#dff7e6','#fbeec6','#fff9e6','#58c996'],['#cdf5f0','#ffd9b8','#fff3cf','#ff8a3d'],['#e0faf7','#fff0c2','#fffbe8','#ffb21a'],['#C3F3EE','#FFE3C2','#FFF6DC','#2EC4B6'],['#04121a','#0e4a52','#d98b3a','#06242a']];
 const rnd=s=>()=>(s=s*16807%2147483647)/2147483647;
 function scene(l,w=400,h=260,uid=''){
  const r=rnd(l.id*131+7),[a,b,c]=PAL[l.pal],d=PAL[l.pal][3],back=l.pal===7?'#12454e':'#ffffff',g='g'+l.id+uid;
