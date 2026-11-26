@@ -8,12 +8,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 <style>
-:root{--bg:#fffcf7;--surf:#fff;--ink:#0f3d4a;--mut:#5c8088;--line:#dcf2ef;--gold:#E55B00;--gold2:#FFB21A;--pi:#E55B00;--r:22px;
---btn:linear-gradient(135deg,#F2750A,#E55B00);--btnink:#fff;--acc:linear-gradient(135deg,#b8f0ea,#5fdcd0);--accink:#0a5a58;
---sec:linear-gradient(135deg,#d6f6f1,#fff3e0 55%,#ffe3c2);--sect:#0f3d4a;--tbg:#0f3d4a;--glass:#ffffffee;--sh:0 22px 48px #f5a05a33;
---hov:linear-gradient(180deg,#fffcf700 55%,#fffcf7);--ftr:#dff6f3;--ftrc:#45767a;--ts:none;
---htx:#0f3d4a;--hsub:#3f6a70;--gl:#ffffffc8;--glb:#fff;--em:linear-gradient(90deg,#E55B00,#FFB21A);--ey:#E55B00;
---fb:#fff;--fbg:#ffffffd9;--fp:#45767a;--glow:#ffc98a66}
+:root{--bg:#fff;--surf:#fff;--ink:#1f2933;--mut:#6b7785;--line:#ebeef2;--gold:#E55B00;--gold2:#FFB21A;--pi:#E55B00;--r:22px;
+--btn:linear-gradient(135deg,#F2750A,#E55B00);--btnink:#fff;--acc:linear-gradient(135deg,#FFE8D3,#FFD3AD);--accink:#B84700;
+--sec:#fff8f1;--sect:#1f2933;--tbg:#1f2933;--glass:#ffffffee;--sh:0 18px 40px #1f293314;
+--hov:linear-gradient(180deg,#ffffff00 55%,#fff);--ftr:#f6f7f9;--ftrc:#6b7785;--ts:none;
+--htx:#1f2933;--hsub:#55606d;--gl:#ffffffd0;--glb:#ebeef2;--em:linear-gradient(90deg,#E55B00,#FFB21A);--ey:#E55B00;
+--fb:#f1e6da;--fbg:#fff;--fp:#6b7785;--glow:#ffd9b84d}
 [data-theme=dark]{--bg:#07171B;--surf:#0E2A30;--ink:#ecf9f7;--mut:#8fb9bb;--line:#16414a;--gold:#e8c987;--gold2:#e8c987;
 --btn:linear-gradient(135deg,#EFD296,#D9B466);--btnink:#06242a;--acc:linear-gradient(135deg,#ecd08e,#c1954a);--accink:#06242a;
 --sec:linear-gradient(135deg,#0c2e35,#12454e);--sect:#fff;--tbg:#16414a;--glass:#0d2a30ee;--sh:0 24px 50px #0009;
@@ -182,14 +182,14 @@ const L=[
 {id:6,pal:5,ty:'land',t:{en:'Bosphorus Land Plot',ar:'قطعة أرض على البوسفور'},c:{en:'Istanbul, Türkiye',ar:'إسطنبول، تركيا'},p:60000,b:0,ba:0,a:1200}];
 
 /* architectural scenes (SVG) */
-const PAL=[['#c3f3ee','#ffe3c2','#fff6df','#2ec4b6'],['#d2f6e9','#ffe1b5','#fff8dc','#17b6a0'],['#ffe0c2','#ffc9a0','#fff1d6','#ff9a4d'],['#dff7e6','#fbeec6','#fff9e6','#58c996'],['#cdf5f0','#ffd9b8','#fff3cf','#ff8a3d'],['#e0faf7','#fff0c2','#fffbe8','#ffb21a'],['#C3F3EE','#FFE3C2','#FFF6DC','#2EC4B6'],['#04121a','#0e4a52','#d98b3a','#06242a']];
+const PAL=[['#FFF3E8','#FFFBF6','#FFFFFF','#DDE4EB'],['#FFEBD8','#FFF7EE','#FFFFFF','#FF9A4D'],['#FFE4CC','#FFF1E2','#FFFDF9','#FFB070'],['#F3F5F7','#FFFFFF','#FFF6EC','#CBD5DE'],['#FFEFE0','#FFFAF4','#FFFFFF','#FF8A3D'],['#FFF0D6','#FFFBF1','#FFFFFF','#E3E9EE'],['#FFF1E2','#FFFAF4','#FFFFFF','#DDE4EB'],['#04121a','#0e4a52','#d98b3a','#06242a']];
 const rnd=s=>()=>(s=s*16807%2147483647)/2147483647;
 function scene(l,w=400,h=260,uid=''){
  const r=rnd(l.id*131+7),[a,b,c]=PAL[l.pal],d=PAL[l.pal][3],back=l.pal===7?'#12454e':'#ffffff',g='g'+l.id+uid;
  let s=`<defs><linearGradient id="${g}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset=".65" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></linearGradient></defs><rect width="${w}" height="${h}" fill="url(#${g})"/><circle cx="${w*.7}" cy="${h*.52}" r="${h*.14}" fill="${l.pal===7?c:'#ffb02e'}" opacity=".95"/>`;
  const base=h*.8;
  if(l.ty==='villa'){
-  s+=`<rect y="${base}" width="${w}" height="${h-base}" fill="#6fe0d4" opacity=".95"/><rect x="${w*.12}" y="${base-78}" width="${w*.5}" height="78" fill="#fdfbf6"/><rect x="${w*.08}" y="${base-96}" width="${w*.58}" height="18" fill="#1e9c92"/><rect x="${w*.2}" y="${base-62}" width="${w*.34}" height="50" fill="#ffd98a" opacity=".92"/><rect x="${w*.37}" y="${base-62}" width="3" height="50" fill="#1e9c92"/><rect x="${w*.62}" y="${base-52}" width="${w*.18}" height="52" fill="#e8e1d0"/><rect x="${w*.62}" y="${base-60}" width="${w*.2}" height="8" fill="#1e9c92"/>`;
+  s+=`<rect y="${base}" width="${w}" height="${h-base}" fill="#D6E4EE" opacity=".95"/><rect x="${w*.12}" y="${base-78}" width="${w*.5}" height="78" fill="#fdfbf6"/><rect x="${w*.08}" y="${base-96}" width="${w*.58}" height="18" fill="#E55B00"/><rect x="${w*.2}" y="${base-62}" width="${w*.34}" height="50" fill="#ffd98a" opacity=".92"/><rect x="${w*.37}" y="${base-62}" width="3" height="50" fill="#E55B00"/><rect x="${w*.62}" y="${base-52}" width="${w*.18}" height="52" fill="#e8e1d0"/><rect x="${w*.62}" y="${base-60}" width="${w*.2}" height="8" fill="#E55B00"/>`;
   [.86,.93].forEach((x,i)=>s+=`<rect x="${w*x}" y="${base-70+i*12}" width="4" height="${70-i*12}" fill="#a9784a"/><ellipse cx="${w*x+2}" cy="${base-72+i*12}" rx="22" ry="9" fill="#86cfa6"/>`);
  }else if(l.ty==='land'){
   s+=`<path d="M0 ${h*.78}Q${w*.25} ${h*.55} ${w*.5} ${h*.72}T${w} ${h*.62}V${h}H0Z" fill="#bfeacf" opacity=".95"/><path d="M0 ${h*.88}Q${w*.3} ${h*.7} ${w*.62} ${h*.84}T${w} ${h*.78}V${h}H0Z" fill="#86cfa6"/><path d="M${w*.25} ${h*.9}L${w*.45} ${h*.78}L${w*.7} ${h*.9}" stroke="${c}" stroke-width="2" fill="none" stroke-dasharray="6 5"/>`;
