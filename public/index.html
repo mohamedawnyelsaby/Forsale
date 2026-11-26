@@ -3,17 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
 <title>Forsale — The world's homes, in Pi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 <style>
-:root{--bg:#fff;--surf:#fff;--ink:#111827;--mut:#434d5c;--line:#f0e6dc;--gold:#E55B00;--gold2:#FFB21A;--pi:#E55B00;--r:22px;
+:root{--bg:#fff;--surf:#fff;--ink:#1d1409;--mut:#85532c;--line:#f5e4d3;--gold:#E55B00;--gold2:#FFB21A;--pi:#E55B00;--r:22px;
 --btn:linear-gradient(135deg,#F2750A,#E55B00);--btnink:#fff;--acc:linear-gradient(135deg,#FFE8D3,#FFD3AD);--accink:#B84700;
---sec:#fff8f1;--sect:#111827;--tbg:#111827;--glass:#ffffffee;--sh:0 18px 40px #1f293314;
---hov:linear-gradient(180deg,#ffffff00 55%,#fff);--ftr:#fff7ef;--ftrc:#434d5c;--ts:none;
---htx:#111827;--hsub:#2f3947;--gl:#ffffffd0;--glb:#f0e6dc;--em:linear-gradient(90deg,#E55B00,#FFB21A);--ey:#E55B00;
---fb:#f1e6da;--fbg:#fff;--fp:#434d5c;--glow:#ffd9b84d}
+--sec:#fff8f1;--sect:#1d1409;--tbg:#1d1409;--glass:#ffffffee;--sh:0 16px 36px #e55b0026;
+--hov:linear-gradient(180deg,#ffffff00 55%,#fff);--ftr:#fff4e8;--ftrc:#85532c;--ts:none;
+--htx:#1d1409;--hsub:#5f3b1e;--gl:#ffffffd0;--glb:#f5e4d3;--em:linear-gradient(90deg,#E55B00,#FFB21A);--ey:#E55B00;
+--fb:#f5e4d3;--fbg:#fff;--fp:#85532c;--glow:#ffd9b84d}
 [data-theme=dark]{--bg:#07171B;--surf:#0E2A30;--ink:#ecf9f7;--mut:#8fb9bb;--line:#16414a;--gold:#e8c987;--gold2:#e8c987;
 --btn:linear-gradient(135deg,#EFD296,#D9B466);--btnink:#06242a;--acc:linear-gradient(135deg,#ecd08e,#c1954a);--accink:#06242a;
 --sec:linear-gradient(135deg,#0c2e35,#12454e);--sect:#fff;--tbg:#16414a;--glass:#0d2a30ee;--sh:0 24px 50px #0009;
@@ -49,7 +50,7 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:7
 .hero h1{font-size:clamp(40px,7vw,84px);line-height:1.02;margin:14px 0 18px;max-width:860px}
 .hero h1 em{font-style:normal;background:var(--em);-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero p{font-size:19px;color:var(--hsub);max-width:560px;line-height:1.6}
-.sbar{text-shadow:none;margin-top:34px;background:var(--surf);color:var(--ink);border-radius:26px;padding:10px;display:grid;grid-template-columns:1.6fr 1fr 1fr auto;gap:6px;max-width:960px;box-shadow:0 30px 80px #0a173066}
+.sbar{text-shadow:none;margin-top:34px;background:var(--surf);color:var(--ink);border-radius:26px;padding:10px;display:grid;grid-template-columns:1.6fr 1fr 1fr auto;gap:6px;max-width:960px;box-shadow:var(--sh)}
 .sbar label{padding:10px 18px;display:block;border-inline-end:1px solid var(--line)}
 .sbar label:nth-child(3){border:0}
 .sbar small{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:600}
@@ -92,7 +93,7 @@ section{padding:84px 0}
 /* ai */
 .ai{display:grid;grid-template-columns:1fr 1.1fr;gap:50px;align-items:center}
 .ai h2{font-size:clamp(30px,4vw,48px);line-height:1.1;margin-bottom:14px}.ai p{color:var(--mut);line-height:1.7}
-.chat{background:var(--surf);border:1px solid var(--line);border-radius:28px;box-shadow:0 30px 70px #0a173018;overflow:hidden}
+.chat{background:var(--surf);border:1px solid var(--line);border-radius:28px;box-shadow:var(--sh);overflow:hidden}
 .ch{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center;font-weight:600}
 .ch i{width:10px;height:10px;border-radius:50%;background:#0f9d6b}
 #log{height:250px;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
@@ -105,7 +106,7 @@ section{padding:84px 0}
 .in button{background:var(--acc);color:var(--accink);font-weight:700;border-radius:14px;padding:0 22px}
 /* modal */
 dialog{border:0;border-radius:28px;width:min(860px,94vw);padding:0;overflow:hidden;background:var(--surf);color:var(--ink);margin:auto}
-dialog::backdrop{background:#0a1730b3;backdrop-filter:blur(6px)}
+dialog::backdrop{background:#1d1409b3;backdrop-filter:blur(6px)}
 .dm{display:grid;grid-template-columns:1.2fr 1fr}.dm .ph{height:100%;min-height:420px}
 .dd{padding:34px}.dd h2{font-size:30px;margin:8px 0}.dd .price{font-size:36px;margin:14px 0}
 .sp{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
@@ -113,8 +114,12 @@ dialog::backdrop{background:#0a1730b3;backdrop-filter:blur(6px)}
 .btn{display:block;width:100%;border-radius:16px;padding:16px;font-weight:700;font-size:16px;margin-top:10px}
 .x{position:absolute;top:14px;inset-inline-end:14px;width:40px;height:40px;border-radius:50%;background:var(--surf);color:var(--ink);z-index:3;font-size:18px}
 footer{background:var(--ftr);color:var(--ftrc);padding:44px 0;font-size:14px}footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
-#toast{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--tbg);color:#fff;padding:14px 22px;border-radius:16px;display:none;z-index:99;font-weight:500;box-shadow:0 20px 50px #0a173066}
+#toast{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--tbg);color:#fff;padding:14px 22px;border-radius:16px;display:none;z-index:99;font-weight:500;box-shadow:0 14px 34px #e55b0044}
 @media(max-width:900px){.links{display:none}.sbar{grid-template-columns:1fr}.sbar label{border:0;border-bottom:1px solid var(--line)}.go{padding:16px}.fg,.ai,.dm{grid-template-columns:1fr}.dm .ph{min-height:260px}.hero{min-height:760px}.grid{grid-template-columns:1fr}}
+@media(max-width:900px){.hero{min-height:0}.hero .wrap{padding-top:96px;padding-bottom:44px}section{padding:52px 0}
+.stats{gap:22px;flex-wrap:nowrap;margin-top:28px}.stats b{font-size:26px}.stats span{font-size:12px}
+.pill{padding:8px 13px;font-size:13px}.logo{font-size:22px}.logo i{width:30px;height:30px}.nr{gap:6px}
+.sbar{border-radius:22px}.hero h1{font-size:40px}.head h2{font-size:30px}}
 </style>
 </head>
 <body>
@@ -204,9 +209,9 @@ function scene(l,w=400,h=260,uid=''){
  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid slice">${s}</svg>`;
 }
 function hero(){$('heroBg').setAttribute('viewBox','0 0 1400 700');
- if(theme==='dark'){$('heroBg').innerHTML=scene({id:9,pal:7,ty:'com'},1400,700,'h').replace(/<\/?svg[^>]*>/g,'');return}
- let b='';for(let i=0;i<14;i++){const h=50+(i*37)%60;b+=`<rect x="${i*100+8}" y="${700-h}" width="84" height="${h}" fill="#FFE7D2"/>`}
- $('heroBg').innerHTML=`<defs><linearGradient id="hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF1E2"/><stop offset="1" stop-color="#fff"/></linearGradient></defs><rect width="1400" height="700" fill="url(#hl)"/><circle cx="1170" cy="200" r="95" fill="#FFB02E" opacity=".9"/>${b}`}
+ if(theme==='dark'){$('heroBg').setAttribute('preserveAspectRatio','xMidYMid slice');$('heroBg').innerHTML=scene({id:9,pal:7,ty:'com'},1400,700,'h').replace(/<\/?svg[^>]*>/g,'');return}
+ $('heroBg').setAttribute('preserveAspectRatio','xMaxYMin slice');
+ $('heroBg').innerHTML=`<defs><linearGradient id="hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF1E2"/><stop offset="1" stop-color="#fff"/></linearGradient></defs><rect width="1400" height="700" fill="url(#hl)"/><circle cx="1180" cy="170" r="95" fill="#FFB02E" opacity=".9"/>`}
 let theme;try{theme=localStorage.getItem('fs-theme2')}catch(e){}
 theme=theme||'light';
 function setTheme(t){theme=t;document.documentElement.dataset.theme=t;$('theme').textContent=t==='dark'?'☀️':'🌙';try{localStorage.setItem('fs-theme2',t)}catch(e){}hero()}
