@@ -1,7 +1,8 @@
 const { LISTINGS } = require('./_data');
 
-// Providers: GEMINI_API_KEY (free tier from Google AI Studio) or ANTHROPIC_API_KEY (paid).
-// Optional: AI_PROVIDER=gemini|anthropic, GEMINI_MODEL=<model id>.
+// Providers with automatic failover (first working one answers):
+//   GEMINI_API_KEY (free, Google AI Studio) -> GROQ_API_KEY (free, console.groq.com) -> ANTHROPIC_API_KEY (paid)
+// Optional: AI_PROVIDERS=gemini,groq,anthropic (order), GEMINI_MODEL, GROQ_MODEL.
 const hits = new Map(); // soft per-IP limit (serverless instances are not shared)
 const limited = ip => {
   const now = Date.now(), h = (hits.get(ip) || []).filter(t => now - t < 3600e3);
@@ -57,11 +58,35 @@ async function callGemini(user) {
   return ((d.candidates || [])[0]?.content?.parts || []).map(p => p.text || '').join('');
 }
 
+async function callGroq(user) {
+  const key = process.env.GROQ_API_KEY, base = 'https://api.groq.com/openai/v1';
+  const auth = { Authorization: `Bearer ${key}`, 'content-type': 'application/json' };
+  let model = process.env.GROQ_MODEL || groqModel || 'llama-3.3-70b-versatile';
+  const ask = async m => fetch(`${base}/chat/completions`, { method: 'POST', headers: auth, body: JSON.stringify({
+    model: m, max_tokens: 450, temperature: 0.6,
+    messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content: user }] }) });
+  let r = await ask(model);
+  if ((r.status === 400 || r.status === 404) && !process.env.GROQ_MODEL) { // model may have been retired: discover a current one
+    const l = await (await fetch(`${base}/models`, { headers: auth })).json();
+    const ids = (l.data || []).map(x => x.id).filter(i => /llama/i.test(i) && !/guard|whisper|tts/i.test(i));
+    const pick = ids.find(i => /versatile/i.test(i)) || ids[0];
+    if (pick) { groqModel = model = pick; r = await ask(model); }
+  }
+  const d = await r.json();
+  if (!r.ok) { const e = new Error((d.error && d.error.message) || 'groq error'); e.code = r.status; throw e; }
+  return ((d.choices || [])[0]?.message?.content) || '';
+}
+let groqModel = null;
+
+const PROVIDERS = { gemini: ['GEMINI_API_KEY', callGemini], groq: ['GROQ_API_KEY', callGroq], anthropic: ['ANTHROPIC_API_KEY', callAnthropic] };
+const cooldown = {}; // provider -> timestamp until which it is skipped after a rate-limit/error
+const chain = () => (process.env.AI_PROVIDERS || 'gemini,groq,anthropic').split(',').map(x => x.trim())
+  .filter(n => PROVIDERS[n] && process.env[PROVIDERS[n][0]]);
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ text: 'POST only' });
-  const useAnthropic = process.env.AI_PROVIDER === 'anthropic' || (!process.env.AI_PROVIDER && process.env.ANTHROPIC_API_KEY);
-  const useGemini = !useAnthropic && process.env.GEMINI_API_KEY;
-  if (!useAnthropic && !useGemini) return res.status(503).json({ text: 'AI is not configured yet.' });
+  const order = chain();
+  if (!order.length) return res.status(503).json({ text: 'AI is not configured yet.' });
   const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
   if (limited(ip)) return res.status(429).json({ text: 'Too many questions for now. Please try again later.' });
 
@@ -78,10 +103,14 @@ module.exports = async (req, res) => {
   if (!request) return res.status(400).json({ text: 'Empty question.' });
   const user = `Reply language: ${lang}\nFocus property: ${JSON.stringify(focus || null)}\nAll listings: ${JSON.stringify(LISTINGS)}\n\nRequest: ${request}`;
 
-  try {
-    const text = useGemini ? await callGemini(user) : await callAnthropic(user);
-    res.json({ text: text || 'Could not answer right now.' });
-  } catch (e) {
-    res.status(e.code === 429 ? 429 : 500).json({ text: e.code === 429 ? 'Marwan is busy right now. Please try again in a minute.' : 'Server error.' });
+  const now = Date.now();
+  const ready = order.filter(n => !(cooldown[n] > now));
+  for (const name of (ready.length ? ready : order)) { // try healthy providers first; if all cooling down, try all
+    try {
+      const text = await PROVIDERS[name][1](user);
+      if (text) return res.json({ text, via: name });
+      cooldown[name] = now + 30e3;
+    } catch (e) { cooldown[name] = now + (e.code === 429 ? 60e3 : 30e3); }
   }
+  res.status(503).json({ text: 'Marwan is busy right now. Please try again in a minute.' });
 };
