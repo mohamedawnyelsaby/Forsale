@@ -128,6 +128,14 @@ html{-webkit-text-size-adjust:100%}body{overflow-x:clip}img,svg{max-width:100%}
 @media(max-width:400px){.wrap{padding-inline:16px}.logo{font-size:19px}.logo i{width:26px;height:26px;font-size:15px}.pill{padding:7px 10px;font-size:12px}.nr{gap:4px}.pi{max-width:118px}.hero h1{font-size:34px}}
 @media(min-width:601px) and (max-width:900px){.sbar{grid-template-columns:1fr 1fr}.sbar label{border:0}.go{grid-column:1/-1}.fg{grid-template-columns:1fr 1fr}.hero h1{font-size:54px}}
 @media(min-width:1500px){.wrap{max-width:1360px}.hero h1{font-size:92px}.hero .wrap{padding-top:130px}}
+.tabs{display:none}
+@media(max-width:900px){
+.tabs{display:flex;position:fixed;inset:auto 0 0;z-index:60;background:var(--nvbg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:6px 6px calc(8px + env(safe-area-inset-bottom,0px) + var(--sb,0px))}
+.tabs button{flex:1;background:none;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:700;padding:6px 0;border-radius:12px}
+.tabs button i{font-style:normal;font-size:20px;line-height:1}
+.tabs button.on{color:var(--gold)}
+footer{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
+#toast{bottom:calc(130px + var(--sb,0px) + env(safe-area-inset-bottom,0px))}}
 </style>
 </head>
 <body>
@@ -177,15 +185,22 @@ html{-webkit-text-size-adjust:100%}body{overflow-x:clip}img,svg{max-width:100%}
 
 <footer><div class="wrap"><div class="logo" style="font-size:20px"><i style="width:28px;height:28px;font-size:15px">F</i>Forsale</div><div>© 2026 Forsale · Built on Pi Network</div></div></footer>
 
+<div class="tabs" id="tabs">
+ <button data-go="home"><i>🏠</i><span data-i="t1"></span></button>
+ <button data-go="explore"><i>🔍</i><span data-i="t2"></span></button>
+ <button data-go="ai"><i>✦</i><span data-i="t3"></span></button>
+ <button data-go="saved"><i>♥</i><span data-i="t4"></span></button>
+ <button data-go="acct"><i>👤</i><span data-i="t5"></span></button>
+</div>
 <dialog id="dlg"><button class="x" onclick="dlg.close()">✕</button><div class="dm" id="dm"></div></dialog>
 <div id="toast"></div>
 
 <script>
 const $=id=>document.getElementById(id);
 const I={
-en:{n1:'Properties',n2:'Why Forsale',n3:'AI Advisor',login:'Connect Pi',eyebrow:'The global property marketplace',h1:'Find your place <em>anywhere</em> on Earth.',sub:'Homes, villas and commercial spaces from around the world — bought and sold directly in Pi.',where:'Where',wph:'City or country',type:'Type',any:'Any type',apt:'Apartment',villa:'Villa',com:'Commercial',land:'Land',budget:'Budget',anyp:'Any price',search:'Search',s1:'Pay in Pi',s2:'Property advisor',s3:'Two languages',feat:'Featured properties',featp:'Sample listings — verified real properties are coming soon.',all:'All',why:'Built for a borderless market',f1t:'Pay in Pi',f1:'Settle purchases and listing fees in Pi — fast, borderless, no banks in the middle.',f2t:'AI property advisor',f2:'Describe your dream home in any language and get matched instantly.',f3t:'Verified listings',f3:'Every owner and agent will be identity-checked before a listing goes live.',aiE:'Forsale AI',aiH:'Tell us what you dream of. We’ll find it.',aiP:'Ask in plain language — budget, city, style. Our advisor compares listings and explains the trade-offs.',aiph:'Describe your dream home',send:'Send',hi:'Hi! I\'m your Forsale advisor. What kind of place are you looking for?',s_1:'Villa by the sea',s_2:'Best investment',s_3:'Cheapest apartment',beds:'Beds',baths:'Baths',area:'m²',buy:'Buy with Pi',offer:'Make an offer',list:'List your property',none:'No properties match.',login1:'Connect Pi first (open in Pi Browser)',ok:'Done ✔',cancel:'Cancelled',err:'Something went wrong',offerOk:'Offer sent to the owner',verified:'Sample'},
-ar:{n1:'العقارات',n2:'لماذا Forsale',n3:'المستشار الذكي',login:'اتصل بـ Pi',eyebrow:'سوق العقارات العالمي',h1:'اعثر على مكانك في <em>أي مكان</em> بالعالم.',sub:'منازل وفلل ومساحات تجارية من حول العالم، تُباع وتُشترى مباشرة بعملة Pi.',where:'الموقع',wph:'مدينة أو دولة',type:'النوع',any:'كل الأنواع',apt:'شقة',villa:'فيلا',com:'تجاري',land:'أرض',budget:'الميزانية',anyp:'أي سعر',search:'بحث',s1:'ادفع بـ Pi',s2:'مستشار عقاري',s3:'لغتان',feat:'عقارات مميزة',featp:'عقارات تجريبية، والعقارات الحقيقية الموثّقة قريبًا.',all:'الكل',why:'مصمم لسوق بلا حدود',f1t:'ادفع بعملة Pi',f1:'سدّد المشتريات ورسوم الإدراج بـ Pi، بسرعة وبدون حدود أو وسطاء بنكيين.',f2t:'مستشار عقاري ذكي',f2:'صف منزل أحلامك بأي لغة واحصل على الترشيحات فورًا.',f3t:'إعلانات موثّقة',f3:'سيتم التحقق من هوية كل مالك ووسيط قبل نشر أي إعلان.',aiE:'Forsale AI',aiH:'قل لنا ما تحلم به، ونحن نجده.',aiP:'اسأل بلغتك: الميزانية، المدينة، الطراز. المستشار يقارن العقارات ويشرح لك الفروقات.',aiph:'صف منزل أحلامك',send:'إرسال',hi:'أهلًا! أنا مستشارك في Forsale. ما نوع المكان الذي تبحث عنه؟',s_1:'فيلا على البحر',s_2:'أفضل استثمار',s_3:'أرخص شقة',beds:'غرف',baths:'حمامات',area:'م²',buy:'اشترِ بـ Pi',offer:'قدّم عرضًا',list:'أضف عقارك',none:'لا توجد نتائج.',login1:'اتصل بـ Pi أولًا (افتح من متصفح Pi)',ok:'تمت العملية ✔',cancel:'أُلغيت العملية',err:'حدث خطأ',offerOk:'تم إرسال عرضك للمالك',verified:'تجريبي'}};
-let lang='en',cat='',user=null,favs=new Set();
+en:{n1:'Properties',n2:'Why Forsale',n3:'AI Advisor',login:'Connect Pi',eyebrow:'The global property marketplace',h1:'Find your place <em>anywhere</em> on Earth.',sub:'Homes, villas and commercial spaces from around the world — bought and sold directly in Pi.',where:'Where',wph:'City or country',type:'Type',any:'Any type',apt:'Apartment',villa:'Villa',com:'Commercial',land:'Land',budget:'Budget',anyp:'Any price',search:'Search',s1:'Pay in Pi',s2:'Property advisor',s3:'Two languages',feat:'Featured properties',featp:'Sample listings — verified real properties are coming soon.',all:'All',why:'Built for a borderless market',f1t:'Pay in Pi',f1:'Settle purchases and listing fees in Pi — fast, borderless, no banks in the middle.',f2t:'AI property advisor',f2:'Describe your dream home in any language and get matched instantly.',f3t:'Verified listings',f3:'Every owner and agent will be identity-checked before a listing goes live.',aiE:'Forsale AI',aiH:'Tell us what you dream of. We’ll find it.',aiP:'Ask in plain language — budget, city, style. Our advisor compares listings and explains the trade-offs.',aiph:'Describe your dream home',send:'Send',t1:'Home',t2:'Explore',t3:'AI',t4:'Saved',t5:'Account',nosaved:'No saved homes yet — tap ♥ on a listing.',hi:'Hi! I\'m your Forsale advisor. What kind of place are you looking for?',s_1:'Villa by the sea',s_2:'Best investment',s_3:'Cheapest apartment',beds:'Beds',baths:'Baths',area:'m²',buy:'Buy with Pi',offer:'Make an offer',list:'List your property',none:'No properties match.',login1:'Connect Pi first (open in Pi Browser)',ok:'Done ✔',cancel:'Cancelled',err:'Something went wrong',offerOk:'Offer sent to the owner',verified:'Sample'},
+ar:{n1:'العقارات',n2:'لماذا Forsale',n3:'المستشار الذكي',login:'اتصل بـ Pi',eyebrow:'سوق العقارات العالمي',h1:'اعثر على مكانك في <em>أي مكان</em> بالعالم.',sub:'منازل وفلل ومساحات تجارية من حول العالم، تُباع وتُشترى مباشرة بعملة Pi.',where:'الموقع',wph:'مدينة أو دولة',type:'النوع',any:'كل الأنواع',apt:'شقة',villa:'فيلا',com:'تجاري',land:'أرض',budget:'الميزانية',anyp:'أي سعر',search:'بحث',s1:'ادفع بـ Pi',s2:'مستشار عقاري',s3:'لغتان',feat:'عقارات مميزة',featp:'عقارات تجريبية، والعقارات الحقيقية الموثّقة قريبًا.',all:'الكل',why:'مصمم لسوق بلا حدود',f1t:'ادفع بعملة Pi',f1:'سدّد المشتريات ورسوم الإدراج بـ Pi، بسرعة وبدون حدود أو وسطاء بنكيين.',f2t:'مستشار عقاري ذكي',f2:'صف منزل أحلامك بأي لغة واحصل على الترشيحات فورًا.',f3t:'إعلانات موثّقة',f3:'سيتم التحقق من هوية كل مالك ووسيط قبل نشر أي إعلان.',aiE:'Forsale AI',aiH:'قل لنا ما تحلم به، ونحن نجده.',aiP:'اسأل بلغتك: الميزانية، المدينة، الطراز. المستشار يقارن العقارات ويشرح لك الفروقات.',aiph:'صف منزل أحلامك',send:'إرسال',t1:'الرئيسية',t2:'استكشف',t3:'المستشار',t4:'المفضلة',t5:'حسابي',nosaved:'لا توجد عقارات محفوظة — اضغط ♥ على أي عقار.',hi:'أهلًا! أنا مستشارك في Forsale. ما نوع المكان الذي تبحث عنه؟',s_1:'فيلا على البحر',s_2:'أفضل استثمار',s_3:'أرخص شقة',beds:'غرف',baths:'حمامات',area:'م²',buy:'اشترِ بـ Pi',offer:'قدّم عرضًا',list:'أضف عقارك',none:'لا توجد نتائج.',login1:'اتصل بـ Pi أولًا (افتح من متصفح Pi)',ok:'تمت العملية ✔',cancel:'أُلغيت العملية',err:'حدث خطأ',offerOk:'تم إرسال عرضك للمالك',verified:'تجريبي'}};
+let lang='en',cat='',user=null,favs=new Set(),onlyFav=false;
 const L=[
 {id:1,pal:0,ty:'com',t:{en:'Skyline Penthouse',ar:'بنتهاوس سكاي لاين'},c:{en:'New York, USA',ar:'نيويورك، أمريكا'},p:1200000,b:4,ba:4,a:310},
 {id:2,pal:1,ty:'villa',t:{en:'Oceanfront Villa',ar:'فيلا على المحيط'},c:{en:'Dubai, UAE',ar:'دبي، الإمارات'},p:480000,b:6,ba:7,a:620},
@@ -240,7 +255,7 @@ function applyLang(){
 const fmt=n=>n.toLocaleString(lang==='ar'?'ar-EG':'en-US');
 function render(){
  const q=$('q').value.trim().toLowerCase(),t=$('t').value||cat,p=+$('p').value;
- const r=L.filter(x=>(!q||(x.t.en+x.t.ar+x.c.en+x.c.ar).toLowerCase().includes(q))&&(!t||x.ty===t)&&(!p||x.p<=p));
+ const r=L.filter(x=>(!q||(x.t.en+x.t.ar+x.c.en+x.c.ar).toLowerCase().includes(q))&&(!t||x.ty===t)&&(!p||x.p<=p)&&(!onlyFav||favs.has(x.id)));
  $('grid').innerHTML=r.map(x=>`<article class="card" data-id="${x.id}"><div class="ph">${x.photo?`<img src="${x.photo}" alt="" onerror="this.outerHTML=window.scene(L.find(v=>v.id==${x.id}))">`:scene(x)}<span class="badge">${T('verified')}</span><button class="heart ${favs.has(x.id)?'on':''}" data-h="${x.id}">♥</button></div>
  <div class="cb"><div class="price">${fmt(x.p)} <span>π</span></div><h3>${x.t[lang]}</h3><div class="loc">📍 ${x.c[lang]}</div>
  <div class="spec"><span>🛏 ${x.b} ${T('beds')}</span><span>🛁 ${x.ba}</span><span>📐 ${fmt(x.a)} ${T('area')}</span></div></div></article>`).join('')||`<p>${T('none')}</p>`;
@@ -278,6 +293,18 @@ async function ask(q){if(!q)return;const lg=$('log');lg.innerHTML+=`<div class="
 $('send').onclick=()=>ask($('aq').value.trim());
 $('aq').onkeydown=e=>{if(e.key==='Enter')ask(e.target.value.trim())};
 $('sug').onclick=e=>{if(e.target.tagName==='BUTTON')ask(e.target.textContent)};
+const tabBtns=document.querySelectorAll('#tabs button');
+const mark=k=>tabBtns.forEach(b=>b.classList.toggle('on',b.dataset.go===k));
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;const k=b.dataset.go,go=(id)=>$(id).scrollIntoView({behavior:'smooth'});
+ if(k==='home'){onlyFav=false;render();scrollTo({top:0,behavior:'smooth'})}
+ else if(k==='explore'){onlyFav=false;render();go('browse')}
+ else if(k==='ai'){go('ai')}
+ else if(k==='saved'){onlyFav=true;render();if(!favs.size)toast(T('nosaved'));go('browse')}
+ else if(k==='acct'){user?toast('@'+user.username):$('login').click()}
+ if(k!=='acct')mark(k)};
+addEventListener('scroll',()=>{if(onlyFav)return;const a=$('ai').getBoundingClientRect().top,b=$('browse').getBoundingClientRect().top;mark(a<innerHeight*.5?'ai':b<innerHeight*.5?'explore':'home')},{passive:true});
+mark('home');
+if(/PiBrowser|; wv\)/i.test(navigator.userAgent))document.documentElement.style.setProperty('--sb','44px');
 setTheme(theme);applyLang();
 </script>
 </body></html>
