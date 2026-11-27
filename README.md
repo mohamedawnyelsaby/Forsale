@@ -3,7 +3,7 @@ Global real-estate marketplace paid in Pi, with an AI advisor. Static front-end 
 
 ## Deploy on Vercel
 1. Import this repo. Vercel reads `vercel.json` (serves `public/`, runs `api/*`).
-2. Project Settings -> Environment Variables: `PI_API_KEY`, `ANTHROPIC_API_KEY`.
+2. Project Settings -> Environment Variables: `PI_API_KEY`, plus ONE AI key: `GEMINI_API_KEY` (free tier, Google AI Studio) or `ANTHROPIC_API_KEY` (paid). Optional: `AI_PROVIDER`, `GEMINI_MODEL`.
 3. Pi Developer Portal: set the app URL, and put the Validation Key in `public/validation-key.txt`.
 4. Test in Pi Browser (sandbox), then set `sandbox:false` in `public/index.html`.
 
