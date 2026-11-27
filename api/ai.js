@@ -29,37 +29,49 @@ async function callAnthropic(user) {
   return (d.content || []).map(c => c.text || '').join('');
 }
 
-// ---- Gemini: model names change often, so pick the newest Flash model the key can use (cached) ----
-async function pickGeminiModel(key) {
-  if (process.env.GEMINI_MODEL) return process.env.GEMINI_MODEL;
-  if (state.gemini) return state.gemini;
+// ---- Gemini: model names change often, so discover them; try at most two candidates (fast lite first) ----
+async function geminiCandidates(key) {
+  if (process.env.GEMINI_MODEL) return [process.env.GEMINI_MODEL];
+  if (state.gemini) return [state.gemini];
+  let names = [];
   try {
     const r = await tfetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200', { headers: { 'x-goog-api-key': key } }, 5000);
-    const d = await r.json();
-    const ok = (d.models || []).filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
+    names = ((await r.json()).models || []).filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
       .map(m => m.name.replace('models/', '')).filter(n => /^gemini-[\d.]+-flash(-lite)?$/.test(n));
-    const ver = n => parseFloat((n.match(/gemini-([\d.]+)/) || [0, 0])[1]);
-    ok.sort((a, b) => ver(b) - ver(a) || (a.includes('lite') ? -1 : 1)); // newest first; lite (faster) before full flash
-    if (ok.length) return (state.gemini = ok[0]);
-  } catch (e) { /* fall through */ }
-  return 'gemini-flash-lite-latest';
+  } catch (e) { /* use aliases only */ }
+  const ver = n => parseFloat((n.match(/gemini-([\d.]+)/) || [0, 0])[1]);
+  const newest = list => list.sort((x, y) => ver(y) - ver(x))[0];
+  const lite = newest(names.filter(n => n.includes('lite'))), flash = newest(names.filter(n => !n.includes('lite')));
+  return [...new Set([lite, flash, 'gemini-flash-lite-latest'].filter(Boolean))].slice(0, 2);
 }
 async function callGemini(user) {
-  const key = process.env.GEMINI_API_KEY, model = await pickGeminiModel(key);
-  const go = think => tfetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-    method: 'POST', headers: { 'x-goog-api-key': key, 'content-type': 'application/json' },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: SYSTEM }] },
-      contents: [{ role: 'user', parts: [{ text: user }] }],
-      generationConfig: { maxOutputTokens: 1200, temperature: 0.6, ...(think ? { thinkingConfig: think } : {}) }
-    })
-  }, 14000);
-  // keep "thinking" minimal so answers come back fast; if the model rejects the setting, retry without it
-  const think = /gemini-2\.5/.test(model) ? { thinkingBudget: 0 } : /gemini-3/.test(model) ? { thinkingLevel: 'low' } : null;
-  let r = await go(think), d = await r.json();
-  if (d.error && d.error.code === 400 && think) { r = await go(null); d = await r.json(); }
-  if (d.error) { const e = new Error(`[${model}] ${d.error.message || 'gemini error'}`); e.code = d.error.code; throw e; }
-  return ((d.candidates || [])[0]?.content?.parts || []).filter(p => !p.thought).map(p => p.text || '').join('');
+  const key = process.env.GEMINI_API_KEY;
+  let last;
+  for (const model of await geminiCandidates(key)) {
+    const go = think => tfetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+      method: 'POST', headers: { 'x-goog-api-key': key, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: SYSTEM }] },
+        contents: [{ role: 'user', parts: [{ text: user }] }],
+        generationConfig: { maxOutputTokens: 1200, temperature: 0.6, ...(think ? { thinkingConfig: think } : {}) }
+      })
+    }, 7000);
+    // keep "thinking" minimal so answers come back fast; if the model rejects the setting, retry without it
+    const think = /gemini-2\.5/.test(model) ? { thinkingBudget: 0 } : /gemini-3/.test(model) ? { thinkingLevel: 'low' } : null;
+    try {
+      let r = await go(think), d = await r.json();
+      if (d.error && d.error.code === 400 && think) { r = await go(null); d = await r.json(); }
+      if (d.error) { const e = new Error(`[${model}] ${d.error.message || 'gemini error'}`); e.code = d.error.code; throw e; }
+      const t = ((d.candidates || [])[0]?.content?.parts || []).filter(p => !p.thought).map(p => p.text || '').join('');
+      if (t) { state.gemini = model; return t; }
+      last = new Error(`[${model}] empty answer`);
+    } catch (e) {
+      last = e.name === 'TimeoutError' ? Object.assign(new Error(`[${model}] timed out after 7s`), { code: 'timeout' }) : e;
+      if (model === state.gemini) state.gemini = null;
+      if (![undefined, 400, 404, 'timeout'].includes(last.code)) throw last; // key/quota problems: another model will not help
+    }
+  }
+  throw last || new Error('no usable gemini model');
 }
 
 // ---- Groq: try the preferred models this account can actually use, remember the one that works ----
@@ -119,8 +131,8 @@ const handler = async (req, res) => {
     try {
       const text = await PROVIDERS[name][1](user);
       if (text) return res.json({ text, via: name });
-      cooldown[name] = now + 30e3;
-    } catch (e) { cooldown[name] = now + (e.code === 429 ? 60e3 : 30e3); }
+      cooldown[name] = now + 60e3;
+    } catch (e) { cooldown[name] = now + (e.code === 'timeout' || e.name === 'TimeoutError' ? 300e3 : 60e3); }
   }
   res.status(503).json({ text: 'Marwan is busy right now. Please try again in a minute.' });
 };
