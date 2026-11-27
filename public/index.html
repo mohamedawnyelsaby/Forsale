@@ -136,6 +136,7 @@ html{-webkit-text-size-adjust:100%}body{overflow-x:clip}img,svg{max-width:100%}
 .tabs button.on{color:var(--gold)}
 footer{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 #toast{bottom:calc(130px + var(--sb,0px) + env(safe-area-inset-bottom,0px))}}
+section{scroll-margin-top:76px}.chat{scroll-margin-top:86px}
 </style>
 </head>
 <body>
@@ -178,7 +179,7 @@ footer{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 
 <section id="ai"><div class="wrap ai">
   <div><span class="eyebrow" style="color:var(--gold)" data-i="aiE"></span><h2 data-i="aiH"></h2><p data-i="aiP"></p></div>
-  <div class="chat"><div class="ch"><i></i>Marwan <span style="font-weight:500;color:var(--mut)">· Forsale AI</span></div><div id="log"></div>
+  <div class="chat" id="chat"><div class="ch"><i></i>Marwan <span style="font-weight:500;color:var(--mut)">· Forsale AI</span></div><div id="log"></div>
     <div class="sug" id="sug"></div>
     <div class="in"><input id="aq" data-ph="aiph"><button id="send" data-i="send"></button></div></div>
 </div></section>
@@ -298,7 +299,7 @@ const mark=k=>tabBtns.forEach(b=>b.classList.toggle('on',b.dataset.go===k));
 $('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;const k=b.dataset.go,go=(id)=>$(id).scrollIntoView({behavior:'smooth'});
  if(k==='home'){onlyFav=false;render();scrollTo({top:0,behavior:'smooth'})}
  else if(k==='explore'){onlyFav=false;render();go('browse')}
- else if(k==='ai'){go('ai')}
+ else if(k==='ai'){go('chat')}
  else if(k==='saved'){onlyFav=true;render();if(!favs.size)toast(T('nosaved'));go('browse')}
  else if(k==='acct'){user?toast('@'+user.username):$('login').click()}
  if(k!=='acct')mark(k)};
