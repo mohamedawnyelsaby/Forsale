@@ -12,6 +12,7 @@ const limited = ip => {
 // fetch with a hard timeout so a slow provider can't eat the whole function time
 const tfetch = (u, o, ms) => fetch(u, { ...o, signal: AbortSignal.timeout(ms) });
 const str = v => String(v || '').slice(0, 80);
+const state = { gemini: null, groq: null };
 
 const SYSTEM = 'You are Marwan, Forsale\'s AI real-estate advisor. If asked who you are, say your name is Marwan. ' +
   'All listings are SAMPLE data with illustrative details: never claim facts beyond the provided fields ' +
@@ -28,57 +29,64 @@ async function callAnthropic(user) {
   return (d.content || []).map(c => c.text || '').join('');
 }
 
-// Model names change often, so pick the newest non-lite Flash model the key can use (cached).
-let geminiModel = null;
+// ---- Gemini: model names change often, so pick the newest Flash model the key can use (cached) ----
 async function pickGeminiModel(key) {
   if (process.env.GEMINI_MODEL) return process.env.GEMINI_MODEL;
-  if (geminiModel) return geminiModel;
+  if (state.gemini) return state.gemini;
   try {
     const r = await tfetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200', { headers: { 'x-goog-api-key': key } }, 5000);
     const d = await r.json();
     const ok = (d.models || []).filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
-      .map(m => m.name.replace('models/', ''))
-      .filter(n => /^gemini-[\d.]+-flash(-lite)?$/.test(n));
+      .map(m => m.name.replace('models/', '')).filter(n => /^gemini-[\d.]+-flash(-lite)?$/.test(n));
     const ver = n => parseFloat((n.match(/gemini-([\d.]+)/) || [0, 0])[1]);
-    ok.sort((a, b) => ver(b) - ver(a) || (a.includes('lite') ? 1 : -1));
-    if (ok.length) return (geminiModel = ok[0]);
+    ok.sort((a, b) => ver(b) - ver(a) || (a.includes('lite') ? -1 : 1)); // newest first; lite (faster) before full flash
+    if (ok.length) return (state.gemini = ok[0]);
   } catch (e) { /* fall through */ }
-  return 'gemini-flash-latest';
+  return 'gemini-flash-lite-latest';
 }
 async function callGemini(user) {
   const key = process.env.GEMINI_API_KEY, model = await pickGeminiModel(key);
-  const r = await tfetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+  const go = think => tfetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
     method: 'POST', headers: { 'x-goog-api-key': key, 'content-type': 'application/json' },
     body: JSON.stringify({
       systemInstruction: { parts: [{ text: SYSTEM }] },
       contents: [{ role: 'user', parts: [{ text: user }] }],
-      generationConfig: { maxOutputTokens: 1500, temperature: 0.6 }
+      generationConfig: { maxOutputTokens: 1200, temperature: 0.6, ...(think ? { thinkingConfig: think } : {}) }
     })
-  }, 10000);
-  const d = await r.json();
-  if (d.error) { const e = new Error(d.error.message || 'gemini error'); e.code = d.error.code; throw e; }
-  return ((d.candidates || [])[0]?.content?.parts || []).map(p => p.text || '').join('');
+  }, 14000);
+  // keep "thinking" minimal so answers come back fast; if the model rejects the setting, retry without it
+  const think = /gemini-2\.5/.test(model) ? { thinkingBudget: 0 } : /gemini-3/.test(model) ? { thinkingLevel: 'low' } : null;
+  let r = await go(think), d = await r.json();
+  if (d.error && d.error.code === 400 && think) { r = await go(null); d = await r.json(); }
+  if (d.error) { const e = new Error(`[${model}] ${d.error.message || 'gemini error'}`); e.code = d.error.code; throw e; }
+  return ((d.candidates || [])[0]?.content?.parts || []).filter(p => !p.thought).map(p => p.text || '').join('');
 }
 
+// ---- Groq: try the preferred models this account can actually use, remember the one that works ----
+const GROQ_PREF = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'openai/gpt-oss-20b', 'openai/gpt-oss-120b', 'meta-llama/llama-4-scout-17b-16e-instruct'];
 async function callGroq(user) {
-  const key = process.env.GROQ_API_KEY, base = 'https://api.groq.com/openai/v1';
-  const auth = { Authorization: `Bearer ${key}`, 'content-type': 'application/json' };
-  let model = process.env.GROQ_MODEL || groqModel || 'llama-3.3-70b-versatile';
-  const ask = async m => tfetch(`${base}/chat/completions`, { method: 'POST', headers: auth, signal: undefined, body: JSON.stringify({
-    model: m, max_tokens: 450, temperature: 0.6,
+  const base = 'https://api.groq.com/openai/v1';
+  const auth = { Authorization: `Bearer ${process.env.GROQ_API_KEY}`, 'content-type': 'application/json' };
+  const post = m => tfetch(`${base}/chat/completions`, { method: 'POST', headers: auth, body: JSON.stringify({
+    model: m, temperature: 0.6, max_tokens: /gpt-oss/.test(m) ? 1200 : 450, ...(/gpt-oss/.test(m) ? { reasoning_effort: 'low' } : {}),
     messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content: user }] }) }, 10000);
-  let r = await ask(model);
-  if ((r.status === 400 || r.status === 404) && !process.env.GROQ_MODEL) { // model may have been retired: discover a current one
-    const l = await (await tfetch(`${base}/models`, { headers: auth }, 5000)).json();
-    const ids = (l.data || []).map(x => x.id).filter(i => /llama/i.test(i) && !/guard|whisper|tts/i.test(i));
-    const pick = ids.find(i => /versatile/i.test(i)) || ids[0];
-    if (pick) { groqModel = model = pick; r = await ask(model); }
+  let order = process.env.GROQ_MODEL ? [process.env.GROQ_MODEL] : state.groq ? [state.groq] : null;
+  if (!order) {
+    let avail = null;
+    try { avail = ((await (await tfetch(`${base}/models`, { headers: auth }, 5000)).json()).data || []).map(x => x.id); } catch (e) { /* use defaults */ }
+    order = avail ? GROQ_PREF.filter(m => avail.includes(m)).concat(avail.filter(i => /llama|gpt-oss/i.test(i) && !/guard|safeguard|whisper|tts|compound/i.test(i) && !GROQ_PREF.includes(i))) : GROQ_PREF;
+    if (!order.length) order = GROQ_PREF;
   }
-  const d = await r.json();
-  if (!r.ok) { const e = new Error((d.error && d.error.message) || 'groq error'); e.code = r.status; throw e; }
-  return ((d.choices || [])[0]?.message?.content) || '';
+  let last;
+  for (const m of order) {
+    const r = await post(m), d = await r.json().catch(() => ({}));
+    if (r.ok) { const t = (d.choices || [])[0]?.message?.content || ''; if (t) { state.groq = m; return t; } last = new Error(`[${m}] empty answer`); continue; }
+    const e = new Error(`[${m}] ${(d.error && d.error.message) || 'groq error'}`); e.code = r.status; last = e;
+    if (m === state.groq) state.groq = null;
+    if (![400, 403, 404].includes(r.status)) throw e; // 401/429/5xx: next model will not help
+  }
+  throw last || new Error('no usable groq model');
 }
-let groqModel = null;
 
 const PROVIDERS = { gemini: ['GEMINI_API_KEY', callGemini], groq: ['GROQ_API_KEY', callGroq], anthropic: ['ANTHROPIC_API_KEY', callAnthropic] };
 const cooldown = {}; // provider -> timestamp until which it is skipped after a rate-limit/error
@@ -118,3 +126,4 @@ const handler = async (req, res) => {
 };
 module.exports = handler;
 module.exports.PROVIDERS = PROVIDERS;
+module.exports.state = state;

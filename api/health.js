@@ -1,6 +1,6 @@
 // /api/health            -> which keys are configured (true/false only)
 // /api/health?test=1     -> also sends a tiny live request to each AI provider and reports the exact result
-const { PROVIDERS } = require('./ai');
+const { PROVIDERS, state } = require('./ai');
 let lastTest = 0;
 module.exports = async (req, res) => {
   const has = k => Boolean(process.env[k]);
@@ -25,5 +25,6 @@ module.exports = async (req, res) => {
       }
     }));
   }
+  if (out.test) out.models = { gemini: state.gemini, groq: state.groq };
   res.json(out);
 };
