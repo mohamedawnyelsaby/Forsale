@@ -1,1 +1,1 @@
-{ "outputDirectory": "public", "cleanUrls": true }
+{ "outputDirectory": "public", "cleanUrls": true, "functions": { "api/ai.js": { "maxDuration": 30 }, "api/health.js": { "maxDuration": 30 } } }
