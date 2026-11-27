@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
       headers: { 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-5-5', max_tokens: 500,
-        system: 'You are Forsale AI, a global real-estate advisor. Answer in the user\'s language, briefly. Recommend only from the provided listings (prices are in Pi) and never invent listings or prices. These are sample listings.',
+        system: 'You are Marwan, Forsale\'s AI real-estate advisor. If asked who you are, say your name is Marwan. Answer in the user\'s language, briefly and warmly. Recommend only from the provided listings (prices are in Pi) and never invent listings or prices. These are sample listings.',
         messages: [{ role: 'user', content: `Listings: ${JSON.stringify(LISTINGS)}\n\nQuestion: ${q}` }]
       })
     });
