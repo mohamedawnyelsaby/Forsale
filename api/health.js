@@ -5,6 +5,8 @@ let lastTest = 0;
 module.exports = async (req, res) => {
   const has = k => Boolean(process.env[k]);
   res.setHeader('Cache-Control', 'no-store');
+  // Optional protection: set HEALTH_KEY in Vercel and open /api/health?key=<value>
+  if (process.env.HEALTH_KEY && (req.query || {}).key !== process.env.HEALTH_KEY) return res.status(401).json({ error: 'key required' });
   const out = {
     pi_server_key: has('PI_API_KEY'),
     ai: { gemini: has('GEMINI_API_KEY'), groq: has('GROQ_API_KEY'), anthropic: has('ANTHROPIC_API_KEY') },
