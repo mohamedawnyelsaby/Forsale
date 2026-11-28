@@ -1,5 +1,5 @@
 const { PI, headers, validId } = require('../_pi');
-const { PRICES, LISTING_FEE } = require('../_data');
+const { LISTINGS, LISTING_FEE, cfg } = require('../_data');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
@@ -12,9 +12,10 @@ module.exports = async (req, res) => {
     if (!pr.ok) return res.status(502).json({ error: 'could not read payment' });
     const pay = await pr.json();
     const m = pay.metadata || {};
-    const expected = m.type === 'listing' ? LISTING_FEE : PRICES[m.listingId];
+    const expected = m.type === 'listing' ? LISTING_FEE
+      : m.type === 'reserve' && LISTINGS.some(l => l.id === Number(m.listingId)) ? cfg().reserve_pi : undefined;
     if (expected === undefined || Number(pay.amount) !== expected) {
-      return res.status(400).json({ error: 'amount does not match the listing price' });
+      return res.status(400).json({ error: 'amount does not match the expected Pi amount' });
     }
     const r = await fetch(`${PI}/payments/${paymentId}/approve`, { method: 'POST', headers: headers() });
     res.status(r.status).json(await r.json());

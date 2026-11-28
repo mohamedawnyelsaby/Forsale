@@ -10,3 +10,8 @@ Global real-estate marketplace paid in Pi, with an AI advisor. Static front-end 
 ## Notes
 - Prices are checked server-side in `api/pi/approve.js` against `api/_data.js` (keep in sync with the sample listings until a database exists).
 - Listings are sample data.
+
+## Payments and prices
+- **Every payment in Forsale is made in Pi** (reservation fee, listing fee). No other payment method exists.
+- Listing prices are shown in USD with a Pi estimate at a fixed *reference* rate (not a live market rate).
+- Vercel env vars (optional): `PI_USD_RATE` (default 0.07), `RESERVATION_PI` (default 10). The server validates every amount before approving a payment.
