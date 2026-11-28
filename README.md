@@ -12,6 +12,6 @@ Global real-estate marketplace paid in Pi, with an AI advisor. Static front-end 
 - Listings are sample data.
 
 ## Payments and prices
-- **Every payment in Forsale is made in Pi** (reservation fee, listing fee). No other payment method exists.
-- Listing prices are shown in USD with a Pi estimate at a fixed *reference* rate (not a live market rate).
-- Vercel env vars (optional): `PI_USD_RATE` (default 0.07), `RESERVATION_PI` (default 10). The server validates every amount before approving a payment.
+- **Every price and payment in Forsale is in Pi** (reservation fee, listing fee). No fiat currency and no other token is used or displayed, in line with Pi's mainnet listing requirements.
+- Sellers set their own Pi price. The reservation fee is `RESERVATION_PI` (Vercel env var, default 10). The server validates every amount before approving a payment.
+- Before a mainnet launch, re-check the current Pi App Studio / Mainnet listing checklist.
